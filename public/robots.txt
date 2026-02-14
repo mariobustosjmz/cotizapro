@@ -1,0 +1,13 @@
+# robots.txt for CotizaPro
+
+User-agent: *
+Allow: /
+
+# Disallow authenticated pages
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /api/
+
+# Sitemap location
+Sitemap: ${NEXT_PUBLIC_APP_URL}/sitemap.xml

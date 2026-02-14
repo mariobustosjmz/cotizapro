@@ -2,6 +2,39 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 export default function LandingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "CotizaPro",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "La herramienta perfecta para técnicos de mantenimiento en México. Crea cotizaciones profesionales en PDF, envíalas por WhatsApp y Email en minutos.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Plan Gratis",
+        "price": "0",
+        "priceCurrency": "MXN"
+      },
+      {
+        "@type": "Offer",
+        "name": "Plan Pro",
+        "price": "299",
+        "priceCurrency": "MXN"
+      },
+      {
+        "@type": "Offer",
+        "name": "Plan Empresa",
+        "price": "799",
+        "priceCurrency": "MXN"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "127"
+    }
+  }
   const features = {
     cotizacion: [
       {
@@ -126,6 +159,12 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Navigation */}
       <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -152,12 +191,12 @@ export default function LandingPage() {
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
           <Link href="/signup">
-            <Button size="lg" className="text-lg px-8">
+            <Button size="lg" className="text-lg px-8 hover:scale-105 transition-transform duration-300">
               Comenzar Gratis
             </Button>
           </Link>
-          <Link href="#features">
-            <Button size="lg" variant="outline" className="text-lg px-8">
+          <Link href="#features" scroll={true}>
+            <Button size="lg" variant="outline" className="text-lg px-8 hover:scale-105 transition-transform duration-300">
               Ver Características
             </Button>
           </Link>
@@ -184,8 +223,8 @@ export default function LandingPage() {
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.cotizacion.map((feature, idx) => (
-              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
                   </svg>
@@ -214,8 +253,8 @@ export default function LandingPage() {
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.seguimiento.map((feature, idx) => (
-              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
                   </svg>
@@ -244,8 +283,8 @@ export default function LandingPage() {
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.gestion.map((feature, idx) => (
-              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
                   </svg>
@@ -489,6 +528,121 @@ export default function LandingPage() {
               <Button variant="outline" className="w-full">Contactar Ventas</Button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="container mx-auto px-4 py-20 bg-gray-50">
+        <h2 className="text-4xl font-bold text-center mb-4">
+          Preguntas Frecuentes
+        </h2>
+        <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          Todo lo que necesitas saber sobre CotizaPro
+        </p>
+        <div className="max-w-3xl mx-auto space-y-4">
+          {/* FAQ 1 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Cómo funciona la prueba gratis de 14 días?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              No necesitas tarjeta de crédito para comenzar. Al registrarte, obtienes acceso completo a todas las funciones del plan Pro por 14 días. Si decides no continuar, tu cuenta simplemente pasa al plan gratuito automáticamente.
+            </p>
+          </details>
+
+          {/* FAQ 2 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Puedo enviar cotizaciones por WhatsApp?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              Sí. Los planes Pro y Empresa incluyen envío directo por WhatsApp. Genera tu cotización en PDF y envíala al WhatsApp del cliente con un solo clic. También puedes enviar por Email en todos los planes.
+            </p>
+          </details>
+
+          {/* FAQ 3 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Incluye facturación electrónica (CFDI 4.0)?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              La facturación CFDI 4.0 estará disponible próximamente en el plan Empresa. Te notificaremos cuando esté lista. Actualmente puedes generar cotizaciones profesionales en PDF con todos tus datos fiscales.
+            </p>
+          </details>
+
+          {/* FAQ 4 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Puedo personalizar mis cotizaciones?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              Completamente. Puedes agregar tu logo, personalizar términos y condiciones, ajustar precios, agregar descuentos, configurar IVA y definir tus propias plantillas. Todo se guarda para reutilizar en futuras cotizaciones.
+            </p>
+          </details>
+
+          {/* FAQ 5 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Qué pasa si quiero cancelar?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              Puedes cancelar tu suscripción en cualquier momento desde tu panel de control. No hay contratos ni penalidades. Si cancelas, tu cuenta pasa automáticamente al plan gratuito y mantienes acceso a tus cotizaciones anteriores.
+            </p>
+          </details>
+
+          {/* FAQ 6 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Funciona en mi celular?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              Sí. CotizaPro funciona perfecto en celulares, tabletas y computadoras. Puedes crear y enviar cotizaciones desde cualquier dispositivo con internet. No necesitas instalar ninguna aplicación.
+            </p>
+          </details>
+
+          {/* FAQ 7 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Cómo funcionan los recordatorios automáticos?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              Esta función estará disponible próximamente en el plan Pro. Te permitirá programar mensajes automáticos por WhatsApp para mantenimientos anuales, seguimiento de cotizaciones y recordatorios de servicio. Nunca más perderás un cliente por olvido.
+            </p>
+          </details>
+
+          {/* FAQ 8 */}
+          <details className="bg-white rounded-lg p-6 shadow-sm group">
+            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
+              ¿Ofrecen soporte técnico?
+              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p className="text-gray-600 mt-4">
+              Sí. Todos los planes incluyen soporte por email en español. El plan Empresa incluye soporte prioritario 24/7 con respuesta en menos de 4 horas. También tenemos un centro de ayuda completo con tutoriales y guías.
+            </p>
+          </details>
         </div>
       </section>
 
