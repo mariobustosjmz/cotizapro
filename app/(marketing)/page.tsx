@@ -2,6 +2,128 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 export default function LandingPage() {
+  const features = {
+    cotizacion: [
+      {
+        icon: "document",
+        title: "Cotizaciones en 30 Segundos",
+        description: "Catálogo pre-cargado de servicios con precios. Crea cotizaciones profesionales en menos de 30 segundos.",
+        color: "blue",
+        badge: null
+      },
+      {
+        icon: "pdf",
+        title: "PDF Profesional",
+        description: "PDF con tu logo personalizado, términos y condiciones. Impresiona a tus clientes desde la primera impresión.",
+        color: "red",
+        badge: null
+      },
+      {
+        icon: "calculator",
+        title: "Cálculo Automático",
+        description: "IVA, descuentos y totales calculados automáticamente. Precios en pesos mexicanos (MXN). Sin errores.",
+        color: "orange",
+        badge: null
+      },
+      {
+        icon: "template",
+        title: "Plantillas Personalizables",
+        description: "Configura términos de pago, garantías y condiciones una vez. Reutiliza en todas tus cotizaciones.",
+        color: "purple",
+        badge: null
+      }
+    ],
+    seguimiento: [
+      {
+        icon: "whatsapp",
+        title: "Envío por WhatsApp/Email",
+        description: "Envía cotizaciones directo al WhatsApp o Email de tus clientes. Rápido, conveniente y profesional.",
+        color: "green",
+        badge: null
+      },
+      {
+        icon: "bell",
+        title: "Recordatorios Automáticos",
+        description: "WhatsApp automático para mantenimientos anuales. Nunca vuelvas a perder un cliente por olvido.",
+        color: "yellow",
+        badge: "PRÓXIMAMENTE"
+      },
+      {
+        icon: "calendar",
+        title: "Calendario de Servicios",
+        description: "Agenda citas, visualiza tu semana y organiza tus servicios. Sincroniza con Google Calendar.",
+        color: "indigo",
+        badge: "PRÓXIMAMENTE"
+      },
+      {
+        icon: "history",
+        title: "Historial Completo",
+        description: "Todas las cotizaciones, servicios y pagos por cliente. Acceso instantáneo al historial completo.",
+        color: "teal",
+        badge: null
+      }
+    ],
+    gestion: [
+      {
+        icon: "users",
+        title: "CRM Integrado",
+        description: "Gestión de clientes con tags, notas y seguimiento. Organiza tu negocio como un profesional.",
+        color: "purple",
+        badge: null
+      },
+      {
+        icon: "creditcard",
+        title: "Link de Pago",
+        description: "Cobra con Stripe (tarjeta o transferencia). Envía link de pago y recibe confirmación automática.",
+        color: "blue",
+        badge: "PRÓXIMAMENTE"
+      },
+      {
+        icon: "receipt",
+        title: "Facturación CFDI 4.0",
+        description: "Facturas electrónicas automáticas cumpliendo con SAT. Integración con PAC certificado.",
+        color: "green",
+        badge: "PRÓXIMAMENTE"
+      },
+      {
+        icon: "chart",
+        title: "Dashboard de Ventas",
+        description: "Métricas en tiempo real: conversión, ingresos, tendencias. Toma decisiones basadas en datos.",
+        color: "red",
+        badge: null
+      }
+    ]
+  }
+
+  const colorClasses = {
+    blue: "bg-blue-100 text-blue-600",
+    red: "bg-red-100 text-red-600",
+    orange: "bg-orange-100 text-orange-600",
+    purple: "bg-purple-100 text-purple-600",
+    green: "bg-green-100 text-green-600",
+    yellow: "bg-yellow-100 text-yellow-600",
+    indigo: "bg-indigo-100 text-indigo-600",
+    teal: "bg-teal-100 text-teal-600"
+  }
+
+  const getIconPath = (iconName: string) => {
+    const icons: Record<string, string> = {
+      document: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+      pdf: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+      calculator: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+      template: "M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z",
+      whatsapp: "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z",
+      bell: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
+      calendar: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+      history: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+      users: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+      creditcard: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
+      receipt: "M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z",
+      chart: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+    }
+    return icons[iconName] || icons.document
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Navigation */}
@@ -47,86 +169,100 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <section id="features" className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold text-center mb-12">
+        <h2 className="text-4xl font-bold text-center mb-4">
           Todo lo que necesitas para cotizar
         </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Feature 1 */}
-          <div className="p-6 border rounded-lg bg-white shadow-sm">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Cotizaciones Rápidas</h3>
-            <p className="text-gray-600">
-              Crea cotizaciones profesionales en PDF en menos de 2 minutos con tu catálogo de servicios. Ahorra 28 minutos por cotización.
-            </p>
-          </div>
+        <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+          Plataforma completa para técnicos de mantenimiento en México
+        </p>
 
-          {/* Feature 2 */}
-          <div className="p-6 border rounded-lg bg-white shadow-sm">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Envío por WhatsApp</h3>
-            <p className="text-gray-600">
-              Envía cotizaciones directo al WhatsApp de tus clientes con un solo clic. Rápido, conveniente y profesional.
-            </p>
+        {/* Categoría 1: Cotización Inteligente */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
+            <span className="text-3xl mr-3">🎯</span>
+            Cotización Inteligente
+          </h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.cotizacion.map((feature, idx) => (
+              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                  {feature.title}
+                  {feature.badge && (
+                    <span className="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
+                      {feature.badge}
+                    </span>
+                  )}
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Feature 3 */}
-          <div className="p-6 border rounded-lg bg-white shadow-sm">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Gestión de Clientes</h3>
-            <p className="text-gray-600">
-              Mantén organizados todos tus clientes con historial de cotizaciones, notas y seguimiento de ventas.
-            </p>
+        {/* Categoría 2: Seguimiento & Automatización */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
+            <span className="text-3xl mr-3">📅</span>
+            Seguimiento & Automatización
+          </h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.seguimiento.map((feature, idx) => (
+              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                  {feature.title}
+                  {feature.badge && (
+                    <span className="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
+                      {feature.badge}
+                    </span>
+                  )}
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Feature 4 */}
-          <div className="p-6 border rounded-lg bg-white shadow-sm">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Cálculo Automático</h3>
-            <p className="text-gray-600">
-              IVA, descuentos y totales calculados automáticamente. Sin errores matemáticos. Precios en pesos mexicanos (MXN).
-            </p>
-          </div>
-
-          {/* Feature 5 */}
-          <div className="p-6 border rounded-lg bg-white shadow-sm">
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Dashboard de Ventas</h3>
-            <p className="text-gray-600">
-              Visualiza tus cotizaciones enviadas, aceptadas y métricas de conversión en tiempo real. Toma mejores decisiones.
-            </p>
-          </div>
-
-          {/* Feature 6 */}
-          <div className="p-6 border rounded-lg bg-white shadow-sm">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">100% Móvil</h3>
-            <p className="text-gray-600">
-              Crea y envía cotizaciones desde tu celular, tablet o computadora. Funciona en cualquier dispositivo.
-            </p>
+        {/* Categoría 3: Gestión & Pagos */}
+        <div>
+          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
+            <span className="text-3xl mr-3">💰</span>
+            Gestión & Pagos
+          </h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.gestion.map((feature, idx) => (
+              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                  {feature.title}
+                  {feature.badge && (
+                    <span className="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
+                      {feature.badge}
+                    </span>
+                  )}
+                </h4>
+                <p className="text-gray-600 text-sm">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -272,6 +408,18 @@ export default function LandingPage() {
                 <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
+                <span className="font-semibold">Recordatorios automáticos</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-semibold">Calendario de servicios</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
                 <span>Dashboard completo</span>
               </li>
               <li className="flex items-start">
@@ -305,6 +453,18 @@ export default function LandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>Múltiples usuarios</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-semibold">Link de pago (Stripe)</span>
+              </li>
+              <li className="flex items-start">
+                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-semibold">Facturación CFDI 4.0</span>
               </li>
               <li className="flex items-start">
                 <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
