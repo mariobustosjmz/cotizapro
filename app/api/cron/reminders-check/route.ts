@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail, generateQuoteEmailHTML } from '@/lib/integrations/email'
 import { sendWhatsAppMessage } from '@/lib/integrations/twilio'
 import { encode as escapeHtml } from 'html-entities'
+import { logger } from '@/lib/logger'
+import { handleApiError, ApiErrors } from '@/lib/error-handler'
 
 /**
  * Cron Job: Check and Send Due Reminders
@@ -23,14 +25,20 @@ export async function GET(request: NextRequest) {
 
     // Validate CRON_SECRET exists and meets minimum security requirements
     if (!cronSecret || typeof cronSecret !== 'string' || cronSecret.length < 32) {
-      console.error('CRON_SECRET not configured or too short (min 32 characters)')
-      return NextResponse.json({ error: 'Cron not configured' }, { status: 500 })
+      logger.security('CRON_SECRET not configured or too short')
+      return handleApiError(
+        ApiErrors.INTERNAL_ERROR('Cron job not properly configured'),
+        'Cron reminders check'
+      )
     }
 
     // Validate authorization header exists
     if (!authHeader) {
-      console.warn('Cron request missing authorization header')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      logger.security('Cron request missing authorization header')
+      return handleApiError(
+        ApiErrors.UNAUTHORIZED(),
+        'Cron reminders check - missing auth header'
+      )
     }
 
     // Use constant-time comparison to prevent timing attacks
@@ -39,8 +47,11 @@ export async function GET(request: NextRequest) {
                     Buffer.from(expectedAuth).toString('utf-8')
 
     if (!isValid) {
-      console.warn('Cron request with invalid authorization')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      logger.security('Cron request with invalid authorization', { requestPath: new URL(request.url).pathname })
+      return handleApiError(
+        ApiErrors.UNAUTHORIZED(),
+        'Cron reminders check - invalid auth'
+      )
     }
 
     const supabase = await createServerClient()
@@ -51,8 +62,11 @@ export async function GET(request: NextRequest) {
       .select('id')
 
     if (orgsError) {
-      console.error('Error fetching organizations:', orgsError)
-      return NextResponse.json({ error: orgsError.message }, { status: 500 })
+      logger.error('Error fetching organizations', orgsError, { context: 'Cron reminders check' })
+      return handleApiError(
+        ApiErrors.INTERNAL_ERROR('Failed to fetch organizations'),
+        'Cron reminders check - fetch organizations'
+      )
     }
 
     let totalProcessed = 0
@@ -71,7 +85,7 @@ export async function GET(request: NextRequest) {
           })
 
         if (remindersError) {
-          console.error(`Error fetching reminders for org ${org.id}:`, remindersError)
+          logger.error('Error fetching reminders for organization', remindersError, { orgId: org.id })
           continue
         }
 
@@ -95,7 +109,7 @@ export async function GET(request: NextRequest) {
               .single()
 
             if (fetchError || !fullReminder) {
-              console.error(`Error fetching reminder ${reminder.id}:`, fetchError)
+              logger.error('Error fetching reminder details', fetchError, { reminderId: reminder.id })
               totalFailed++
               continue
             }
@@ -201,14 +215,20 @@ CotizaPro - Sistema de Gestión de Cotizaciones`
               totalFailed++
             }
           } catch (reminderError) {
-            console.error(`Error processing reminder ${reminder.id}:`, reminderError)
+            logger.error('Error processing reminder', reminderError as Error, { reminderId: reminder.id })
             totalFailed++
           }
         }
       } catch (orgError) {
-        console.error(`Error processing org ${org.id}:`, orgError)
+        logger.error('Error processing organization', orgError as Error, { orgId: org.id })
       }
     }
+
+    logger.info('Cron job completed', {
+      processed: totalProcessed,
+      sent: totalSent,
+      failed: totalFailed,
+    })
 
     return NextResponse.json({
       success: true,
@@ -219,8 +239,11 @@ CotizaPro - Sistema de Gestión de Cotizaciones`
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('Cron job error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    logger.error('Cron job unhandled error', error as Error)
+    return handleApiError(
+      ApiErrors.INTERNAL_ERROR('Cron job failed'),
+      'Cron reminders check - unhandled error'
+    )
   }
 }
 
