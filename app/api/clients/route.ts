@@ -5,6 +5,7 @@ import type { Client } from '@/types/database.types'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+import { sanitizeSearchInput } from '@/lib/search-sanitizer'
 
 // GET /api/clients - List clients with pagination and search
 export async function GET(request: NextRequest) {
@@ -56,6 +57,9 @@ export async function GET(request: NextRequest) {
 
     const { search, limit, offset, tags } = validation.data
 
+    // Sanitize and escape search input for LIKE queries
+    const sanitizedSearch = sanitizeSearchInput(search)
+
     // Build query
     let query = supabase
       .from('clients')
@@ -64,9 +68,10 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
-    // Add search filter
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`)
+    // Add search filter with properly escaped wildcards
+    if (sanitizedSearch) {
+      logger.database('SEARCH', 'clients', { searchTerm: '[REDACTED]', fieldsSearched: 3 })
+      query = query.or(`name.ilike.%${sanitizedSearch}%,email.ilike.%${sanitizedSearch}%,phone.ilike.%${sanitizedSearch}%`)
     }
 
     // Add tags filter
