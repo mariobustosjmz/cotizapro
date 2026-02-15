@@ -1,0 +1,61 @@
+# E2E Test Artifacts
+
+# Playwright reports and artifacts
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+/test-results.json
+junit.xml
+
+# Screenshots and videos
+/screenshots/
+/videos/
+
+# Trace files
+*.trace
+*.zip
+
+# Playwright downloads
+/tests/fixtures/downloads
+
+# Browser cache
+.playwright-mcp/
+
+# Node modules (if E2E run separately)
+/e2e/node_modules/
+
+# Environment files
+e2e/.env
+e2e/.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary test files
+/e2e/temp/
+*.tmp
+*.temp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Playwright config cache
+.playwright.config.*
+
+# Test coverage
+/coverage/
+.nyc_output/
+
+# Build artifacts
+/dist/
+/build/

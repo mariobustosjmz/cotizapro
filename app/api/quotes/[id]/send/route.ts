@@ -2,8 +2,8 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendQuoteSchema } from '@/lib/validations/cotizapro'
 import { generateQuotePDF } from '@/lib/integrations/pdf'
-import { sendEmail, generateQuoteEmailHTML } from '@/lib/integrations/email'
-import { sendWhatsAppMessage } from '@/lib/integrations/twilio'
+import { sendEmail, generateQuoteEmailHTML, type EmailResult } from '@/lib/integrations/email'
+import { sendWhatsAppMessage, type WhatsAppResult } from '@/lib/integrations/twilio'
 import { messageLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -89,7 +89,10 @@ export async function POST(
 
     logger.info('PDF generated and uploaded successfully', { quoteNumber: quote.quote_number, pdfUrl: publicUrl })
 
-    const results: any = {
+    const results: {
+      email: EmailResult | null
+      whatsapp: WhatsAppResult | null
+    } = {
       email: null,
       whatsapp: null,
     }

@@ -1,0 +1,85 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - generic [ref=e12]:
+    - generic [ref=e13]:
+      - link "C CotizaPro" [ref=e15] [cursor=pointer]:
+        - /url: /dashboard
+        - generic [ref=e16]: C
+        - generic [ref=e17]: CotizaPro
+      - navigation [ref=e18]:
+        - link "Dashboard" [ref=e19] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e20]
+          - generic [ref=e22]: Dashboard
+        - link "Clientes" [ref=e23] [cursor=pointer]:
+          - /url: /dashboard/clients
+          - img [ref=e24]
+          - generic [ref=e26]: Clientes
+        - link "Cotizaciones" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard/quotes
+          - img [ref=e28]
+          - generic [ref=e30]: Cotizaciones
+        - link "Recordatorios" [ref=e31] [cursor=pointer]:
+          - /url: /dashboard/reminders
+          - img [ref=e32]
+          - generic [ref=e34]: Recordatorios
+        - link "Servicios" [ref=e35] [cursor=pointer]:
+          - /url: /dashboard/services
+          - img [ref=e36]
+          - generic [ref=e38]: Servicios
+        - link "Analytics" [ref=e39] [cursor=pointer]:
+          - /url: /dashboard/analytics
+          - img [ref=e40]
+          - generic [ref=e42]: Analytics
+      - generic [ref=e43]:
+        - link "Equipo" [ref=e44] [cursor=pointer]:
+          - /url: /dashboard/team
+          - img [ref=e45]
+          - generic [ref=e47]: Equipo
+        - link "Configuración" [ref=e48] [cursor=pointer]:
+          - /url: /dashboard/settings
+          - img [ref=e49]
+          - generic [ref=e52]: Configuración
+      - generic [ref=e54]:
+        - generic [ref=e55]: O
+        - generic [ref=e56]:
+          - paragraph [ref=e57]: owner@example.com
+          - paragraph [ref=e58]: Test Organization
+    - generic [ref=e59]:
+      - banner [ref=e60]:
+        - heading "Dashboard" [level=1] [ref=e62]
+        - generic [ref=e63]:
+          - button "+ Nueva Cotización" [ref=e64]
+          - button "Salir" [ref=e65]
+      - main [ref=e66]:
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - heading "Bienvenido a CotizaPro" [level=1] [ref=e70]
+            - paragraph [ref=e71]: Test Owner
+            - paragraph [ref=e72]: "Organizacion: Test Organization"
+          - generic [ref=e73]:
+            - heading "Comienza a usar CotizaPro" [level=2] [ref=e74]
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - heading "1. Configura tu perfil" [level=3] [ref=e77]
+                - paragraph [ref=e78]: Personaliza tu informacion y preferencias
+              - generic [ref=e79]:
+                - heading "2. Agrega clientes" [level=3] [ref=e80]
+                - paragraph [ref=e81]: Gestiona tu base de clientes y contactos
+              - generic [ref=e82]:
+                - heading "3. Crea cotizaciones" [level=3] [ref=e83]
+                - paragraph [ref=e84]: Genera cotizaciones profesionales en minutos
+              - generic [ref=e85]:
+                - heading "4. Haz seguimiento" [level=3] [ref=e86]
+                - paragraph [ref=e87]: Configura recordatorios automaticos para tus clientes
+          - generic [ref=e89]:
+            - img [ref=e91]
+            - generic [ref=e93]:
+              - paragraph [ref=e94]: Sistema configurado correctamente
+              - paragraph [ref=e95]: Autenticacion activa • Base de datos conectada • Multi-tenancy habilitado
+```

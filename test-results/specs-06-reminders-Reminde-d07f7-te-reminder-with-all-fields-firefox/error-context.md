@@ -1,0 +1,122 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "C CotizaPro" [ref=e5] [cursor=pointer]:
+      - /url: /dashboard
+      - generic [ref=e6]: C
+      - generic [ref=e7]: CotizaPro
+    - navigation [ref=e8]:
+      - link "Dashboard" [ref=e9] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e10]
+        - generic [ref=e12]: Dashboard
+      - link "Clientes" [ref=e13] [cursor=pointer]:
+        - /url: /dashboard/clients
+        - img [ref=e14]
+        - generic [ref=e16]: Clientes
+      - link "Cotizaciones" [ref=e17] [cursor=pointer]:
+        - /url: /dashboard/quotes
+        - img [ref=e18]
+        - generic [ref=e20]: Cotizaciones
+      - link "Recordatorios" [ref=e21] [cursor=pointer]:
+        - /url: /dashboard/reminders
+        - img [ref=e22]
+        - generic [ref=e24]: Recordatorios
+      - link "Servicios" [ref=e25] [cursor=pointer]:
+        - /url: /dashboard/services
+        - img [ref=e26]
+        - generic [ref=e28]: Servicios
+      - link "Analytics" [ref=e29] [cursor=pointer]:
+        - /url: /dashboard/analytics
+        - img [ref=e30]
+        - generic [ref=e32]: Analytics
+    - generic [ref=e33]:
+      - link "Equipo" [ref=e34] [cursor=pointer]:
+        - /url: /dashboard/team
+        - img [ref=e35]
+        - generic [ref=e37]: Equipo
+      - link "Configuración" [ref=e38] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - img [ref=e39]
+        - generic [ref=e42]: Configuración
+    - generic [ref=e44]:
+      - generic [ref=e45]: O
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: owner@example.com
+        - paragraph [ref=e48]: Test Organization
+  - generic [ref=e49]:
+    - banner [ref=e50]:
+      - heading "Dashboard" [level=1] [ref=e52]
+      - generic [ref=e53]:
+        - button "+ Nueva Cotización" [ref=e54]
+        - button "Salir" [ref=e55]
+    - main [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - link "Volver" [ref=e59] [cursor=pointer]:
+            - /url: /dashboard/reminders
+            - button "Volver" [ref=e60]:
+              - img
+              - text: Volver
+          - generic [ref=e61]:
+            - heading "Nuevo Recordatorio" [level=2] [ref=e62]
+            - paragraph [ref=e63]: Programa un recordatorio de seguimiento
+        - generic [ref=e64]:
+          - heading "Información del Recordatorio" [level=3] [ref=e66]
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - text: Cliente *
+              - combobox "Cliente *" [ref=e70]:
+                - option "Selecciona un cliente..." [selected]
+              - paragraph [ref=e71]:
+                - text: No hay clientes.
+                - link "Crear cliente" [ref=e72] [cursor=pointer]:
+                  - /url: /dashboard/clients/new
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - text: Título *
+                - textbox "Título *" [active] [ref=e75]:
+                  - /placeholder: Mantenimiento anual de minisplit
+                  - text: Seguimiento con cliente
+              - generic [ref=e76]:
+                - text: Tipo de Recordatorio *
+                - combobox "Tipo de Recordatorio *" [ref=e77]:
+                  - option "Seguimiento" [selected]
+                  - option "Mantenimiento"
+                  - option "Renovación"
+                  - option "Personalizado"
+              - generic [ref=e78]:
+                - text: Prioridad *
+                - combobox "Prioridad *" [ref=e79]:
+                  - option "Normal" [selected]
+                  - option "Baja"
+                  - option "Alta"
+                  - option "Urgente"
+              - generic [ref=e80]:
+                - text: Fecha Programada *
+                - textbox "Fecha Programada *" [ref=e81]
+              - generic [ref=e82]:
+                - text: Categoría de Servicio
+                - combobox "Categoría de Servicio" [ref=e83]:
+                  - option "Ninguna" [selected]
+                  - option "HVAC"
+                  - option "Pintura"
+                  - option "Plomería"
+                  - option "Eléctrico"
+                  - option "Otro"
+            - generic [ref=e84]:
+              - text: Mensaje
+              - textbox "Mensaje" [ref=e85]:
+                - /placeholder: "Hola {cliente}, es momento de programar el mantenimiento anual de tu minisplit..."
+              - paragraph [ref=e86]: Este mensaje se enviará al cliente en la fecha programada
+            - generic [ref=e88]:
+              - checkbox "Recordatorio recurrente" [ref=e89]
+              - generic [ref=e90] [cursor=pointer]: Recordatorio recurrente
+            - generic [ref=e91]:
+              - link "Cancelar" [ref=e92] [cursor=pointer]:
+                - /url: /dashboard/reminders
+                - button "Cancelar" [ref=e93]
+              - button "Crear Recordatorio" [ref=e94]
+```

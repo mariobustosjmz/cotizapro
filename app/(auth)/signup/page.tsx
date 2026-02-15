@@ -36,7 +36,8 @@ export default async function SignupPage() {
     })
 
     if (error) {
-      redirect('/signup?error=signup-failed')
+      console.error('Signup error:', error)
+      redirect(`/signup?error=signup-failed&message=${encodeURIComponent(error.message)}`)
     }
 
     if (!data.user) {
@@ -59,7 +60,8 @@ export default async function SignupPage() {
     })
 
     if (orgError) {
-      redirect('/signup?error=org-creation-failed')
+      console.error('Organization creation error:', orgError)
+      redirect(`/signup?error=org-creation-failed&message=${encodeURIComponent(orgError.message)}`)
     }
 
     redirect('/dashboard?welcome=true')

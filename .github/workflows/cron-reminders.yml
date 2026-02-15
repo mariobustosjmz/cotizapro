@@ -1,0 +1,37 @@
+name: Daily Reminder Check
+
+on:
+  schedule:
+    # Runs every day at 9:00 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  check-reminders:
+    name: Check and Send Due Reminders
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cron Endpoint
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            ${{ secrets.APP_URL }}/api/cron/reminders-check)
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+
+          if [ "$http_code" != "200" ]; then
+            echo "Cron job failed with status $http_code"
+            exit 1
+          fi
+
+      - name: Log Success
+        if: success()
+        run: echo "Reminder check completed successfully at $(date)"
+
+      - name: Log Failure
+        if: failure()
+        run: echo "Reminder check failed at $(date)"

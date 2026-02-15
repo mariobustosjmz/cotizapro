@@ -1,0 +1,98 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "C CotizaPro" [ref=e5] [cursor=pointer]:
+      - /url: /dashboard
+      - generic [ref=e6]: C
+      - generic [ref=e7]: CotizaPro
+    - navigation [ref=e8]:
+      - link "Dashboard" [ref=e9] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e10]
+        - generic [ref=e12]: Dashboard
+      - link "Clientes" [ref=e13] [cursor=pointer]:
+        - /url: /dashboard/clients
+        - img [ref=e14]
+        - generic [ref=e16]: Clientes
+      - link "Cotizaciones" [ref=e17] [cursor=pointer]:
+        - /url: /dashboard/quotes
+        - img [ref=e18]
+        - generic [ref=e20]: Cotizaciones
+      - link "Recordatorios" [ref=e21] [cursor=pointer]:
+        - /url: /dashboard/reminders
+        - img [ref=e22]
+        - generic [ref=e24]: Recordatorios
+      - link "Servicios" [ref=e25] [cursor=pointer]:
+        - /url: /dashboard/services
+        - img [ref=e26]
+        - generic [ref=e28]: Servicios
+      - link "Analytics" [ref=e29] [cursor=pointer]:
+        - /url: /dashboard/analytics
+        - img [ref=e30]
+        - generic [ref=e32]: Analytics
+    - generic [ref=e33]:
+      - link "Equipo" [ref=e34] [cursor=pointer]:
+        - /url: /dashboard/team
+        - img [ref=e35]
+        - generic [ref=e37]: Equipo
+      - link "Configuración" [ref=e38] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - img [ref=e39]
+        - generic [ref=e42]: Configuración
+    - generic [ref=e44]:
+      - generic [ref=e45]: O
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: owner@example.com
+        - paragraph [ref=e48]: Test Organization
+  - generic [ref=e49]:
+    - banner [ref=e50]:
+      - heading "Dashboard" [level=1] [ref=e52]
+      - generic [ref=e53]:
+        - button "+ Nueva Cotización" [ref=e54]
+        - button "Salir" [ref=e55]
+    - main [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - heading "Cotizaciones" [level=2] [ref=e60]
+            - paragraph [ref=e61]: Gestiona tus cotizaciones y propuestas
+          - link "Nueva Cotización" [ref=e62] [cursor=pointer]:
+            - /url: /dashboard/quotes/new
+            - button "Nueva Cotización" [ref=e63]:
+              - img
+              - generic [ref=e64]: Nueva Cotización
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - heading "Borradores" [level=3] [ref=e68]
+              - img [ref=e69]
+            - generic [ref=e73]: "0"
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - heading "Enviadas" [level=3] [ref=e76]
+              - img [ref=e77]
+            - generic [ref=e81]: "0"
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - heading "Aceptadas" [level=3] [ref=e84]
+              - img [ref=e85]
+            - generic [ref=e89]: "0"
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - heading "Rechazadas" [level=3] [ref=e92]
+              - img [ref=e93]
+            - generic [ref=e97]: "0"
+        - generic [ref=e98]:
+          - heading "Lista de Cotizaciones" [level=3] [ref=e100]
+          - generic [ref=e102]:
+            - img [ref=e103]
+            - heading "No hay cotizaciones" [level=3] [ref=e106]
+            - paragraph [ref=e107]: Comienza creando tu primera cotización
+            - link "Nueva Cotización" [ref=e109] [cursor=pointer]:
+              - /url: /dashboard/quotes/new
+              - button "Nueva Cotización" [ref=e110]:
+                - img
+                - text: Nueva Cotización
+```

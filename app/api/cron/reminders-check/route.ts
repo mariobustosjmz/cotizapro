@@ -5,6 +5,7 @@ import { sendWhatsAppMessage } from '@/lib/integrations/twilio'
 import { encode as escapeHtml } from 'html-entities'
 import { logger } from '@/lib/logger'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
+import { timingSafeEqual } from 'crypto'
 
 /**
  * Cron Job: Check and Send Due Reminders
@@ -43,8 +44,20 @@ export async function GET(request: NextRequest) {
 
     // Use constant-time comparison to prevent timing attacks
     const expectedAuth = `Bearer ${cronSecret}`
-    const isValid = Buffer.from(authHeader).toString('utf-8') ===
-                    Buffer.from(expectedAuth).toString('utf-8')
+
+    // Ensure both strings are the same length for timingSafeEqual
+    if (authHeader.length !== expectedAuth.length) {
+      logger.security('Cron request with invalid authorization (length mismatch)', { requestPath: new URL(request.url).pathname })
+      return handleApiError(
+        ApiErrors.UNAUTHORIZED(),
+        'Cron reminders check - invalid auth'
+      )
+    }
+
+    const isValid = timingSafeEqual(
+      Buffer.from(authHeader, 'utf-8'),
+      Buffer.from(expectedAuth, 'utf-8')
+    )
 
     if (!isValid) {
       logger.security('Cron request with invalid authorization', { requestPath: new URL(request.url).pathname })
@@ -60,6 +73,7 @@ export async function GET(request: NextRequest) {
     const { data: organizations, error: orgsError } = await supabase
       .from('organizations')
       .select('id')
+      .limit(10000)
 
     if (orgsError) {
       logger.error('Error fetching organizations', orgsError, { context: 'Cron reminders check' })
@@ -69,10 +83,18 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    interface ReminderResult {
+      reminder_id: string
+      client_name: string
+      title: string
+      email_sent: boolean
+      whatsapp_sent: boolean
+    }
+
     let totalProcessed = 0
     let totalSent = 0
     let totalFailed = 0
-    const results: any[] = []
+    const results: ReminderResult[] = []
 
     // Process each organization
     for (const org of organizations || []) {
@@ -165,7 +187,7 @@ CotizaPro - Sistema de Gestión de Cotizaciones`
                       <p><strong>Cliente:</strong> ${escapeHtml(client.name)}</p>
                       <p><strong>Teléfono:</strong> ${escapeHtml(client.phone || '')}</p>
                       <p><strong>Fecha programada:</strong> ${new Date(fullReminder.scheduled_date).toLocaleDateString('es-MX')}</p>
-                      <p><strong>Prioridad:</strong> ${fullReminder.priority === 'urgent' ? '🔴 Urgente' : fullReminder.priority === 'high' ? '🟠 Alta' : fullReminder.priority === 'normal' ? '🟡 Normal' : '🟢 Baja'}</p>
+                      <p><strong>Prioridad:</strong> ${fullReminder.priority === 'urgent' ? 'URGENTE' : fullReminder.priority === 'high' ? 'ALTA' : fullReminder.priority === 'normal' ? 'NORMAL' : 'BAJA'}</p>
                       <p><strong>Tipo:</strong> ${escapeHtml(fullReminder.reminder_type)}</p>
                       ${fullReminder.related_service_category ? `<p><strong>Categoría de servicio:</strong> ${escapeHtml(fullReminder.related_service_category)}</p>` : ''}
                     </div>

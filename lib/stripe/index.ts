@@ -1,8 +1,47 @@
 import Stripe from 'stripe'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-01-28.clover',
-  typescript: true,
+let stripeInstance: Stripe | null = null
+
+/**
+ * Get or create Stripe instance.
+ * Lazy-initializes to avoid errors during build when STRIPE_SECRET_KEY is not available.
+ */
+function getStripeInstance(): Stripe {
+  if (!stripeInstance) {
+    const apiKey = process.env.STRIPE_SECRET_KEY
+    if (!apiKey) {
+      throw new Error(
+        'STRIPE_SECRET_KEY environment variable is not set. ' +
+        'Please configure your Stripe API key in environment variables.'
+      )
+    }
+    stripeInstance = new Stripe(apiKey, {
+      apiVersion: '2026-01-28.clover' as any,
+      typescript: true,
+    })
+  }
+  return stripeInstance
+}
+
+/**
+ * Lazy-loaded Stripe client.
+ * Only initializes when first used, avoiding build-time errors.
+ */
+export function getStripe(): Stripe {
+  return getStripeInstance()
+}
+
+/**
+ * Direct Stripe access.
+ * Lazily initializes on first property access while maintaining type safety.
+ */
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop: string | symbol) {
+    const instance = getStripeInstance()
+    const value = instance[prop as keyof Stripe]
+    // Bind methods to the instance to preserve 'this' context
+    return typeof value === 'function' ? value.bind(instance) : value
+  },
 })
 
 export const PLANS = {

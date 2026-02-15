@@ -1,0 +1,102 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "C CotizaPro" [ref=e5]:
+      - /url: /dashboard
+      - generic [ref=e6]: C
+      - generic [ref=e7]: CotizaPro
+    - navigation [ref=e8]:
+      - link "Dashboard" [ref=e9]:
+        - /url: /dashboard
+        - img [ref=e10]
+        - generic [ref=e12]: Dashboard
+      - link "Clientes" [ref=e13]:
+        - /url: /dashboard/clients
+        - img [ref=e14]
+        - generic [ref=e16]: Clientes
+      - link "Cotizaciones" [ref=e17]:
+        - /url: /dashboard/quotes
+        - img [ref=e18]
+        - generic [ref=e20]: Cotizaciones
+      - link "Recordatorios" [ref=e21]:
+        - /url: /dashboard/reminders
+        - img [ref=e22]
+        - generic [ref=e24]: Recordatorios
+      - link "Servicios" [ref=e25]:
+        - /url: /dashboard/services
+        - img [ref=e26]
+        - generic [ref=e28]: Servicios
+      - link "Analytics" [ref=e29]:
+        - /url: /dashboard/analytics
+        - img [ref=e30]
+        - generic [ref=e32]: Analytics
+    - generic [ref=e33]:
+      - link "Equipo" [ref=e34]:
+        - /url: /dashboard/team
+        - img [ref=e35]
+        - generic [ref=e37]: Equipo
+      - link "Configuración" [ref=e38]:
+        - /url: /dashboard/settings
+        - img [ref=e39]
+        - generic [ref=e42]: Configuración
+    - generic [ref=e44]:
+      - generic [ref=e45]: O
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: owner@example.com
+        - paragraph [ref=e48]: Test Organization
+  - generic [ref=e49]:
+    - banner [ref=e50]:
+      - heading "Dashboard" [level=1] [ref=e52]
+      - generic [ref=e53]:
+        - button "+ Nueva Cotización" [ref=e54]
+        - button "Salir" [ref=e55]
+    - main [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - heading "Equipo" [level=2] [ref=e60]
+            - paragraph [ref=e61]: Gestiona los miembros de tu organización
+          - link "Invitar Miembro" [ref=e62]:
+            - /url: /dashboard/team/invite
+            - button "Invitar Miembro" [ref=e63]:
+              - img
+              - text: Invitar Miembro
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - heading "Total de Miembros" [level=3] [ref=e67]
+            - generic [ref=e69]:
+              - img [ref=e70]
+              - paragraph [ref=e75]: "1"
+          - generic [ref=e76]:
+            - heading "Invitaciones Pendientes" [level=3] [ref=e78]
+            - generic [ref=e80]:
+              - img [ref=e81]
+              - paragraph [ref=e84]: "0"
+          - generic [ref=e85]:
+            - heading "Administradores" [level=3] [ref=e87]
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - paragraph [ref=e93]: "1"
+        - generic [ref=e94]:
+          - heading "Miembros del Equipo" [level=3] [ref=e96]
+          - table [ref=e99]:
+            - rowgroup [ref=e100]:
+              - row "Miembro Email Rol Miembro desde Acciones" [ref=e101]:
+                - columnheader "Miembro" [ref=e102]
+                - columnheader "Email" [ref=e103]
+                - columnheader "Rol" [ref=e104]
+                - columnheader "Miembro desde" [ref=e105]
+                - columnheader "Acciones" [ref=e106]
+            - rowgroup [ref=e107]:
+              - row "T Test Owner(Tú) owner@example.com Propietario 14/2/2026" [ref=e108]:
+                - cell "T Test Owner(Tú)" [ref=e109]:
+                  - generic [ref=e110]:
+                    - generic [ref=e112]: T
+                    - paragraph [ref=e114]: Test Owner(Tú)
+                - cell "owner@example.com" [ref=e115]
+                - cell "Propietario" [ref=e116]
+                - cell "14/2/2026" [ref=e117]
+                - cell [ref=e118]
+```

@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { encode as escapeHtml } from 'html-entities'
+import type { QuoteWithItems } from '@/types/database.types'
 
 // Only initialize Resend if we have an API key (not during build)
 const apiKey = process.env.RESEND_API_KEY
@@ -31,6 +32,15 @@ export async function sendEmail({
   attachments,
 }: SendEmailParams): Promise<EmailResult> {
   try {
+    // Validate API key is configured
+    if (!apiKey) {
+      console.error('Email send failed: RESEND_API_KEY environment variable is not set')
+      return {
+        success: false,
+        error: 'Email service not configured. Please set RESEND_API_KEY environment variable.',
+      }
+    }
+
     const result = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'CotizaPro <noreply@cotizapro.com>',
       to,
@@ -52,7 +62,7 @@ export async function sendEmail({
   }
 }
 
-export function generateQuoteEmailHTML(quote: any, pdfUrl: string): string {
+export function generateQuoteEmailHTML(quote: QuoteWithItems, pdfUrl: string): string {
   return `
     <!DOCTYPE html>
     <html>
