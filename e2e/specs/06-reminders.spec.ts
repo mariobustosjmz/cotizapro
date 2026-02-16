@@ -22,11 +22,10 @@ test.describe('Reminders Management', () => {
     const remindersPage = new RemindersPage(page)
     await remindersPage.goto()
 
-    const newButton = page.locator('a[href="/dashboard/reminders/new"], button:has-text("Nuevo")')
-    if (await newButton.isVisible()) {
-      await newButton.click()
-      expect(page.url()).toContain('/dashboard/reminders/new')
-    }
+    const newButton = page.locator('a[href="/dashboard/reminders/new"]').first()
+    await newButton.click()
+    await page.waitForURL('**/dashboard/reminders/new')
+    expect(page.url()).toContain('/dashboard/reminders/new')
   })
 
   test('Reminder form has title field', async ({ page }) => {
@@ -188,7 +187,7 @@ test.describe('Reminders Management', () => {
     const remindersPage = new RemindersPage(page)
     await remindersPage.goToNewReminder()
 
-    const cancelButton = page.locator('a:has-text("Cancelar"), a:has-text("Cancel"), button:has-text("Cancelar")')
+    const cancelButton = page.locator('a:has-text("Cancelar"), a:has-text("Cancel"), button:has-text("Cancelar")').first()
     if (await cancelButton.isVisible()) {
       await cancelButton.click()
       await page.waitForURL('**/dashboard/reminders')

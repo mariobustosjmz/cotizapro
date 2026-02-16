@@ -12,6 +12,12 @@ export class RemindersPage extends BasePage {
 
   async goToNewReminder() {
     await super.goto('/dashboard/reminders/new')
+    // Wait for API calls to complete (clients)
+    await Promise.all([
+      this.page.waitForResponse(resp => resp.url().includes('/api/clients') && resp.status() === 200).catch(() => null)
+    ])
+    // Give React a moment to render the options
+    await this.page.waitForTimeout(500)
   }
 
   async goToReminderDetails(reminderId: string) {
@@ -25,18 +31,44 @@ export class RemindersPage extends BasePage {
     dueDate?: string
     relatedTo?: 'quote' | 'client'
     relatedId?: string
+    client_id?: string
   }) {
     const titleInput = this.page.locator('input[name="title"]')
     await titleInput.fill(data.title)
 
     if (data.description) {
-      const descInput = this.page.locator('textarea[name="description"]')
+      const descInput = this.page.locator('textarea[name="message"]')
       await descInput.fill(data.description)
     }
 
-    if (data.dueDate) {
-      const dateInput = this.page.locator('input[name="due_date"], input[type="date"]')
-      await dateInput.fill(data.dueDate)
+    // Scheduled date is required - use provided date or default to tomorrow
+    const scheduledDate = data.dueDate || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const dateInput = this.page.locator('input[name="scheduled_date"]')
+    // For HTML5 date inputs, we need to set the value attribute directly
+    await dateInput.evaluate((element, value) => {
+      const input = element as HTMLInputElement
+      input.value = value
+      // Trigger events to ensure React state updates
+      input.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }))
+      input.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }))
+      input.dispatchEvent(new Event('blur', { bubbles: true, cancelable: true }))
+    }, scheduledDate)
+    // Wait a moment for React to process the change
+    await this.page.waitForTimeout(100)
+
+    // Client selection - required field
+    // If client_id provided, select that client, otherwise select first available client
+    const clientSelect = this.page.locator('select[name="client_id"]')
+    if (await clientSelect.isVisible()) {
+      if (data.client_id) {
+        await clientSelect.selectOption(data.client_id)
+      } else {
+        // Select first client (index 1, since 0 is placeholder)
+        const options = await clientSelect.locator('option').count()
+        if (options > 1) {
+          await clientSelect.selectOption({ index: 1 })
+        }
+      }
     }
 
     if (data.relatedTo) {
@@ -55,8 +87,66 @@ export class RemindersPage extends BasePage {
   }
 
   async submitReminderForm() {
+    // Wait for API response to avoid race conditions
+    const responsePromise = this.page.waitForResponse(
+      response => response.url().includes('/api/reminders') && response.request().method() === 'POST',
+      { timeout: 10000 }
+    ).catch((err) => {
+      console.log('[E2E] No API response received for reminder creation:', err?.message)
+      return null
+    })
+
     await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
-    await this.page.waitForURL('**/dashboard/reminders', { timeout: 5000 })
+
+    const response = await responsePromise
+    let createdReminderId: string | null = null
+
+    if (response) {
+      const status = response.status()
+      console.log(`[E2E] Reminder API response status: ${status}`)
+
+      // Get raw response text first
+      const rawBody = await response.text().catch(() => '')
+      console.log(`[E2E] Reminder API raw response:`, rawBody)
+
+      if (status !== 200 && status !== 201) {
+        console.log(`[E2E] Reminder creation failed with status ${status}`)
+      } else {
+        try {
+          const body = rawBody ? JSON.parse(rawBody) : null
+          console.log(`[E2E] Reminder created successfully:`, JSON.stringify(body))
+          if (body && body.id) {
+            createdReminderId = body.id
+            console.log(`[E2E] Created reminder ID: ${createdReminderId}`)
+          }
+        } catch (e) {
+          console.log('[E2E] Failed to parse response JSON:', e)
+        }
+      }
+    } else {
+      console.log('[E2E] No response received from reminder API')
+    }
+
+    await this.page.waitForURL('**/dashboard/reminders', { timeout: 10000 })
+
+    // Force a page reload to ensure fresh data from Server Component
+    await this.page.reload({ waitUntil: 'networkidle' })
+
+    // Wait for the table to be visible (or empty state)
+    await this.page.locator('table, text=No hay recordatorios').waitFor({ timeout: 5000 }).catch(() => null)
+
+    // Give React time to hydrate
+    await this.page.waitForTimeout(500)
+
+    // Log what we see on the page
+    const hasTable = await this.page.locator('table').isVisible().catch(() => false)
+    const hasEmptyState = await this.page.locator('text=No hay recordatorios').isVisible().catch(() => false)
+    console.log(`[E2E] After reload - Table visible: ${hasTable}, Empty state visible: ${hasEmptyState}`)
+
+    if (hasTable) {
+      const rowCount = await this.page.locator('table tbody tr').count()
+      console.log(`[E2E] Table has ${rowCount} rows`)
+    }
   }
 
   async createReminder(data: {
@@ -80,12 +170,12 @@ export class RemindersPage extends BasePage {
     return parseInt(text, 10) || 0
   }
 
-  async getReminderByTitle(title: string) {
-    return this.page.locator(`table tbody tr:has-text("${title}")`)
+  getReminderByTitle(title: string) {
+    return this.page.locator(`table tbody tr:has-text("${title}")`).first()
   }
 
   async clickReminderDetailsLink(title: string) {
-    await this.page.locator(`table tbody tr:has-text("${title}") a:has-text("Ver detalles")`).click()
+    await this.page.locator(`table tbody tr:has-text("${title}") a:has-text("Ver detalles")`).first().click()
     await this.page.waitForURL('**/dashboard/reminders/*')
   }
 
@@ -101,7 +191,7 @@ export class RemindersPage extends BasePage {
   }
 
   async getReminderStatus(): Promise<string> {
-    const status = this.page.locator('[data-testid="reminder-status"], .reminder-status, text=/Estado:|Status:/')
+    const status = this.page.locator('[data-testid="reminder-status"], .reminder-status').first()
     return await this.getText(status)
   }
 
