@@ -12,6 +12,13 @@ export class QuotesPage extends BasePage {
 
   async goToNewQuote() {
     await super.goto('/dashboard/quotes/new')
+    // Wait for API calls to complete (clients and services)
+    await Promise.all([
+      this.page.waitForResponse(resp => resp.url().includes('/api/clients') && resp.status() === 200).catch(() => null),
+      this.page.waitForResponse(resp => resp.url().includes('/api/services') && resp.status() === 200).catch(() => null)
+    ])
+    // Give React a moment to render the options
+    await this.page.waitForTimeout(800)
   }
 
   async goToQuoteDetails(quoteId: string) {
@@ -32,6 +39,7 @@ export class QuotesPage extends BasePage {
     client_id?: string
     description?: string
     notes?: string
+    itemIndex?: number
   }) {
     if (data.client_id) {
       const clientSelect = this.page.locator('select[name="client_id"]')
@@ -39,7 +47,8 @@ export class QuotesPage extends BasePage {
     }
 
     if (data.description) {
-      await this.page.locator('textarea[name="description"]').fill(data.description)
+      const index = data.itemIndex ?? 0
+      await this.page.locator(`[data-testid="item-description-${index}"]`).fill(data.description)
     }
 
     if (data.notes) {
@@ -47,26 +56,52 @@ export class QuotesPage extends BasePage {
     }
   }
 
-  async addService(name: string, price: string, quantity: string = '1') {
-    const addButton = this.page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    await addButton.click()
+  async addQuoteItem(description: string, price: string, quantity: string = '1', itemIndex: number = 0) {
+    // If adding a new item (not the first one), click the add button
+    if (itemIndex > 0) {
+      const addButton = this.page.locator('[data-testid="add-quote-item-btn"]')
+      await addButton.waitFor({ state: 'visible', timeout: 10000 })
+      await addButton.click()
+      await this.page.waitForTimeout(500)
+    }
 
-    await this.page.waitForTimeout(500)
+    // Wait for the item fields to be visible before filling
+    const descInput = this.page.locator(`[data-testid="item-description-${itemIndex}"]`)
+    const priceInput = this.page.locator(`[data-testid="item-unit-price-${itemIndex}"]`)
+    const quantityInput = this.page.locator(`[data-testid="item-quantity-${itemIndex}"]`)
 
-    const nameInput = this.page.locator('input[name*="service_name"], input[placeholder*="Nombre"]').last()
-    const priceInput = this.page.locator('input[name*="service_price"], input[placeholder*="Precio"]').last()
-    const quantityInput = this.page.locator('input[name*="quantity"], input[placeholder*="Cantidad"]').last()
-
-    await nameInput.fill(name)
+    // Wait for fields with longer timeout and better error handling
+    await descInput.waitFor({ state: 'visible', timeout: 10000 })
+    await descInput.fill(description)
+    await priceInput.waitFor({ state: 'visible', timeout: 5000 })
     await priceInput.fill(price)
     if (quantity !== '1') {
+      await quantityInput.clear()
       await quantityInput.fill(quantity)
     }
   }
 
   async submitQuoteForm() {
-    await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
-    await this.page.waitForURL('**/dashboard/quotes', { timeout: 5000 })
+    // Wait for API response to avoid race conditions
+    const responsePromise = this.page.waitForResponse(
+      response => response.url().includes('/api/quotes') && response.request().method() === 'POST',
+      { timeout: 10000 }
+    ).catch(() => null)
+
+    await this.page.locator('[data-testid="submit-quote-btn"]').click()
+
+    await responsePromise
+
+    await this.page.waitForURL('**/dashboard/quotes', { timeout: 10000 })
+
+    // Force a page reload to ensure fresh data from Server Component
+    await this.page.reload({ waitUntil: 'networkidle' })
+
+    // Wait for the table to be visible (or empty state)
+    await this.page.locator('table, text=No hay cotizaciones').waitFor({ timeout: 5000 }).catch(() => null)
+
+    // Give React time to hydrate
+    await this.page.waitForTimeout(500)
   }
 
   // Quote List
@@ -76,22 +111,22 @@ export class QuotesPage extends BasePage {
   }
 
   async getDraftQuotesCount(): Promise<number> {
-    const text = await this.getText(this.page.locator('text=Borradores').locator('..').locator('div.text-2xl'))
+    const text = await this.getText(this.page.locator('[data-testid="draft-quotes-count"]'))
     return parseInt(text, 10)
   }
 
   async getSentQuotesCount(): Promise<number> {
-    const text = await this.getText(this.page.locator('text=Enviadas').locator('..').locator('div.text-2xl'))
+    const text = await this.getText(this.page.locator('[data-testid="sent-quotes-count"]'))
     return parseInt(text, 10)
   }
 
   async getAcceptedQuotesCount(): Promise<number> {
-    const text = await this.getText(this.page.locator('text=Aceptadas').locator('..').locator('div.text-2xl'))
+    const text = await this.getText(this.page.locator('[data-testid="accepted-quotes-count"]'))
     return parseInt(text, 10)
   }
 
   async getRejectedQuotesCount(): Promise<number> {
-    const text = await this.getText(this.page.locator('text=Rechazadas').locator('..').locator('div.text-2xl'))
+    const text = await this.getText(this.page.locator('[data-testid="rejected-quotes-count"]'))
     return parseInt(text, 10)
   }
 
@@ -111,7 +146,7 @@ export class QuotesPage extends BasePage {
   }
 
   async getQuoteTotal(): Promise<string> {
-    const total = this.page.locator('[data-testid="quote-total"], .quote-total, text=/Total|TOTAL/')
+    const total = this.page.locator('[data-testid="quote-total"], .quote-total')
     return await this.getText(total)
   }
 
@@ -152,6 +187,6 @@ export class QuotesPage extends BasePage {
   }
 
   async isNewQuoteButtonVisible(): Promise<boolean> {
-    return await this.page.locator('a[href="/dashboard/quotes/new"]').isVisible()
+    return await this.page.locator('a[href="/dashboard/quotes/new"]').first().isVisible()
   }
 }

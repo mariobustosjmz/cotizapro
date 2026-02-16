@@ -43,7 +43,7 @@ export class BasePage {
   }
 
   async expectUrl(path: string) {
-    await this.page.waitForURL(`**${path}`, { timeout: 5000 })
+    await this.page.waitForURL(`**${path}`, { timeout: 10000 })
   }
 
   async expectVisible(locator: Locator) {

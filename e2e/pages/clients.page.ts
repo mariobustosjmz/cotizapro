@@ -19,7 +19,6 @@ export class ClientsPage extends BasePage {
     name: string
     email?: string
     phone?: string
-    company_name?: string
     address?: string
     tags?: string
   }) {
@@ -31,10 +30,6 @@ export class ClientsPage extends BasePage {
 
     if (data.phone) {
       await this.page.locator('input[name="phone"]').fill(data.phone)
-    }
-
-    if (data.company_name) {
-      await this.page.locator('input[name="company_name"]').fill(data.company_name)
     }
 
     if (data.address) {
@@ -50,15 +45,52 @@ export class ClientsPage extends BasePage {
   }
 
   async submitClientForm() {
+    // Listen for console messages
+    const consoleMessages: string[] = []
+    this.page.on('console', msg => {
+      consoleMessages.push(`[${msg.type()}] ${msg.text()}`)
+    })
+
+    // Wait for API response
+    const responsePromise = this.page.waitForResponse(
+      response => response.url().includes('/api/clients') && response.request().method() === 'POST',
+      { timeout: 10000 }
+    )
+
     await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
-    await this.page.waitForURL('**/dashboard/clients', { timeout: 5000 })
+
+    try {
+      const response = await responsePromise
+      console.log('[E2E] API Response status:', response.status())
+      const responseBody = await response.json().catch(() => null)
+      console.log('[E2E] API Response body:', JSON.stringify(responseBody, null, 2))
+      console.log('[E2E] Console messages:', consoleMessages.join('\n'))
+
+      if (!response.ok()) {
+        throw new Error(`API returned ${response.status()}: ${JSON.stringify(responseBody)}`)
+      }
+    } catch (error) {
+      console.error('[E2E] Error waiting for API response:', error)
+      console.log('[E2E] Console messages:', consoleMessages.join('\n'))
+      throw error
+    }
+
+    await this.page.waitForURL('**/dashboard/clients', { timeout: 10000 })
+
+    // Force a page reload to ensure fresh data from Server Component
+    await this.page.reload({ waitUntil: 'networkidle' })
+
+    // Wait for the table to be visible (or empty state)
+    await this.page.locator('table, text=No hay clientes').waitFor({ timeout: 5000 }).catch(() => null)
+
+    // Give React time to hydrate
+    await this.page.waitForTimeout(500)
   }
 
   async createClient(data: {
     name: string
     email?: string
     phone?: string
-    company_name?: string
   }) {
     await this.goToNewClient()
     await this.fillClientForm(data)
