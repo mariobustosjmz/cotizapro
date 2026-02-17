@@ -104,7 +104,8 @@ export class ClientsPage extends BasePage {
   }
 
   async getTotalClientCount(): Promise<number> {
-    const text = await this.getText(this.page.locator('text=Total Clientes').locator('..').locator('div.text-2xl'))
+    const card = this.page.locator('text=Total Clientes').locator('../..')
+    const text = await this.getText(card.locator('div.text-2xl'))
     return parseInt(text, 10)
   }
 
@@ -113,7 +114,7 @@ export class ClientsPage extends BasePage {
   }
 
   async clickClientDetailsLink(clientName: string) {
-    await this.page.locator(`table tbody tr:has-text("${clientName}") a:has-text("Ver detalles")`).click()
+    await this.page.locator(`table tbody tr:has-text("${clientName}") a:has-text("Ver detalles")`).first().click()
     await this.page.waitForURL('**/dashboard/clients/*')
   }
 
@@ -137,13 +138,12 @@ export class ClientsPage extends BasePage {
   }
 
   async clickDeleteButton() {
+    this.page.once('dialog', dialog => dialog.accept())
     await this.page.locator('button:has-text("Eliminar")').click()
   }
 
   async confirmDelete() {
-    const confirmButton = this.page.locator('button:has-text("Eliminar"), button:has-text("Confirmar")')
-    await confirmButton.click({ force: true })
-    await this.page.waitForURL('**/dashboard/clients')
+    await this.page.waitForURL('**/dashboard/clients', { timeout: 10000 })
   }
 
   async isEmptyStateVisible(): Promise<boolean> {
@@ -151,7 +151,7 @@ export class ClientsPage extends BasePage {
   }
 
   async isNewClientButtonVisible(): Promise<boolean> {
-    return await this.page.locator('a[href="/dashboard/clients/new"]').isVisible()
+    return await this.page.locator('a[href="/dashboard/clients/new"]').first().isVisible()
   }
 
   async getEmptyStateText(): Promise<string> {

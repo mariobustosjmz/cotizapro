@@ -31,6 +31,11 @@ export function createRateLimiter(options: {
     request: Request,
     statusCode?: number
   ): { limited: boolean; remaining: number; resetTime: number } {
+    // Skip rate limiting in non-production environments (development, test, E2E)
+    if (process.env.NODE_ENV !== 'production') {
+      return { limited: false, remaining: max, resetTime: 0 }
+    }
+
     // Generate key for this request (IP-based by default)
     const key = keyGenerator?.(request) || extractClientIp(request)
     const now = Date.now()

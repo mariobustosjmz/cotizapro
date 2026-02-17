@@ -72,7 +72,8 @@ export class DashboardPage extends BasePage {
   }
 
   async isDashboardVisible(): Promise<boolean> {
-    return await this.page.locator('text=Dashboard').isVisible()
+    // Scope to banner heading to avoid matching sidebar navigation link
+    return await this.page.locator('[role="banner"] h1:has-text("Dashboard"), header h1:has-text("Dashboard")').first().isVisible()
   }
 
   // Stats

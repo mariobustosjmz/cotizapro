@@ -24,7 +24,8 @@ test.describe('Client Management', () => {
     const clientsPage = new ClientsPage(page)
     await clientsPage.goto()
 
-    await page.locator('a[href="/dashboard/clients/new"]').click()
+    await page.locator('a[href="/dashboard/clients/new"]').first().click()
+    await page.waitForURL('**/dashboard/clients/new', { timeout: 5000 })
     expect(page.url()).toContain('/dashboard/clients/new')
   })
 

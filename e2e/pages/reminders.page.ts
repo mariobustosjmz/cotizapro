@@ -12,12 +12,22 @@ export class RemindersPage extends BasePage {
 
   async goToNewReminder() {
     await super.goto('/dashboard/reminders/new')
-    // Wait for API calls to complete (clients)
-    await Promise.all([
-      this.page.waitForResponse(resp => resp.url().includes('/api/clients') && resp.status() === 200).catch(() => null)
-    ])
-    // Give React a moment to render the options
-    await this.page.waitForTimeout(500)
+
+    // Wait for client dropdown to load options
+    const clientSelect = this.page.locator('select[name="client_id"]')
+
+    // Wait for at least 2 options (placeholder + at least one client)
+    await this.page.waitForFunction(
+      (selector) => {
+        const select = document.querySelector(selector) as HTMLSelectElement
+        return select && select.options.length > 1
+      },
+      'select[name="client_id"]',
+      { timeout: 10000 }
+    )
+
+    const optionCount = await clientSelect.locator('option').count()
+    console.log(`[E2E] Client dropdown loaded with ${optionCount} options (including placeholder)`)
   }
 
   async goToReminderDetails(reminderId: string) {
@@ -37,7 +47,7 @@ export class RemindersPage extends BasePage {
     await titleInput.fill(data.title)
 
     if (data.description) {
-      const descInput = this.page.locator('textarea[name="message"]')
+      const descInput = this.page.locator('textarea[name="description"]')
       await descInput.fill(data.description)
     }
 
@@ -154,9 +164,82 @@ export class RemindersPage extends BasePage {
     description?: string
     dueDate?: string
   }) {
+    // Ensure at least one client exists before creating reminder
+    await this.ensureClientExists()
+
     await this.goToNewReminder()
     await this.fillReminderForm(data)
     await this.submitReminderForm()
+  }
+
+  // Helper method to ensure at least one client exists
+  async ensureClientExists() {
+    // Navigate to clients page to check if any exist
+    await this.page.goto('/dashboard/clients')
+    await this.page.waitForLoadState('networkidle')
+
+    // Check if empty state is visible
+    const emptyState = this.page.locator('text=No hay clientes')
+    const hasClients = !(await emptyState.isVisible().catch(() => false))
+
+    if (!hasClients) {
+      console.log('[E2E] No clients exist, creating test client for reminder')
+      await this.createTestClientViaUI()
+    } else {
+      console.log('[E2E] Clients already exist')
+    }
+  }
+
+  // Create a test client via UI
+  async createTestClientViaUI() {
+    // Navigate to new client page
+    await this.page.goto('/dashboard/clients/new')
+    await this.page.waitForLoadState('networkidle')
+
+    // Fill client form
+    const testClient = {
+      name: `Test Client ${Date.now()}`,
+      email: `test-${Date.now()}@example.com`,
+      phone: '+34 912 345 678',
+    }
+
+    await this.page.locator('input[name="name"]').fill(testClient.name)
+    await this.page.locator('input[name="email"]').fill(testClient.email)
+    await this.page.locator('input[name="phone"]').fill(testClient.phone)
+
+    // Wait for API response
+    const responsePromise = this.page.waitForResponse(
+      response => response.url().includes('/api/clients') && response.request().method() === 'POST',
+      { timeout: 10000 }
+    )
+
+    // Submit form
+    await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
+
+    // Wait for response
+    const response = await responsePromise
+    if (response.ok()) {
+      console.log('[E2E] Test client created successfully via UI')
+    }
+
+    // Wait for navigation back to clients list
+    await this.page.waitForURL('**/dashboard/clients', { timeout: 10000 })
+    await this.page.waitForLoadState('networkidle')
+
+    // Force a page reload to ensure fresh data from Server Component
+    await this.page.reload({ waitUntil: 'networkidle' })
+
+    // Wait for the table to be visible (not empty state)
+    await this.page.locator('table').waitFor({ timeout: 5000 })
+
+    // Verify the client appears in the table
+    const clientRow = this.page.locator(`table tbody tr:has-text("${testClient.name}")`)
+    await clientRow.waitFor({ timeout: 5000 })
+
+    // Give React time to hydrate
+    await this.page.waitForTimeout(500)
+
+    console.log(`[E2E] Verified client "${testClient.name}" is visible in the list`)
   }
 
   // Reminders List
@@ -175,13 +258,28 @@ export class RemindersPage extends BasePage {
   }
 
   async clickReminderDetailsLink(title: string) {
-    await this.page.locator(`table tbody tr:has-text("${title}") a:has-text("Ver detalles")`).first().click()
+    console.log('[E2E] Clicking details link for reminder:', title)
+    console.log('[E2E] Current URL before click:', this.page.url())
+
+    const detailsLink = this.page.locator(`table tbody tr:has-text("${title}") a:has-text("Ver detalles")`).first()
+    const isVisible = await detailsLink.isVisible().catch(() => false)
+    console.log('[E2E] Details link visible:', isVisible)
+
+    if (isVisible) {
+      const href = await detailsLink.getAttribute('href')
+      console.log('[E2E] Details link href:', href)
+      await detailsLink.click()
+      console.log('[E2E] Clicked details link, waiting for URL change...')
+    }
+
     await this.page.waitForURL('**/dashboard/reminders/*')
+    console.log('[E2E] URL after navigation:', this.page.url())
   }
 
   // Reminder Details Page
   async getReminderTitle(): Promise<string> {
-    const title = this.page.locator('h1, h2')
+    // Use main content area to avoid matching the layout's "Dashboard" h1
+    const title = this.page.locator('main h1, main h2').first()
     return await this.getText(title)
   }
 

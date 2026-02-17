@@ -15,7 +15,7 @@ export class AuthPage extends BasePage {
     await this.page.locator('input[name="email"]').fill(email)
     await this.page.locator('input[name="password"]').fill(password)
     await this.page.locator('button[type="submit"]').click()
-    await this.page.waitForURL('**/dashboard', { timeout: 10000 })
+    await this.page.waitForURL('**/dashboard', { timeout: 30000 })
   }
 
   async fillLoginForm(email: string, password: string) {

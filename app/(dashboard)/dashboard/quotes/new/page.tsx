@@ -14,6 +14,7 @@ interface QuoteItem {
   description: string
   quantity: number
   unit_price: number
+  unit_type: 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
   service_id: string | null
 }
 
@@ -40,7 +41,7 @@ export default function NewQuotePage() {
   const [clients, setClients] = useState<Client[]>([])
   const [services, setServices] = useState<Service[]>([])
   const [items, setItems] = useState<QuoteItem[]>([
-    { description: '', quantity: 1, unit_price: 0, service_id: null }
+    { description: '', quantity: 1, unit_price: 0, unit_type: 'per_unit', service_id: null }
   ])
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function NewQuotePage() {
 
         if (clientsRes.ok) {
           const data = await clientsRes.json()
-          setClients(data.data || [])
+          setClients(data.clients || [])
         }
 
         if (servicesRes.ok) {
@@ -69,7 +70,7 @@ export default function NewQuotePage() {
   }, [])
 
   function addItem() {
-    setItems([...items, { description: '', quantity: 1, unit_price: 0, service_id: null }])
+    setItems([...items, { description: '', quantity: 1, unit_price: 0, unit_type: 'per_unit', service_id: null }])
   }
 
   function removeItem(index: number) {
@@ -92,7 +93,8 @@ export default function NewQuotePage() {
         ...newItems[index],
         service_id: serviceId,
         description: service.name,
-        unit_price: service.default_price
+        unit_price: service.default_price,
+        unit_type: service.unit_type as 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
       }
       setItems(newItems)
     }
@@ -126,15 +128,16 @@ export default function NewQuotePage() {
       return
     }
 
+    const validUntilDays = parseInt(formData.get('valid_until_days') as string) || 30
+    const validUntilDate = new Date()
+    validUntilDate.setDate(validUntilDate.getDate() + validUntilDays)
+
     const data = {
       client_id: clientId,
-      client_name: selectedClient.name,
-      client_email: selectedClient.email,
-      client_phone: selectedClient.phone,
       items: items.filter(item => item.description && item.quantity > 0),
-      notes: formData.get('notes'),
-      terms: formData.get('terms'),
-      valid_until_days: parseInt(formData.get('valid_until_days') as string) || 30,
+      notes: formData.get('notes') || null,
+      terms_and_conditions: formData.get('terms') || null,
+      valid_until: validUntilDate.toISOString(),
       discount_rate: discountRate,
     }
 
@@ -224,7 +227,7 @@ export default function NewQuotePage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Items de la Cotización</CardTitle>
-              <Button type="button" onClick={addItem} size="sm" variant="outline">
+              <Button type="button" onClick={addItem} size="sm" variant="outline" data-testid="add-quote-item-btn">
                 <Plus className="w-4 h-4 mr-2" />
                 Agregar Item
               </Button>
@@ -273,6 +276,7 @@ export default function NewQuotePage() {
                       onChange={(e) => updateItem(index, 'description', e.target.value)}
                       required
                       placeholder="Instalación de minisplit 12000 BTU"
+                      data-testid={`item-description-${index}`}
                     />
                   </div>
 
@@ -286,6 +290,7 @@ export default function NewQuotePage() {
                       value={item.quantity}
                       onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                       required
+                      data-testid={`item-quantity-${index}`}
                     />
                   </div>
 
@@ -299,6 +304,7 @@ export default function NewQuotePage() {
                       value={item.unit_price}
                       onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                       required
+                      data-testid={`item-unit-price-${index}`}
                     />
                   </div>
                 </div>
@@ -329,7 +335,7 @@ export default function NewQuotePage() {
             </div>
             <div className="flex justify-between pt-2 border-t">
               <span className="text-lg font-bold">Total:</span>
-              <span className="text-lg font-bold text-blue-600">${total.toLocaleString('es-MX')}</span>
+              <span className="text-lg font-bold text-blue-600" data-testid="quote-total">${total.toLocaleString('es-MX')}</span>
             </div>
           </CardContent>
         </Card>
@@ -379,12 +385,12 @@ export default function NewQuotePage() {
 
         {/* Actions */}
         <div className="flex justify-end space-x-4">
-          <Link href="/dashboard/quotes">
+          <Link href="/dashboard/quotes" data-testid="cancel-quote-btn">
             <Button type="button" variant="outline" disabled={loading}>
               Cancelar
             </Button>
           </Link>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} data-testid="submit-quote-btn">
             {loading ? 'Creando...' : 'Crear Cotización'}
           </Button>
         </div>

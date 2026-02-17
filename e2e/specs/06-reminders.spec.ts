@@ -136,6 +136,16 @@ test.describe('Reminders Management', () => {
   })
 
   test('Reminder details page shows title', async ({ page }) => {
+    // Capture browser console logs
+    page.on('console', msg => {
+      console.log(`[BROWSER ${msg.type()}]`, msg.text())
+    })
+
+    // Capture page errors
+    page.on('pageerror', error => {
+      console.error('[PAGE ERROR]', error.message)
+    })
+
     const remindersPage = new RemindersPage(page)
 
     const reminderTitle = `Test Reminder ${Date.now()}`
@@ -144,6 +154,9 @@ test.describe('Reminders Management', () => {
     })
 
     await remindersPage.clickReminderDetailsLink(reminderTitle)
+
+    // Wait a bit to let the fetch happen
+    await page.waitForTimeout(2000)
 
     const title = await remindersPage.getReminderTitle()
     expect(title).toContain(reminderTitle)
@@ -197,11 +210,15 @@ test.describe('Reminders Management', () => {
   test('Reminder due date is formatted correctly', async ({ page }) => {
     const remindersPage = new RemindersPage(page)
     const testDate = '2026-02-28'
+    const reminderTitle = `Dated Reminder ${Date.now()}`
 
     await remindersPage.createReminder({
-      title: `Dated Reminder ${Date.now()}`,
+      title: reminderTitle,
       dueDate: testDate,
     })
+
+    // Navigate to details page to see the formatted date
+    await remindersPage.clickReminderDetailsLink(reminderTitle)
 
     const dueDate = await remindersPage.getReminderDueDate()
     expect(dueDate).toBeDefined()

@@ -61,7 +61,7 @@ export async function seedTestDatabase() {
 
         if (authError) {
           // User might already exist - try to get existing user
-          if (authError.message.includes('already registered')) {
+          if (authError.message.includes('already registered') || authError.code === 'email_exists') {
             const { data: existingUsers } = await supabase.auth.admin.listUsers()
             const existingUser = existingUsers.users.find((u) => u.email === user.email)
 
@@ -137,10 +137,17 @@ export async function cleanTestDatabase() {
     // Delete test users from auth
     for (const user of existingUsers.users) {
       if (testUserEmails.includes(user.email!)) {
-        await supabase.auth.admin.deleteUser(user.id)
-        console.log(`  ✅ Deleted user: ${user.email}`)
+        const { error } = await supabase.auth.admin.deleteUser(user.id)
+        if (error) {
+          console.warn(`  ⚠️  Failed to delete user ${user.email}:`, error.message)
+        } else {
+          console.log(`  ✅ Deleted user: ${user.email}`)
+        }
       }
     }
+
+    // Wait a moment for deletions to propagate
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     // Delete test organization (cascades to profiles, clients, quotes, etc.)
     const { error: orgError } = await supabase

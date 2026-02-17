@@ -1,10 +1,17 @@
 import { chromium, FullConfig } from '@playwright/test'
-import { seedTestDatabase } from './helpers/seed-database'
+import { seedTestDatabase, cleanTestDatabase } from './helpers/seed-database'
 
 async function globalSetup(config: FullConfig) {
   console.log('🚀 Running global setup...')
 
-  // Seed test database FIRST
+  // Clean any existing test data first (idempotent setup)
+  try {
+    await cleanTestDatabase()
+  } catch (error) {
+    console.warn('⚠️  Database cleanup failed (may be expected if no test data exists):', error)
+  }
+
+  // Seed test database
   try {
     await seedTestDatabase()
   } catch (error) {

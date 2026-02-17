@@ -34,7 +34,15 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goto()
 
-    await page.locator('a[href="/dashboard/quotes/new"]').click()
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('networkidle')
+
+    // Click the link and wait for navigation
+    await Promise.all([
+      page.waitForURL('**/dashboard/quotes/new', { timeout: 10000 }),
+      page.locator('[data-testid="new-quote-header-btn"]').click()
+    ])
+
     expect(page.url()).toContain('/dashboard/quotes/new')
   })
 
@@ -50,14 +58,11 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goToNewQuote()
 
-    const addServiceButton = page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    if (await addServiceButton.isVisible()) {
-      await quotesPage.addService('Web Design', '1500', '1')
+    await quotesPage.addQuoteItem('Web Design', '1500', '1', 0)
 
-      const nameInput = page.locator('input[placeholder*="Nombre"], input[placeholder*="Name"]').last()
-      const value = await nameInput.inputValue()
-      expect(value).toContain('Web Design')
-    }
+    const descInput = page.locator('[data-testid="item-description-0"]')
+    const value = await descInput.inputValue()
+    expect(value).toContain('Web Design')
   })
 
   test('Quote list displays correctly', async ({ page }) => {
@@ -136,15 +141,12 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goToNewQuote()
 
-    const addServiceButton = page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    if (await addServiceButton.isVisible()) {
-      await quotesPage.addService('Web Design', '1500', '1')
-      await quotesPage.addService('Hosting', '120', '12')
+    await quotesPage.addQuoteItem('Web Design', '1500', '1', 0)
+    await quotesPage.addQuoteItem('Hosting', '120', '12', 1)
 
-      const serviceInputs = page.locator('input[placeholder*="Nombre"], input[placeholder*="Name"]')
-      const count = await serviceInputs.count()
-      expect(count).toBeGreaterThanOrEqual(2)
-    }
+    const descInputs = page.locator('[data-testid^="item-description-"]')
+    const count = await descInputs.count()
+    expect(count).toBeGreaterThanOrEqual(2)
   })
 
   test('Quote form validates numeric price input', async ({ page }) => {
@@ -166,7 +168,7 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goToNewQuote()
 
-    const cancelButton = page.locator('a:has-text("Cancelar"), a:has-text("Cancel"), button:has-text("Cancelar")')
+    const cancelButton = page.locator('[data-testid="cancel-quote-btn"]')
     if (await cancelButton.isVisible()) {
       await cancelButton.click()
       await page.waitForTimeout(500)
@@ -177,15 +179,12 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goToNewQuote()
 
-    const addServiceButton = page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    if (await addServiceButton.isVisible()) {
-      await quotesPage.addService('Web Design', '1500', '1')
+    await quotesPage.addQuoteItem('Web Design', '1500', '1', 0)
 
-      const totalElement = page.locator('[data-testid="quote-total"], .quote-total, text=/Total|TOTAL/')
-      if (await totalElement.isVisible()) {
-        const total = await totalElement.textContent()
-        expect(total).toBeDefined()
-      }
+    const totalElement = page.locator('[data-testid="quote-total"]')
+    if (await totalElement.isVisible()) {
+      const total = await totalElement.textContent()
+      expect(total).toBeDefined()
     }
   })
 
@@ -237,17 +236,18 @@ test.describe('Quote Management', () => {
           await firstOption.click()
         }
       } else {
-        // Select element
+        // Select element - wait for options to load
+        await page.waitForFunction(() => {
+          const select = document.querySelector('select[name="client_id"]') as HTMLSelectElement
+          return select && select.options.length > 1
+        }, { timeout: 10000 })
         await clientSelect.selectOption({ index: 1 })
       }
     }
 
-    // Add services
-    const addServiceButton = page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    if (await addServiceButton.isVisible()) {
-      await quotesPage.addService('Web Design', '1500', '1')
-      await quotesPage.addService('Hosting', '120', '12')
-    }
+    // Add quote items (first item already exists by default)
+    await quotesPage.addQuoteItem('Web Design', '1500', '1', 0)
+    await quotesPage.addQuoteItem('Hosting', '120', '12', 1)
 
     // Submit form
     const submitButton = page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")')
@@ -334,21 +334,18 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goToNewQuote()
 
-    const addServiceButton = page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    if (await addServiceButton.isVisible()) {
-      await quotesPage.addService('Web Design', '1000', '1')
+    await quotesPage.addQuoteItem('Web Design', '1000', '1', 0)
 
-      const totalBefore = await page.locator('[data-testid="quote-total"], .quote-total, text=/Total|TOTAL/').textContent()
+    const totalBefore = await page.locator('[data-testid="quote-total"]').textContent()
 
-      const quantityInput = page.locator('input[name*="quantity"]').last()
-      if (await quantityInput.isVisible()) {
-        await quantityInput.clear()
-        await quantityInput.fill('2')
-        await page.waitForTimeout(300)
+    const quantityInput = page.locator('[data-testid="item-quantity-0"]')
+    if (await quantityInput.isVisible()) {
+      await quantityInput.clear()
+      await quantityInput.fill('2')
+      await page.waitForTimeout(300)
 
-        const totalAfter = await page.locator('[data-testid="quote-total"], .quote-total, text=/Total|TOTAL/').textContent()
-        expect(totalAfter).not.toBe(totalBefore)
-      }
+      const totalAfter = await page.locator('[data-testid="quote-total"]').textContent()
+      expect(totalAfter).not.toBe(totalBefore)
     }
   })
 
@@ -356,16 +353,13 @@ test.describe('Quote Management', () => {
     const quotesPage = new QuotesPage(page)
     await quotesPage.goToNewQuote()
 
-    const addServiceButton = page.locator('button:has-text("Agregar servicio"), button:has-text("Add service")')
-    if (await addServiceButton.isVisible()) {
-      await quotesPage.addService('Web Design', '1500', '1')
-      await page.waitForTimeout(300)
+    await quotesPage.addQuoteItem('Web Design', '1500', '1', 0)
+    await page.waitForTimeout(300)
 
-      const removeButton = page.locator('button:has-text("Eliminar"), [aria-label*="Remove"]').last()
-      if (await removeButton.isVisible()) {
-        await removeButton.click()
-        await page.waitForTimeout(300)
-      }
+    const removeButton = page.locator('button:has-text("Eliminar"), [aria-label*="Remove"]').last()
+    if (await removeButton.isVisible()) {
+      await removeButton.click()
+      await page.waitForTimeout(300)
     }
   })
 

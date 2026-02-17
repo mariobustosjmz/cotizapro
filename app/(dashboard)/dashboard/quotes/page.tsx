@@ -42,7 +42,7 @@ export default async function QuotesPage() {
             Gestiona tus cotizaciones y propuestas
           </p>
         </div>
-        <Link href="/dashboard/quotes/new">
+        <Link href="/dashboard/quotes/new" data-testid="new-quote-header-btn">
           <Button className="flex items-center space-x-2">
             <Plus className="w-4 h-4" />
             <span>Nueva Cotización</span>
@@ -58,7 +58,7 @@ export default async function QuotesPage() {
             <FileText className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts.draft}</div>
+            <div className="text-2xl font-bold" data-testid="draft-quotes-count">{statusCounts.draft}</div>
           </CardContent>
         </Card>
         <Card>
@@ -67,7 +67,7 @@ export default async function QuotesPage() {
             <FileText className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts.sent}</div>
+            <div className="text-2xl font-bold" data-testid="sent-quotes-count">{statusCounts.sent}</div>
           </CardContent>
         </Card>
         <Card>
@@ -76,7 +76,7 @@ export default async function QuotesPage() {
             <FileText className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts.accepted}</div>
+            <div className="text-2xl font-bold" data-testid="accepted-quotes-count">{statusCounts.accepted}</div>
           </CardContent>
         </Card>
         <Card>
@@ -85,7 +85,7 @@ export default async function QuotesPage() {
             <FileText className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statusCounts.rejected}</div>
+            <div className="text-2xl font-bold" data-testid="rejected-quotes-count">{statusCounts.rejected}</div>
           </CardContent>
         </Card>
       </div>
@@ -104,7 +104,7 @@ export default async function QuotesPage() {
                 Comienza creando tu primera cotización
               </p>
               <div className="mt-6">
-                <Link href="/dashboard/quotes/new">
+                <Link href="/dashboard/quotes/new" data-testid="new-quote-empty-btn">
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
                     Nueva Cotización
