@@ -21,6 +21,7 @@ import {
   LogOut,
   UserCircle,
   Settings,
+  Calendar as CalendarIcon,
 } from 'lucide-react'
 
 interface ProfileOrganization {
@@ -43,6 +44,7 @@ const principalNav = [
   { name: 'Clientes', href: '/dashboard/clients', icon: Users, shortcut: 'G C' },
   { name: 'Cotizaciones', href: '/dashboard/quotes', icon: FileText, shortcut: 'G Q' },
   { name: 'Recordatorios', href: '/dashboard/reminders', icon: Bell, shortcut: 'G R' },
+  { name: 'Agenda', href: '/dashboard/calendar', icon: CalendarIcon, shortcut: 'G A' },
   { name: 'Servicios', href: '/dashboard/services', icon: Briefcase, shortcut: 'G S' },
 ]
 
