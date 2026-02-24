@@ -46,11 +46,15 @@ export default async function NewEventPage(props: {
     console.error('Error fetching clients:', clientsError)
   }
 
-  const typedClients: Client[] = (clients || []).map((c: any) => ({
+  const typedClients: Client[] = (clients || []).map((c) => ({
     id: c.id,
     name: c.name,
     company_name: c.company_name,
   }))
+
+  // Validate hour parameter: ensure it's a finite number within 0-23, default to 9
+  const rawHour = Number(searchParams.hour)
+  const validatedHour = Number.isFinite(rawHour) && rawHour >= 0 && rawHour <= 23 ? rawHour : 9
 
   return (
     <div className="p-6 max-w-xl">
@@ -58,7 +62,7 @@ export default async function NewEventPage(props: {
       <WorkEventForm
         clients={typedClients}
         defaultDate={searchParams.date}
-        defaultHour={searchParams.hour ? Number(searchParams.hour) : undefined}
+        defaultHour={validatedHour}
         defaultClientId={searchParams.client_id}
       />
     </div>

@@ -111,7 +111,7 @@ export async function DELETE(
       userId: user.id,
     })
 
-    return NextResponse.json({ data: { success: true } }, { status: 204 })
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     logger.error('Unexpected error in DELETE /api/quotes/[id]/payments/[paymentId]', error as Error)
     return handleApiError(

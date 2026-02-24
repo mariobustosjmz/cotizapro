@@ -61,7 +61,7 @@ export default async function CalendarPage() {
     console.error('Error fetching calendar events:', eventsError)
   }
 
-  const typedEvents: CalendarEvent[] = (events || []).map((event: any) => ({
+  const typedEvents: CalendarEvent[] = (events || []).map((event) => ({
     id: event.id,
     title: event.title,
     event_type: event.event_type,

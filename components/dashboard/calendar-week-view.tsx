@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { WORK_EVENT_TYPE_LABELS } from '@/lib/constants/work-events'
 
 interface CalendarEvent {
   id: string
@@ -25,14 +26,6 @@ const EVENT_TYPE_COLORS: Record<CalendarEvent['event_type'], { bg: string; borde
   visita_tecnica: { bg: 'bg-purple-50', border: 'border-purple-300', text: 'text-purple-900' },
   mantenimiento: { bg: 'bg-green-50', border: 'border-green-300', text: 'text-green-900' },
   otro: { bg: 'bg-gray-50', border: 'border-gray-300', text: 'text-gray-900' },
-}
-
-const EVENT_TYPE_LABELS: Record<CalendarEvent['event_type'], string> = {
-  instalacion: 'Instalación',
-  medicion: 'Medición',
-  visita_tecnica: 'Visita Técnica',
-  mantenimiento: 'Mantenimiento',
-  otro: 'Otro',
 }
 
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 8) // 8am to 8pm
@@ -138,9 +131,11 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
               const dayEnd = new Date(day)
               dayEnd.setHours(20, 0, 0, 0)
 
+              // Filter events that overlap with the day (not just start time)
               const dayEvents = events.filter((e) => {
                 const eStart = new Date(e.scheduled_start)
-                return eStart >= dayStart && eStart < dayEnd
+                const eEnd = new Date(e.scheduled_end)
+                return eStart < dayEnd && eEnd > dayStart
               })
 
               const isToday = day.toDateString() === today.toDateString()
@@ -176,6 +171,7 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
 
                       const colors = EVENT_TYPE_COLORS[event.event_type]
                       const clientDisplay = event.clients?.company_name || event.clients?.name || 'Sin cliente'
+                      const eventTypeLabel = WORK_EVENT_TYPE_LABELS[event.event_type]
 
                       return (
                         <div
@@ -190,7 +186,7 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
                         >
                           <div className={`${colors.text} font-semibold truncate`}>{event.title}</div>
                           <div className={`${colors.text} text-[10px] truncate opacity-75`}>{clientDisplay}</div>
-                          <div className={`${colors.text} text-[10px] opacity-60`}>{EVENT_TYPE_LABELS[event.event_type]}</div>
+                          <div className={`${colors.text} text-[10px] opacity-60`}>{eventTypeLabel}</div>
                         </div>
                       )
                     })}

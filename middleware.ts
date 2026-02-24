@@ -74,13 +74,16 @@ export async function middleware(request: NextRequest) {
     if (sizeError) return sizeError
   }
 
-  const response = await updateSession(request)
-
-  // Attach CORS headers to all API responses
+  // API routes handle their own auth — skip cookie-based redirect for them.
+  // Bearer token callers (e.g. mobile app) would get a /login redirect instead of 401.
   if (request.nextUrl.pathname.startsWith('/api/')) {
+    const response = NextResponse.next()
     const headers = corsHeaders(origin)
     Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v))
+    return response
   }
+
+  const response = await updateSession(request)
 
   return response
 }

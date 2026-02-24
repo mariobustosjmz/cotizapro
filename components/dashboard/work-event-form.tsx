@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { WORK_EVENT_TYPE_OPTIONS } from '@/lib/constants/work-events'
 
 interface Client {
   id: string
@@ -19,14 +20,6 @@ interface WorkEventFormProps {
   defaultHour?: number
   defaultClientId?: string
 }
-
-const EVENT_TYPE_OPTIONS = [
-  { value: 'instalacion', label: 'Instalación' },
-  { value: 'medicion', label: 'Medición' },
-  { value: 'visita_tecnica', label: 'Visita Técnica' },
-  { value: 'mantenimiento', label: 'Mantenimiento' },
-  { value: 'otro', label: 'Otro' },
-]
 
 function padZero(num: number): string {
   return String(num).padStart(2, '0')
@@ -63,15 +56,15 @@ export function WorkEventForm({
       const address = (formData.get('address') as string) || null
       const notes = (formData.get('notes') as string) || null
 
-      const startDate = new Date(scheduledStart)
-      const endDate = new Date(scheduledEnd)
-
+      // Keep datetime strings as-is (local ISO format)
+      // PostgreSQL accepts timestamptz with local ISO strings
+      // Server handles timezone conversion correctly
       const payload = {
         title,
         client_id: clientId,
         event_type: eventType,
-        scheduled_start: startDate.toISOString(),
-        scheduled_end: endDate.toISOString(),
+        scheduled_start: scheduledStart,
+        scheduled_end: scheduledEnd,
         address,
         notes,
       }
@@ -87,6 +80,7 @@ export function WorkEventForm({
         throw new Error(data.error || 'Error al crear evento')
       }
 
+      // Keep loading true during redirect to prevent state updates on unmounting component
       router.push('/dashboard/calendar')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido')
@@ -144,7 +138,7 @@ export function WorkEventForm({
           defaultValue="instalacion"
           className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
         >
-          {EVENT_TYPE_OPTIONS.map((option) => (
+          {WORK_EVENT_TYPE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
