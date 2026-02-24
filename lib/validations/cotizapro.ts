@@ -342,3 +342,56 @@ export interface QuotePayment {
   received_by: string | null
   created_at: string
 }
+
+// ========================================
+// Work Event Schemas
+// ========================================
+
+export const workEventTypeEnum = z.enum(['instalacion', 'medicion', 'visita_tecnica', 'mantenimiento', 'otro'])
+export const workEventStatusEnum = z.enum(['pendiente', 'en_camino', 'completado', 'cancelado'])
+
+export const createWorkEventSchema = z.object({
+  title: z.string().min(1, 'El título es requerido').max(200, 'Título muy largo'),
+  event_type: workEventTypeEnum,
+  scheduled_start: z.string().datetime('Fecha de inicio inválida'),
+  scheduled_end: z.string().datetime('Fecha de fin inválida'),
+  client_id: z.string().uuid('Cliente inválido'),
+  quote_id: z.string().uuid().optional().nullable(),
+  assigned_to: z.string().uuid().optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+})
+
+export const updateWorkEventSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  event_type: workEventTypeEnum.optional(),
+  scheduled_start: z.string().datetime().optional(),
+  scheduled_end: z.string().datetime().optional(),
+  client_id: z.string().uuid().optional(),
+  quote_id: z.string().uuid().optional().nullable(),
+  assigned_to: z.string().uuid().optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+  status: workEventStatusEnum.optional(),
+})
+
+export type WorkEventType = z.infer<typeof workEventTypeEnum>
+export type WorkEventStatus = z.infer<typeof workEventStatusEnum>
+export type CreateWorkEventInput = z.infer<typeof createWorkEventSchema>
+export type UpdateWorkEventInput = z.infer<typeof updateWorkEventSchema>
+
+export interface WorkEvent {
+  id: string
+  organization_id: string
+  client_id: string
+  quote_id: string | null
+  assigned_to: string | null
+  title: string
+  event_type: WorkEventType
+  scheduled_start: string
+  scheduled_end: string
+  address: string | null
+  notes: string | null
+  status: WorkEventStatus
+  created_at: string
+}
