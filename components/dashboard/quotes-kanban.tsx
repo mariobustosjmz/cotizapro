@@ -6,11 +6,10 @@ import { QuoteStatus } from '@/lib/validations/cotizapro'
 export interface KanbanQuote {
   id: string
   quote_number: string
-  clients: { name: string | null; company_name: string | null } | null
-  total_amount: number
+  client: { id: string; name: string | null; email: string | null; phone: string | null } | null
+  total: number
   status: QuoteStatus
   updated_at: string
-  has_pending_balance?: boolean
 }
 
 const KANBAN_COLUMNS: { key: QuoteStatus; label: string }[] = [
@@ -108,21 +107,16 @@ export function QuotesKanban({ quotes, onStatusChange }: Props) {
                     #{quote.quote_number}
                   </div>
                   <div className="text-sm font-medium text-gray-800 truncate">
-                    {quote.clients?.company_name ?? quote.clients?.name ?? '—'}
+                    {quote.client?.name ?? '—'}
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm font-semibold text-gray-900">
-                      ${Number(quote.total_amount).toLocaleString('es-MX')}
+                      ${Number(quote.total).toLocaleString('es-MX')}
                     </span>
                     <span className="text-xs text-gray-400">
                       {daysSince(quote.updated_at)}d
                     </span>
                   </div>
-                  {quote.has_pending_balance && (
-                    <span className="mt-1 inline-block text-xs bg-amber-100 text-amber-700 rounded px-1.5 py-0.5">
-                      Saldo Pendiente
-                    </span>
-                  )}
                 </div>
               ))}
             </div>
@@ -141,7 +135,7 @@ export function QuotesKanban({ quotes, onStatusChange }: Props) {
               <h3 className="text-sm font-semibold text-gray-500 mb-2">{col.label}</h3>
               {quotes.filter(q => q.status === col.key).map(quote => (
                 <div key={quote.id} className="bg-white rounded p-2 text-xs text-gray-600 mb-1">
-                  #{quote.quote_number} — {quote.clients?.name ?? '—'}
+                  #{quote.quote_number} — {quote.client?.name ?? '—'}
                 </div>
               ))}
             </div>

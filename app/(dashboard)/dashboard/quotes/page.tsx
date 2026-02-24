@@ -6,9 +6,10 @@ import { FileText, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { QuoteSearchInput } from './search-input'
 import { QuotesKanbanWrapper } from '@/components/dashboard/quotes-kanban-wrapper'
+import type { QuoteStatus } from '@/lib/validations/cotizapro'
+import { quoteStatusSchema } from '@/lib/validations/cotizapro'
 
-const VALID_STATUSES = ['draft', 'sent', 'viewed', 'accepted', 'rejected', 'expired'] as const
-type QuoteStatus = typeof VALID_STATUSES[number]
+const VALID_STATUSES = quoteStatusSchema.options as readonly QuoteStatus[]
 
 const STATUS_LABELS: Record<QuoteStatus, string> = {
   draft: 'Borradores',
@@ -17,6 +18,9 @@ const STATUS_LABELS: Record<QuoteStatus, string> = {
   accepted: 'Aceptadas',
   rejected: 'Rechazadas',
   expired: 'Expiradas',
+  en_instalacion: 'En Instalación',
+  completado: 'Completadas',
+  cobrado: 'Cobradas',
 }
 
 const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
@@ -26,6 +30,9 @@ const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   accepted: 'Aceptada',
   rejected: 'Rechazada',
   expired: 'Expirada',
+  en_instalacion: 'En Instalación',
+  completado: 'Completada',
+  cobrado: 'Cobrada',
 }
 
 export default async function QuotesPage({

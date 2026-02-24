@@ -8,11 +8,10 @@ import { QuoteStatus } from '@/lib/validations/cotizapro'
 interface Quote {
   id: string
   quote_number: string
-  total_amount: number | string
+  total: number | string
   status: QuoteStatus
   updated_at: string
-  clients: { name: string | null; company_name: string | null } | null
-  has_pending_balance?: boolean
+  client: { id: string; name: string | null; email: string | null; phone: string | null } | null
 }
 
 interface ApiResponse {
@@ -54,13 +53,12 @@ export function QuotesKanbanWrapper(): React.ReactNode {
         const transformedQuotes: KanbanQuote[] = data.data.map(quote => ({
           id: quote.id,
           quote_number: quote.quote_number,
-          clients: quote.clients,
-          total_amount: typeof quote.total_amount === 'string'
-            ? parseFloat(quote.total_amount)
-            : quote.total_amount,
+          client: quote.client,
+          total: typeof quote.total === 'string'
+            ? parseFloat(quote.total)
+            : quote.total,
           status: quote.status,
           updated_at: quote.updated_at,
-          has_pending_balance: quote.has_pending_balance,
         }))
         setQuotes(transformedQuotes)
       } catch (err) {
@@ -77,6 +75,7 @@ export function QuotesKanbanWrapper(): React.ReactNode {
 
   const handleStatusChange = async (quoteId: string, newStatus: QuoteStatus): Promise<void> => {
     try {
+      setError(null)
       const response = await fetch(`/api/quotes/${quoteId}`, {
         method: 'PATCH',
         headers: {
