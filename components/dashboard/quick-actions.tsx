@@ -36,7 +36,7 @@ export function QuickActionsList({
   className = '',
 }: QuickActionsListProps) {
   return (
-    <div
+    <ul
       className={
         variant === 'horizontal'
           ? `flex items-center gap-3 ${className}`
@@ -46,21 +46,29 @@ export function QuickActionsList({
       {actions.map((action) => {
         const Icon = action.icon
         return (
-          <Link
-            key={action.id}
-            href={action.href}
-            onClick={() => onActionClick?.()}
-            className={
-              variant === 'horizontal'
-                ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-md hover:bg-gray-100 transition-colors'
-                : 'flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-50 transition-colors'
-            }
-          >
-            <Icon className="w-4 h-4" />
-            <span>{action.label}</span>
-          </Link>
+          <li key={action.id}>
+            <Link
+              href={action.href}
+              onClick={() => onActionClick?.()}
+              aria-label={
+                action.id === 'quote'
+                  ? 'Nueva cotización'
+                  : action.id === 'client'
+                    ? 'Nuevo cliente'
+                    : 'Nuevo evento'
+              }
+              className={
+                variant === 'horizontal'
+                  ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-md hover:bg-gray-100 transition-colors'
+                  : 'flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-50 transition-colors'
+              }
+            >
+              <Icon className="w-4 h-4" />
+              <span>{action.label}</span>
+            </Link>
+          </li>
         )
       })}
-    </div>
+    </ul>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, X } from 'lucide-react'
 import { QuickActionsList } from './quick-actions'
 
@@ -14,6 +14,19 @@ export function FAB() {
   const handleActionClick = () => {
     setIsOpen(false)
   }
+
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscapeKey)
+    return () => {
+      window.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [isOpen])
 
   return (
     <div className="lg:hidden fixed bottom-6 right-6 z-50">
