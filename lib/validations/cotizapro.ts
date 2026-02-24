@@ -1,4 +1,43 @@
 import { z } from 'zod'
+import type { CustomFieldDefinition } from '@/types/custom-fields'
+
+// ========================================
+// Client Schemas
+// ========================================
+
+// ========================================
+// Custom Fields Schema Builder
+// ========================================
+
+export function buildCustomFieldsSchema(fields: CustomFieldDefinition[]): z.ZodObject<Record<string, z.ZodTypeAny>> {
+  const shape: Record<string, z.ZodTypeAny> = {}
+  for (const field of fields.filter(f => f.is_active)) {
+    let fieldSchema: z.ZodTypeAny
+    switch (field.field_type) {
+      case 'number':
+        fieldSchema = z.coerce.number()
+        break
+      case 'checkbox':
+        fieldSchema = z.coerce.boolean()
+        break
+      case 'date':
+        fieldSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido (YYYY-MM-DD)')
+        break
+      case 'email':
+        fieldSchema = z.string().email('Email inválido')
+        break
+      case 'url':
+        fieldSchema = z.string().url('URL inválida')
+        break
+      default:
+        fieldSchema = z.string().max(1000, 'Valor demasiado largo')
+    }
+    shape[field.field_key] = field.is_required
+      ? fieldSchema
+      : fieldSchema.optional().nullable()
+  }
+  return z.object(shape)
+}
 
 // ========================================
 // Client Schemas
@@ -10,7 +49,9 @@ export const createClientSchema = z.object({
   phone: z.string()
     .min(10, 'Teléfono debe tener al menos 10 dígitos')
     .max(20, 'Teléfono es muy largo')
-    .regex(/^[\d\s\-\+\(\)]+$/, 'Formato de teléfono inválido'),
+    .regex(/^[\d\s\-\+\(\)]+$/, 'Formato de teléfono inválido')
+    .optional()
+    .nullable(),
   whatsapp_phone: z.string()
     .min(10)
     .max(20)
@@ -23,6 +64,7 @@ export const createClientSchema = z.object({
   postal_code: z.string().max(10, 'Código postal muy largo').optional().nullable(),
   notes: z.string().max(2000, 'Notas muy largas').optional().nullable(),
   tags: z.array(z.string().max(50)).max(20, 'Máximo 20 etiquetas').optional().nullable(),
+  custom_fields: z.record(z.string(), z.unknown()).optional().nullable(),
 })
 
 export const updateClientSchema = createClientSchema.partial()
@@ -52,6 +94,7 @@ export const createServiceSchema = z.object({
     .optional()
     .nullable(),
   is_active: z.boolean().default(true),
+  custom_fields: z.record(z.string(), z.unknown()).optional().nullable(),
 })
 
 export const updateServiceSchema = createServiceSchema.partial()
@@ -95,9 +138,24 @@ export const createQuoteSchema = z.object({
     .min(0, 'El descuento no puede ser negativo')
     .max(100, 'El descuento no puede ser mayor a 100%')
     .default(0),
+  custom_fields: z.record(z.string(), z.unknown()).optional().nullable(),
 })
 
-export const quoteStatusEnum = z.enum(['draft', 'sent', 'viewed', 'accepted', 'rejected', 'expired'])
+export const quoteStatusSchema = z.enum([
+  'draft',
+  'sent',
+  'viewed',
+  'accepted',
+  'rejected',
+  'expired',
+  'en_instalacion',
+  'completado',
+  'cobrado',
+])
+
+export type QuoteStatus = z.infer<typeof quoteStatusSchema>
+
+export const quoteStatusEnum = quoteStatusSchema
 
 export const updateQuoteSchema = z.object({
   client_id: z.string().uuid('Cliente inválido').optional(),
