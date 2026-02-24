@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Trash2, Save, FileDown, Send } from 'lucide-react'
+import { ArrowLeft, Trash2, Save, FileDown, Send, MessageCircle, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { PaymentSection } from '@/components/dashboard/payment-section'
 
@@ -141,6 +141,32 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
     } catch (err) {
       setError('Error al exportar PDF')
     }
+  }
+
+  function handleSendWhatsApp() {
+    if (!quote?.client?.phone) {
+      setError('No hay número de teléfono disponible para este cliente')
+      return
+    }
+
+    const phoneNumber = quote.client.phone.replace(/\D/g, '')
+    const message = encodeURIComponent(
+      `Hola ${quote.client.name}, te envío la cotización #${quote.quote_number}. Válida hasta: ${new Date(quote.valid_until).toLocaleDateString('es-MX')}`
+    )
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank')
+  }
+
+  function handleSendEmail() {
+    if (!quote?.client?.email) {
+      setError('No hay email disponible para este cliente')
+      return
+    }
+
+    const subject = encodeURIComponent(`Cotización #${quote.quote_number}`)
+    const body = encodeURIComponent(
+      `Hola ${quote.client.name},\n\nTe envío la cotización #${quote.quote_number}.\n\nValor Total: $${Number(quote.total).toLocaleString('es-MX')}\nVálida hasta: ${new Date(quote.valid_until).toLocaleDateString('es-MX')}\n\nQuedo atento a tus comentarios.`
+    )
+    window.location.href = `mailto:${quote.client.email}?subject=${subject}&body=${body}`
   }
 
   if (!quote) {
@@ -405,6 +431,47 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </CardContent>
       </Card>
+
+      {/* Spacer for mobile sticky bar */}
+      <div className="h-20 lg:hidden" />
+
+      {/* Mobile Sticky Send Bar */}
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden z-30 bg-white border-t border-gray-200 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex gap-2">
+          {quote.status === 'draft' && (
+            <>
+              <Button
+                onClick={handleSendWhatsApp}
+                disabled={loading || !quote.client?.phone}
+                variant="outline"
+                className="flex-1"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                WhatsApp
+              </Button>
+              <Button
+                onClick={handleSendEmail}
+                disabled={loading || !quote.client?.email}
+                variant="outline"
+                className="flex-1"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Email
+              </Button>
+            </>
+          )}
+          {quote.status !== 'draft' && (
+            <Button
+              onClick={handleExportPDF}
+              variant="outline"
+              className="flex-1"
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Descargar
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

@@ -193,7 +193,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPI Cards — Phase 6.1 */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {/* Clients */}
         <Card className="group hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

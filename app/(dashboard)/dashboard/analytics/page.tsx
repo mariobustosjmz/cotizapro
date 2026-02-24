@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TrendingUp, TrendingDown, Users, FileText, DollarSign, Bell } from 'lucide-react'
+import { IncomeAnalytics } from '@/components/dashboard/income-analytics'
 
 interface AnalyticsData {
   summary: {
@@ -361,6 +362,9 @@ export default async function AnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Income Analytics */}
+      <IncomeAnalytics />
     </div>
   )
 }
