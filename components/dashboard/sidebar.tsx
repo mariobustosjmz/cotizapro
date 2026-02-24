@@ -22,6 +22,7 @@ import {
   UserCircle,
   Settings,
   Calendar as CalendarIcon,
+  Copy as TemplateIcon,
 } from 'lucide-react'
 
 interface ProfileOrganization {
@@ -46,6 +47,7 @@ const principalNav = [
   { name: 'Recordatorios', href: '/dashboard/reminders', icon: Bell, shortcut: 'G R' },
   { name: 'Agenda', href: '/dashboard/calendar', icon: CalendarIcon, shortcut: 'G A' },
   { name: 'Servicios', href: '/dashboard/services', icon: Briefcase, shortcut: 'G S' },
+  { name: 'Templates', href: '/dashboard/templates', icon: TemplateIcon, shortcut: 'G T' },
 ]
 
 const analyticsNav = [

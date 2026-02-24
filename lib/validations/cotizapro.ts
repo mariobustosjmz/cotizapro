@@ -395,3 +395,41 @@ export interface WorkEvent {
   status: WorkEventStatus
   created_at: string
 }
+
+// ========================================
+// Quote Template Schemas
+// ========================================
+
+export const createQuoteTemplateSchema = z.object({
+  name: z.string().min(1, 'El nombre es requerido').max(200, 'Nombre muy largo'),
+  description: z.string().max(1000, 'Descripción muy larga').optional().nullable(),
+  default_items: z.array(quoteItemSchema).max(50).optional().nullable(),
+  default_terms: z.string().max(5000, 'Términos muy largos').optional().nullable(),
+  default_discount_rate: z.number().min(0).max(100).optional().nullable(),
+  is_active: z.boolean().default(true),
+  promotional_label: z.string().max(200, 'Etiqueta muy larga').optional().nullable(),
+  promotional_valid_until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida (YYYY-MM-DD)').optional().nullable(),
+})
+
+export const templateQuerySchema = paginationSchema.extend({
+  active_only: z.boolean().default(false),
+})
+
+export const updateQuoteTemplateSchema = createQuoteTemplateSchema.partial()
+
+export type CreateQuoteTemplateInput = z.infer<typeof createQuoteTemplateSchema>
+export type UpdateQuoteTemplateInput = z.infer<typeof updateQuoteTemplateSchema>
+
+export interface QuoteTemplate {
+  id: string
+  organization_id: string
+  name: string
+  description: string | null
+  default_items: unknown | null
+  default_terms: string | null
+  default_discount_rate: string | null
+  is_active: boolean
+  promotional_label: string | null
+  promotional_valid_until: string | null
+  created_at: string
+}

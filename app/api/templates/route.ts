@@ -1,26 +1,16 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { quoteItemSchema } from '@/lib/validations/cotizapro'
+import { createQuoteTemplateSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
-
-const createTemplateSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido').max(200),
-  description: z.string().max(1000).optional(),
-  default_items: z.array(quoteItemSchema).min(1, 'Debe agregar al menos un item').max(50),
-  default_notes: z.string().max(2000).optional().nullable(),
-  default_terms_and_conditions: z.string().max(5000).optional().nullable(),
-  default_discount_rate: z.number().min(0).max(100).default(0),
-  default_valid_days: z.number().int().min(1).max(365).default(30),
-  category: z.string().max(50).optional().nullable(),
-})
+import { handleApiError, ApiErrors } from '@/lib/error-handler'
+import { logger } from '@/lib/logger'
 
 // GET /api/templates - List quote templates
 export async function GET(request: NextRequest) {
   try {
-    // Apply rate limiting
     const limitResult = defaultApiLimiter(request)
     if (limitResult.limited) {
+      logger.warn('Rate limit exceeded for templates list', { ip: request.headers.get('x-forwarded-for') })
       return applyRateLimit(limitResult)
     }
 
@@ -28,7 +18,8 @@ export async function GET(request: NextRequest) {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+      logger.security('GET /api/templates - unauthorized access attempt')
+      return handleApiError(ApiErrors.UNAUTHORIZED(), 'GET /api/templates')
     }
 
     const { data: profile } = await supabase
@@ -38,48 +29,53 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (!profile) {
-      return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 404 })
+      logger.warn('Profile not found for authenticated user', { userId: user.id })
+      return handleApiError(ApiErrors.NOT_FOUND('Profile'), 'GET /api/templates')
     }
 
     const searchParams = request.nextUrl.searchParams
-    const category = searchParams.get('category')
-    const active_only = searchParams.get('active') === 'true'
+    const activeOnly = searchParams.get('active') === 'true'
 
+    logger.database('SELECT', 'quote_templates', { orgId: profile.organization_id })
     let query = supabase
       .from('quote_templates')
-      .select('*')
+      .select(
+        'id, organization_id, name, description, default_items, default_terms_and_conditions, default_discount_rate, is_active, promotional_label, promotional_valid_until, created_at'
+      )
       .eq('organization_id', profile.organization_id)
-      .order('usage_count', { ascending: false })
       .order('name')
-      .limit(500)
+      .limit(100)
 
-    if (category) {
-      query = query.eq('category', category)
-    }
-
-    if (active_only) {
+    if (activeOnly) {
       query = query.eq('is_active', true)
     }
 
     const { data: templates, error } = await query
 
     if (error) {
-      return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+      logger.error('Error fetching templates', error, { orgId: profile.organization_id })
+      return handleApiError(
+        ApiErrors.INTERNAL_ERROR('Failed to fetch templates'),
+        'GET /api/templates - select'
+      )
     }
 
-    return NextResponse.json({ templates })
+    return NextResponse.json({ data: templates || [] })
   } catch (error) {
-    console.error('Templates fetch error:', error)
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+    logger.error('Unexpected error in GET /api/templates', error)
+    return handleApiError(
+      ApiErrors.INTERNAL_ERROR('Failed to process request'),
+      'GET /api/templates'
+    )
   }
 }
 
 // POST /api/templates - Create template
 export async function POST(request: NextRequest) {
   try {
-    // Apply rate limiting
     const limitResult = defaultApiLimiter(request)
     if (limitResult.limited) {
+      logger.warn('Rate limit exceeded for template creation', { ip: request.headers.get('x-forwarded-for') })
       return applyRateLimit(limitResult)
     }
 
@@ -87,7 +83,8 @@ export async function POST(request: NextRequest) {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+      logger.security('POST /api/templates - unauthorized access attempt')
+      return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/templates')
     }
 
     const { data: profile } = await supabase
@@ -97,11 +94,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!profile) {
-      return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 404 })
+      logger.warn('Profile not found for authenticated user', { userId: user.id })
+      return handleApiError(ApiErrors.NOT_FOUND('Profile'), 'POST /api/templates')
     }
 
     const body = await request.json()
-    const validation = createTemplateSchema.safeParse(body)
+    const validation = createQuoteTemplateSchema.safeParse(body)
 
     if (!validation.success) {
       return NextResponse.json({
@@ -110,23 +108,43 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
+    logger.database('INSERT', 'quote_templates', { orgId: profile.organization_id })
     const { data: template, error } = await supabase
       .from('quote_templates')
       .insert({
-        ...validation.data,
+        name: validation.data.name,
+        description: validation.data.description ?? null,
+        default_items: validation.data.default_items ?? null,
+        default_terms_and_conditions: validation.data.default_terms ?? null,
+        default_discount_rate: validation.data.default_discount_rate ?? 0,
+        is_active: validation.data.is_active ?? true,
+        promotional_label: validation.data.promotional_label ?? null,
+        promotional_valid_until: validation.data.promotional_valid_until ?? null,
         organization_id: profile.organization_id,
         created_by: user.id,
+        usage_count: 0,
+        default_valid_days: 30,
       })
-      .select()
+      .select(
+        'id, organization_id, name, description, default_items, default_terms_and_conditions, default_discount_rate, is_active, promotional_label, promotional_valid_until, created_at'
+      )
       .single()
 
     if (error) {
-      return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+      logger.error('Error creating template', error, { orgId: profile.organization_id })
+      return handleApiError(
+        ApiErrors.INTERNAL_ERROR('Failed to create template'),
+        'POST /api/templates - insert'
+      )
     }
 
-    return NextResponse.json({ template }, { status: 201 })
+    logger.info('Template created successfully', { templateId: template.id, userId: user.id })
+    return NextResponse.json({ data: template }, { status: 201 })
   } catch (error) {
-    console.error('Template creation error:', error)
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+    logger.error('Unexpected error in POST /api/templates', error)
+    return handleApiError(
+      ApiErrors.INTERNAL_ERROR('Failed to process request'),
+      'POST /api/templates'
+    )
   }
 }
