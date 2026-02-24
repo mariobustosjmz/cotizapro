@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, Trash2, Save, FileDown, Send } from 'lucide-react'
 import Link from 'next/link'
+import { PaymentSection } from '@/components/dashboard/payment-section'
 
 interface QuoteItem {
   id: string
@@ -311,6 +312,9 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </CardContent>
       </Card>
+
+      {/* Payments Section */}
+      <PaymentSection quoteId={quote.id} quoteTotal={quote.total} />
 
       {/* Additional Info */}
       <div className="grid gap-6 md:grid-cols-2">
