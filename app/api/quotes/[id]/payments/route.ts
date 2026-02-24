@@ -61,7 +61,7 @@ export async function GET(
     logger.database('SELECT', 'quote_payments', { quoteId: id })
     const { data: payments, error: paymentsError } = await supabase
       .from('quote_payments')
-      .select('*')
+      .select('id, amount, payment_type, payment_method, payment_date, notes, received_by, created_at')
       .eq('quote_id', id)
       .eq('organization_id', profile.organization_id)
       .order('payment_date', { ascending: false })
