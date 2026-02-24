@@ -212,14 +212,16 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
                     <td className="text-right py-3 px-3 font-semibold">
                       ${Number(payment.amount).toLocaleString('es-MX')}
                     </td>
-                    <td className="py-3 px-3 text-gray-600">—</td>
+                    <td className="py-3 px-3 text-gray-600">
+                      {payment.received_by ? payment.received_by.slice(-8) : '—'}
+                    </td>
                     <td className="text-center py-3 px-3">
                       <div className="flex justify-center gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          disabled
-                          title="No disponible aún"
+                          title="Descargar comprobante"
+                          onClick={() => window.open(`/api/quotes/${quoteId}/payments/receipt/${payment.id}`, '_blank')}
                         >
                           <FileDown className="w-4 h-4" />
                         </Button>
