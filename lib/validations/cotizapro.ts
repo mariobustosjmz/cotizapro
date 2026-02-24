@@ -155,8 +155,6 @@ export const quoteStatusSchema = z.enum([
 
 export type QuoteStatus = z.infer<typeof quoteStatusSchema>
 
-export const quoteStatusEnum = quoteStatusSchema
-
 export const updateQuoteSchema = z.object({
   client_id: z.string().uuid('Cliente inválido').optional(),
   valid_until: z.string().datetime('Fecha inválida').or(z.date()).optional(),
@@ -170,7 +168,7 @@ export const updateQuoteSchema = z.object({
     .min(0, 'El descuento no puede ser negativo')
     .max(100, 'El descuento no puede ser mayor a 100%')
     .optional(),
-  status: quoteStatusEnum.optional(),
+  status: quoteStatusSchema.optional(),
 })
 
 export type CreateQuoteInput = z.infer<typeof createQuoteSchema>
@@ -219,7 +217,7 @@ export const serviceQuerySchema = paginationSchema.extend({
 })
 
 export const quoteQuerySchema = paginationSchema.extend({
-  status: quoteStatusEnum.optional(),
+  status: quoteStatusSchema.optional(),
   client_id: z.string().uuid().optional(),
   from_date: z.string().datetime().optional(),
   to_date: z.string().datetime().optional(),
