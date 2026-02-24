@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { FileText, Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { QuoteSearchInput } from './search-input'
+import { QuotesKanbanWrapper } from '@/components/dashboard/quotes-kanban-wrapper'
 
 const VALID_STATUSES = ['draft', 'sent', 'viewed', 'accepted', 'rejected', 'expired'] as const
 type QuoteStatus = typeof VALID_STATUSES[number]
@@ -30,12 +31,13 @@ const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
 export default async function QuotesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; q?: string }>
+  searchParams: Promise<{ status?: string; q?: string; view?: string }>
 }) {
-  const { status, q } = await searchParams
+  const { status, q, view } = await searchParams
   const activeStatus = VALID_STATUSES.includes(status as QuoteStatus)
     ? (status as QuoteStatus)
     : undefined
+  const isKanbanView = view === 'kanban'
 
   const supabase = await createServerClient()
 
@@ -90,56 +92,87 @@ export default async function QuotesPage({
             Gestiona tus cotizaciones y propuestas
           </p>
         </div>
-        <Link href="/dashboard/quotes/new" data-testid="new-quote-header-btn">
-          <Button className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="w-4 h-4" />
-            <span>Nueva Cotización</span>
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+            <Link
+              href="/dashboard/quotes"
+              className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                !isKanbanView
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Lista
+            </Link>
+            <Link
+              href="/dashboard/quotes?view=kanban"
+              className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                isKanbanView
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Kanban
+            </Link>
+          </div>
+          <Link href="/dashboard/quotes/new" data-testid="new-quote-header-btn">
+            <Button className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white">
+              <Plus className="w-4 h-4" />
+              <span>Nueva Cotización</span>
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Borradores</CardTitle>
-            <FileText className="h-4 w-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="draft-quotes-count">{statusCounts.draft}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Enviadas</CardTitle>
-            <FileText className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="sent-quotes-count">{statusCounts.sent}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aceptadas</CardTitle>
-            <FileText className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="accepted-quotes-count">{statusCounts.accepted}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rechazadas</CardTitle>
-            <FileText className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold" data-testid="rejected-quotes-count">{statusCounts.rejected}</div>
-          </CardContent>
-        </Card>
-      </div>
+      {!isKanbanView && (
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Borradores</CardTitle>
+              <FileText className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="draft-quotes-count">{statusCounts.draft}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Enviadas</CardTitle>
+              <FileText className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="sent-quotes-count">{statusCounts.sent}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Aceptadas</CardTitle>
+              <FileText className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="accepted-quotes-count">{statusCounts.accepted}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Rechazadas</CardTitle>
+              <FileText className="h-4 w-4 text-red-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" data-testid="rejected-quotes-count">{statusCounts.rejected}</div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-      {/* Quotes List */}
-      <Card>
+      {/* Kanban View */}
+      {isKanbanView ? (
+        <QuotesKanbanWrapper />
+      ) : (
+        /* Quotes List */
+        <Card>
         <CardHeader className="space-y-3">
           <div className="flex items-center justify-between">
             <CardTitle>Lista de Cotizaciones</CardTitle>
@@ -279,6 +312,7 @@ export default async function QuotesPage({
           )}
         </CardContent>
       </Card>
+      )}
     </div>
   )
 }

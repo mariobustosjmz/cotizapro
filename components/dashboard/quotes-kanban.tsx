@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import { QuoteStatus } from '@/lib/validations/cotizapro'
 
-interface KanbanQuote {
+export interface KanbanQuote {
   id: string
   quote_number: string
   clients: { name: string | null; company_name: string | null } | null
