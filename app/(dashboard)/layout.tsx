@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { DashboardSidebar } from '@/components/dashboard/sidebar'
 import { DashboardHeader } from '@/components/dashboard/header'
 import { ClientLayout } from '@/components/dashboard/client-layout'
+import { FAB } from '@/components/dashboard/fab'
 
 export default async function DashboardLayout({
   children,
@@ -46,6 +47,9 @@ export default async function DashboardLayout({
         <ClientLayout>
           {children}
         </ClientLayout>
+
+        {/* Mobile FAB */}
+        <FAB />
       </div>
     </div>
   )

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Bell, ChevronRight } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
+import { QuickActionsList } from './quick-actions'
 
 interface HeaderProps {
   user: User
@@ -76,7 +77,12 @@ export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps)
       </nav>
 
       {/* Right actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex items-center gap-4 shrink-0">
+        {/* Quick Actions - Desktop only */}
+        <div className="hidden lg:block">
+          <QuickActionsList variant="horizontal" />
+        </div>
+
         {/* Notifications */}
         <button
           className="relative w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
