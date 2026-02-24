@@ -65,7 +65,11 @@ export function QuotesKanban({ quotes, onStatusChange }: Props) {
         return
       }
       setDragging(null)
-      await onStatusChange(dragging, targetStatus)
+      try {
+        await onStatusChange(dragging, targetStatus)
+      } catch (error) {
+        console.error('Failed to update quote status:', error)
+      }
     },
     [dragging, quotes, onStatusChange]
   )
@@ -166,7 +170,11 @@ export function QuotesKanban({ quotes, onStatusChange }: Props) {
                 onClick={async () => {
                   const { quoteId, to } = confirmMove
                   setConfirmMove(null)
-                  await onStatusChange(quoteId, to)
+                  try {
+                    await onStatusChange(quoteId, to)
+                  } catch (error) {
+                    console.error('Failed to update quote status:', error)
+                  }
                 }}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
