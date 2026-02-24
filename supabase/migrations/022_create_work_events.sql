@@ -30,6 +30,11 @@ CREATE POLICY "org members can insert work events"
   ON work_events FOR INSERT
   WITH CHECK (organization_id = (auth.jwt()->>'organization_id')::UUID);
 
+CREATE POLICY "org members can update work events"
+  ON work_events FOR UPDATE
+  USING (organization_id = (auth.jwt()->>'organization_id')::UUID)
+  WITH CHECK (organization_id = (auth.jwt()->>'organization_id')::UUID);
+
 CREATE POLICY "org admins can delete work events"
   ON work_events FOR DELETE
   USING (

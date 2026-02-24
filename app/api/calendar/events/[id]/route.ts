@@ -169,10 +169,10 @@ export async function DELETE(
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'DELETE /api/calendar/events/[id]')
     }
 
-    // Get user's organization and role
+    // Get user's organization
     const { data: profile } = await supabase
       .from('profiles')
-      .select('organization_id, role')
+      .select('organization_id')
       .eq('id', user.id)
       .single()
 
@@ -181,13 +181,7 @@ export async function DELETE(
       return handleApiError(ApiErrors.NOT_FOUND('Profile'), 'DELETE /api/calendar/events/[id]')
     }
 
-    // Check role authorization
-    if (!['owner', 'admin'].includes(profile.role)) {
-      logger.security('DELETE /api/calendar/events/[id] - insufficient permissions', { userId: user.id, role: profile.role })
-      return handleApiError(ApiErrors.FORBIDDEN(), 'DELETE /api/calendar/events/[id]')
-    }
-
-    // Delete work event (RLS will enforce organization filter)
+    // Delete work event (RLS will enforce organization and role filters)
     const { error } = await supabase
       .from('work_events')
       .delete()
