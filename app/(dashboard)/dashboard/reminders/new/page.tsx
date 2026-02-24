@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,7 +30,7 @@ export default function NewReminderPage() {
         const response = await fetch('/api/clients')
         if (response.ok) {
           const data = await response.json()
-          setClients(data.data || [])
+          setClients(data.clients || [])
         }
       } catch (err) {
         console.error('Error loading clients:', err)
@@ -56,7 +57,7 @@ export default function NewReminderPage() {
     const data = {
       client_id: clientId,
       title: formData.get('title'),
-      message: formData.get('message'),
+      description: formData.get('description'),
       reminder_type: formData.get('reminder_type'),
       scheduled_date: formData.get('scheduled_date'),
       priority: formData.get('priority'),
@@ -116,13 +117,12 @@ export default function NewReminderPage() {
             )}
 
             {/* Client Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="client_id">Cliente *</Label>
+            <FormField label="Cliente" htmlFor="client_id" required>
               <select
                 id="client_id"
                 name="client_id"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="">Selecciona un cliente...</option>
                 {clients.map(client => (
@@ -131,60 +131,52 @@ export default function NewReminderPage() {
                   </option>
                 ))}
               </select>
-              {clients.length === 0 && (
-                <p className="text-sm text-gray-500">
-                  No hay clientes. <Link href="/dashboard/clients/new" className="text-blue-600 hover:underline">Crear cliente</Link>
-                </p>
-              )}
-            </div>
+            </FormField>
+            {clients.length === 0 && (
+              <p className="text-sm text-gray-500">
+                No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 hover:underline">Crear cliente</Link>
+              </p>
+            )}
 
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Title */}
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="title">Título *</Label>
+              <FormField label="Título" htmlFor="title" required className="md:col-span-2">
                 <Input
                   id="title"
                   name="title"
                   required
                   placeholder="Mantenimiento anual de minisplit"
                 />
-              </div>
+              </FormField>
 
-              {/* Reminder Type */}
-              <div className="space-y-2">
-                <Label htmlFor="reminder_type">Tipo de Recordatorio *</Label>
+              <FormField label="Tipo de Recordatorio" htmlFor="reminder_type" required>
                 <select
                   id="reminder_type"
                   name="reminder_type"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="follow_up">Seguimiento</option>
                   <option value="maintenance">Mantenimiento</option>
                   <option value="renewal">Renovación</option>
                   <option value="custom">Personalizado</option>
                 </select>
-              </div>
+              </FormField>
 
-              {/* Priority */}
-              <div className="space-y-2">
-                <Label htmlFor="priority">Prioridad *</Label>
+              <FormField label="Prioridad" htmlFor="priority" required>
                 <select
                   id="priority"
                   name="priority"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="normal">Normal</option>
                   <option value="low">Baja</option>
                   <option value="high">Alta</option>
                   <option value="urgent">Urgente</option>
                 </select>
-              </div>
+              </FormField>
 
-              {/* Scheduled Date */}
-              <div className="space-y-2">
-                <Label htmlFor="scheduled_date">Fecha Programada *</Label>
+              <FormField label="Fecha Programada" htmlFor="scheduled_date" required>
                 <Input
                   id="scheduled_date"
                   name="scheduled_date"
@@ -192,15 +184,13 @@ export default function NewReminderPage() {
                   required
                   min={new Date().toISOString().split('T')[0]}
                 />
-              </div>
+              </FormField>
 
-              {/* Service Category */}
-              <div className="space-y-2">
-                <Label htmlFor="related_service_category">Categoría de Servicio</Label>
+              <FormField label="Categoría de Servicio" htmlFor="related_service_category">
                 <select
                   id="related_service_category"
                   name="related_service_category"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Ninguna</option>
                   <option value="hvac">HVAC</option>
@@ -209,22 +199,21 @@ export default function NewReminderPage() {
                   <option value="electrical">Eléctrico</option>
                   <option value="other">Otro</option>
                 </select>
-              </div>
+              </FormField>
             </div>
 
-            {/* Message */}
-            <div className="space-y-2">
-              <Label htmlFor="message">Mensaje</Label>
+            <FormField
+              label="Mensaje"
+              htmlFor="description"
+              hint="Este mensaje se enviará al cliente en la fecha programada"
+            >
               <Textarea
-                id="message"
-                name="message"
+                id="description"
+                name="description"
                 rows={4}
                 placeholder="Hola {cliente}, es momento de programar el mantenimiento anual de tu minisplit..."
               />
-              <p className="text-sm text-gray-500">
-                Este mensaje se enviará al cliente en la fecha programada
-              </p>
-            </div>
+            </FormField>
 
             {/* Recurring */}
             <div className="space-y-4">
@@ -234,7 +223,7 @@ export default function NewReminderPage() {
                   id="is_recurring"
                   checked={isRecurring}
                   onChange={(e) => setIsRecurring(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded"
                 />
                 <Label htmlFor="is_recurring" className="cursor-pointer">
                   Recordatorio recurrente
@@ -242,20 +231,23 @@ export default function NewReminderPage() {
               </div>
 
               {isRecurring && (
-                <div className="space-y-2 pl-6">
-                  <Label htmlFor="recurrence_interval_months">Repetir cada (meses) *</Label>
-                  <Input
-                    id="recurrence_interval_months"
-                    name="recurrence_interval_months"
-                    type="number"
-                    min="1"
-                    max="36"
-                    defaultValue="12"
+                <div className="pl-6">
+                  <FormField
+                    label="Repetir cada (meses)"
+                    htmlFor="recurrence_interval_months"
                     required={isRecurring}
-                  />
-                  <p className="text-sm text-gray-500">
-                    El recordatorio se creará automáticamente cada vez que se complete
-                  </p>
+                    hint="El recordatorio se creará automáticamente cada vez que se complete"
+                  >
+                    <Input
+                      id="recurrence_interval_months"
+                      name="recurrence_interval_months"
+                      type="number"
+                      min="1"
+                      max="36"
+                      defaultValue="12"
+                      required={isRecurring}
+                    />
+                  </FormField>
                 </div>
               )}
             </div>
@@ -267,7 +259,7 @@ export default function NewReminderPage() {
                   Cancelar
                 </Button>
               </Link>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
                 {loading ? 'Creando...' : 'Crear Recordatorio'}
               </Button>
             </div>

@@ -1,0 +1,16 @@
+- referencias a otros similares
+- catalogos personalizados : dynamic fields:
+- requerimiento materiales (proveedor/cliente) : conexion o abrir las ligas mas rapido (materia prima)
+- agenda cita, confirmacion : calendario y agenda con seguimiento.
+- servicios extra: servicios post venta/Servicio.
+- link rapido para cotizar (fb marketplace, whatsapp) : cotizador online tipo ecommerce
+
+pensar en ciclo de mantenimiento de climas:
+pensar en puerta de madera para escaleras
+pensar en vidrio templado, canceles.
+estos proveedores aveces requieren ir para tomar medidas o confirmar primero.
+
+
+feature:
+- gestion documentos para empresas (licitaciones)
+- contacto de empresas en el CRM.

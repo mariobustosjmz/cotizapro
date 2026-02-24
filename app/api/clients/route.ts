@@ -139,7 +139,23 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json()
-    const validation = createClientSchema.safeParse(body)
+
+    // Convert empty strings to null for optional fields
+    const sanitizedBody = {
+      ...body,
+      email: body.email === '' ? null : body.email,
+      phone: body.phone === '' ? null : body.phone,
+      whatsapp_phone: body.whatsapp_phone === '' ? null : body.whatsapp_phone,
+      address: body.address === '' ? null : body.address,
+      city: body.city === '' ? null : body.city,
+      state: body.state === '' ? null : body.state,
+      postal_code: body.postal_code === '' ? null : body.postal_code,
+      country: body.country === '' ? null : body.country,
+      tax_id: body.tax_id === '' ? null : body.tax_id,
+      notes: body.notes === '' ? null : body.notes,
+    }
+
+    const validation = createClientSchema.safeParse(sanitizedBody)
 
     if (!validation.success) {
       return handleApiError(

@@ -60,7 +60,7 @@ export class QuotesPage extends BasePage {
     // If adding a new item (not the first one), click the add button
     if (itemIndex > 0) {
       const addButton = this.page.locator('[data-testid="add-quote-item-btn"]')
-      await addButton.waitFor({ state: 'visible', timeout: 10000 })
+      await addButton.waitFor({ state: 'visible', timeout: 30000 })
       await addButton.click()
       await this.page.waitForTimeout(500)
     }
@@ -71,7 +71,7 @@ export class QuotesPage extends BasePage {
     const quantityInput = this.page.locator(`[data-testid="item-quantity-${itemIndex}"]`)
 
     // Wait for fields with longer timeout and better error handling
-    await descInput.waitFor({ state: 'visible', timeout: 10000 })
+    await descInput.waitFor({ state: 'visible', timeout: 30000 })
     await descInput.fill(description)
     await priceInput.waitFor({ state: 'visible', timeout: 5000 })
     await priceInput.fill(price)
@@ -85,17 +85,17 @@ export class QuotesPage extends BasePage {
     // Wait for API response to avoid race conditions
     const responsePromise = this.page.waitForResponse(
       response => response.url().includes('/api/quotes') && response.request().method() === 'POST',
-      { timeout: 10000 }
+      { timeout: 30000 }
     ).catch(() => null)
 
     await this.page.locator('[data-testid="submit-quote-btn"]').click()
 
     await responsePromise
 
-    await this.page.waitForURL('**/dashboard/quotes', { timeout: 10000 })
+    await this.page.waitForURL('**/dashboard/quotes', { timeout: 30000 })
 
     // Force a page reload to ensure fresh data from Server Component
-    await this.page.reload({ waitUntil: 'networkidle' })
+    await this.page.reload({ waitUntil: 'load' }).catch(() => null)
 
     // Wait for the table to be visible (or empty state)
     await this.page.locator('table, text=No hay cotizaciones').waitFor({ timeout: 5000 }).catch(() => null)

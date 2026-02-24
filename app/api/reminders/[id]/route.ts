@@ -16,30 +16,57 @@ export async function GET(
     }
 
     const { id } = await params
+    console.log('[API /reminders/[id] GET] Fetching reminder:', id)
     const supabase = await createServerClient()
 
     // Verify authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
+    console.log('[API /reminders/[id] GET] Auth check:', { userId: user?.id, hasError: !!authError })
     if (authError || !user) {
+      console.log('[API /reminders/[id] GET] Unauthorized')
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    // Fetch reminder (RLS will enforce organization filter)
+    // Fetch reminder without join (split queries to avoid RLS issues)
     const { data: reminder, error } = await supabase
       .from('follow_up_reminders')
-      .select(`
-        *,
-        client:clients(*),
-        related_quote:quotes(id, quote_number, total, status)
-      `)
+      .select('*')
       .eq('id', id)
       .single()
 
+    console.log('[API /reminders/[id] GET] Query result:', { found: !!reminder, error: error?.message })
     if (error || !reminder) {
+      console.log('[API /reminders/[id] GET] Reminder not found')
       return NextResponse.json({ error: 'Recordatorio no encontrado' }, { status: 404 })
     }
 
-    return NextResponse.json({ reminder })
+    // Fetch client separately
+    const { data: client } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('id', reminder.client_id)
+      .single()
+
+    // Fetch related quote if exists
+    let relatedQuote = null
+    if (reminder.related_quote_id) {
+      const { data: quote } = await supabase
+        .from('quotes')
+        .select('id, quote_number, total, status')
+        .eq('id', reminder.related_quote_id)
+        .single()
+      relatedQuote = quote
+    }
+
+    // Map data to reminder
+    const reminderWithRelations = {
+      ...reminder,
+      clients: client,
+      related_quote: relatedQuote
+    }
+
+    console.log('[API /reminders/[id] GET] Returning reminder:', reminderWithRelations.id, reminderWithRelations.title)
+    return NextResponse.json({ data: reminderWithRelations })
   } catch (error) {
     console.error('Unexpected error:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
@@ -96,15 +123,12 @@ export async function PATCH(
       }
     }
 
-    // Update reminder (RLS will enforce organization filter)
+    // Update reminder without join (split queries to avoid RLS issues)
     const { data: reminder, error } = await supabase
       .from('follow_up_reminders')
       .update(validation.data)
       .eq('id', id)
-      .select(`
-        *,
-        client:clients(id, name, email, phone, whatsapp_phone)
-      `)
+      .select('*')
       .single()
 
     if (error) {
@@ -115,7 +139,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Error al actualizar el recordatorio' }, { status: 500 })
     }
 
-    return NextResponse.json({ reminder })
+    // Fetch client separately
+    const { data: client } = await supabase
+      .from('clients')
+      .select('id, name, email, phone, whatsapp_phone')
+      .eq('id', reminder.client_id)
+      .single()
+
+    // Map client data to reminder
+    const reminderWithClient = {
+      ...reminder,
+      clients: client
+    }
+
+    return NextResponse.json({ data: reminderWithClient })
   } catch (error) {
     console.error('Unexpected error:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })

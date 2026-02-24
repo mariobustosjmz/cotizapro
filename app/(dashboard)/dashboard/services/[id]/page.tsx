@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,33 +9,39 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
+import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
+import type { CustomFieldValues } from '@/types/custom-fields'
 
 interface Service {
   id: string
   name: string
   description: string | null
   category: string
-  default_price: number
+  unit_price: number
   unit_type: string
   is_active: boolean
   created_at: string
+  custom_fields?: CustomFieldValues
 }
 
-export default function ServiceDetailPage({ params }: { params: { id: string } }) {
+export default function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const { id } = use(params)
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [service, setService] = useState<Service | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [customFields, setCustomFields] = useState<CustomFieldValues>({})
 
   useEffect(() => {
     async function fetchService() {
       try {
-        const response = await fetch(`/api/services/${params.id}`)
+        const response = await fetch(`/api/services/${id}`)
         if (response.ok) {
           const data = await response.json()
           setService(data.data)
+          setCustomFields((data.data.custom_fields as CustomFieldValues) ?? {})
         } else {
           setError('Servicio no encontrado')
         }
@@ -45,7 +51,7 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
     }
 
     fetchService()
-  }, [params.id])
+  }, [id])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -58,13 +64,14 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
       name: formData.get('name'),
       description: formData.get('description'),
       category: formData.get('category'),
-      default_price: parseFloat(formData.get('default_price') as string),
+      unit_price: parseFloat(formData.get('unit_price') as string),
       unit_type: formData.get('unit_type'),
       is_active: formData.get('is_active') === 'true',
+      custom_fields: customFields,
     }
 
     try {
-      const response = await fetch(`/api/services/${params.id}`, {
+      const response = await fetch(`/api/services/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -94,7 +101,7 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
     setError('')
 
     try {
-      const response = await fetch(`/api/services/${params.id}`, {
+      const response = await fetch(`/api/services/${id}`, {
         method: 'DELETE',
       })
 
@@ -236,27 +243,24 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
                     defaultValue={service.unit_type}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="servicio">Servicio</option>
-                    <option value="hora">Hora</option>
-                    <option value="m2">Metro cuadrado (m²)</option>
-                    <option value="m">Metro (m)</option>
-                    <option value="pieza">Pieza</option>
-                    <option value="paquete">Paquete</option>
-                    <option value="proyecto">Proyecto</option>
+                    <option value="fixed">Precio Fijo</option>
+                    <option value="per_hour">Por Hora</option>
+                    <option value="per_sqm">Por Metro Cuadrado (m²)</option>
+                    <option value="per_unit">Por Unidad</option>
                   </select>
                 </div>
 
                 {/* Default Price */}
                 <div className="space-y-2">
-                  <Label htmlFor="default_price">Precio Base *</Label>
+                  <Label htmlFor="unit_price">Precio Base *</Label>
                   <Input
-                    id="default_price"
-                    name="default_price"
+                    id="unit_price"
+                    name="unit_price"
                     type="number"
                     min="0"
                     step="0.01"
                     required
-                    defaultValue={service.default_price}
+                    defaultValue={service.unit_price}
                   />
                 </div>
 
@@ -290,6 +294,12 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
                 />
               </div>
 
+              <DynamicFieldsSection
+                entityType="service"
+                values={customFields}
+                onChange={setCustomFields}
+              />
+
               {/* Actions */}
               <div className="flex justify-end">
                 <Button type="submit" disabled={loading}>
@@ -314,7 +324,7 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
                 <div>
                   <Label className="text-sm text-gray-500">Precio Base</Label>
                   <p className="text-gray-900 text-xl font-bold">
-                    ${service.default_price.toLocaleString('es-MX')}
+                    ${Number(service.unit_price).toLocaleString('es-MX')}
                   </p>
                 </div>
 
@@ -348,6 +358,13 @@ export default function ServiceDetailPage({ params }: { params: { id: string } }
                   <p className="text-gray-900 whitespace-pre-wrap">{service.description}</p>
                 </div>
               )}
+
+              <DynamicFieldsSection
+                entityType="service"
+                values={customFields}
+                onChange={() => {}}
+                disabled
+              />
             </div>
           )}
         </CardContent>

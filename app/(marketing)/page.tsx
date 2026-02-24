@@ -158,552 +158,691 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* JSON-LD Structured Data */}
+    <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600">CotizaPro</div>
-          <div className="flex gap-4">
-            <Link href="/login">
-              <Button variant="ghost">Iniciar Sesión</Button>
+      {/* ── Navigation ──────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-slate-200/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <span className="text-lg font-bold text-slate-900">
+                Cotiza<span className="text-blue-800">Pro</span>
+              </span>
             </Link>
-            <Link href="/signup">
-              <Button>Prueba Gratis</Button>
-            </Link>
+
+            {/* Nav links */}
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="#caracteristicas" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
+                Características
+              </Link>
+              <Link href="#precios" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
+                Precios
+              </Link>
+              <Link href="#faq" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
+                FAQ
+              </Link>
+            </div>
+
+            {/* CTA */}
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="hidden sm:block text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer">
+                Iniciar sesión
+              </Link>
+              <Link href="/signup">
+                <button className="btn-glow-orange bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer">
+                  Empieza Gratis
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-          Cotizaciones Profesionales<br />
-          <span className="text-blue-600">en Minutos</span>
-        </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          La herramienta perfecta para técnicos de mantenimiento en México. Crea, envía y gestiona cotizaciones por WhatsApp y Email.
-        </p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/signup">
-            <Button size="lg" className="text-lg px-8 hover:scale-105 transition-transform duration-300">
-              Comenzar Gratis
-            </Button>
-          </Link>
-          <Link href="#features" scroll={true}>
-            <Button size="lg" variant="outline" className="text-lg px-8 hover:scale-105 transition-transform duration-300">
-              Ver Características
-            </Button>
-          </Link>
+      {/* ── Hero Section ────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-slate-50 pt-16 pb-24">
+        {/* Gradient mesh blobs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="animate-blob absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-blue-300/30 blur-3xl opacity-40" />
+          <div className="animate-blob-delay-2 absolute top-1/2 -right-48 w-[420px] h-[420px] rounded-full bg-blue-400/25 blur-3xl opacity-40" />
+          <div className="animate-blob-delay-4 absolute -bottom-24 left-1/3 w-[380px] h-[380px] rounded-full bg-orange-300/20 blur-3xl opacity-30" />
         </div>
-        <p className="text-sm text-gray-500 mt-4">
-          ✓ Sin tarjeta de crédito ✓ 14 días gratis ✓ Cancelación cuando quieras
-        </p>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left column */}
+            <div className="animate-fade-in-up">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                Nuevo: WhatsApp integrado
+              </div>
+
+              {/* Heading */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
+                Cotiza como{' '}
+                <span className="gradient-text-animated">profesional</span>
+                <br />en 30 segundos
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-lg text-slate-600 leading-relaxed mb-8 max-w-lg animate-fade-in-up-delay-1">
+                La plataforma de cotizaciones para técnicos de HVAC, plomería, electricidad y pintura en México. Profesional, rápido y sin complicaciones.
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-10 animate-fade-in-up-delay-2">
+                <Link href="/signup">
+                  <button className="btn-glow-orange bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl text-base transition-colors cursor-pointer w-full sm:w-auto">
+                    Empieza Gratis — sin tarjeta
+                  </button>
+                </Link>
+                <Link href="#precios">
+                  <button className="bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-xl text-base transition-colors cursor-pointer w-full sm:w-auto">
+                    Ver precios
+                  </button>
+                </Link>
+              </div>
+
+              {/* Trust chips */}
+              <div className="flex flex-wrap gap-4 animate-fade-in-up-delay-3">
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <svg className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                  <span><strong className="text-slate-700">4.8</strong> calificación promedio</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+                  </svg>
+                  <span><strong className="text-slate-700">500+</strong> técnicos activos</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <svg className="w-4 h-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <span>SSL certificado</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column — floating mockup cards */}
+            <div className="relative hidden lg:flex items-center justify-center h-[460px]">
+              {/* Quote card */}
+              <div className="animate-float absolute top-0 left-8 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-5 z-20">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Cotización #1247</span>
+                  <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">Enviada</span>
+                </div>
+                <p className="text-sm font-semibold text-slate-800 mb-1">Instalación A/C Split 24,000 BTU</p>
+                <p className="text-xs text-slate-500 mb-3">Cliente: Constructora Reyma</p>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-black text-slate-900">$4,500 <span className="text-sm font-normal text-slate-500">MXN</span></span>
+                  <span className="text-xs text-slate-400">+IVA</span>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full bg-slate-100 rounded-full h-1.5">
+                  <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: '68%' }} />
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Tasa de cierre: 68%</p>
+              </div>
+
+              {/* Stats card */}
+              <div className="animate-float-slow absolute bottom-8 left-0 w-60 bg-white rounded-2xl shadow-xl border border-slate-100 p-5 z-10">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Este mes</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-2xl font-black text-blue-800">127</p>
+                    <p className="text-xs text-slate-500">Cotizaciones</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-orange-500">68%</p>
+                    <p className="text-xs text-slate-500">Cierre</p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <p className="text-sm font-bold text-slate-800">$142,800 MXN</p>
+                  <p className="text-xs text-slate-400">Ingresos del mes</p>
+                </div>
+              </div>
+
+              {/* Notification card */}
+              <div className="animate-float-delay absolute top-16 right-0 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-30">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">Cliente aprobó cotización</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Constructora Reyma — #1247</p>
+                    <p className="text-xs text-green-600 font-semibold mt-1">hace 2 minutos</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Decorative ring */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-100/40 to-transparent" />
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold text-center mb-4">
-          Todo lo que necesitas para cotizar
-        </h2>
-        <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
-          Plataforma completa para técnicos de mantenimiento en México
-        </p>
-
-        {/* Categoría 1: Cotización Inteligente */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
-            <span className="text-3xl mr-3">🎯</span>
-            Cotización Inteligente
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.cotizacion.map((feature, idx) => (
-              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
-                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  {feature.title}
-                  {feature.badge && (
-                    <span className="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
-                      {feature.badge}
-                    </span>
-                  )}
-                </h4>
-                <p className="text-gray-600 text-sm">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Categoría 2: Seguimiento & Automatización */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
-            <span className="text-3xl mr-3">📅</span>
-            Seguimiento & Automatización
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.seguimiento.map((feature, idx) => (
-              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
-                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  {feature.title}
-                  {feature.badge && (
-                    <span className="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
-                      {feature.badge}
-                    </span>
-                  )}
-                </h4>
-                <p className="text-gray-600 text-sm">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Categoría 3: Gestión & Pagos */}
-        <div>
-          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
-            <span className="text-3xl mr-3">💰</span>
-            Gestión & Pagos
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.gestion.map((feature, idx) => (
-              <div key={idx} className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
-                <div className={`w-12 h-12 ${colorClasses[feature.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getIconPath(feature.icon)} />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  {feature.title}
-                  {feature.badge && (
-                    <span className="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">
-                      {feature.badge}
-                    </span>
-                  )}
-                </h4>
-                <p className="text-gray-600 text-sm">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
+      {/* ── Stats Bar ───────────────────────────────────────────────── */}
+      <section className="bg-slate-900 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-black text-white">500+</p>
+              <p className="text-sm text-slate-400 mt-1">Técnicos Activos</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-black text-orange-400">30 seg</p>
+              <p className="text-sm text-slate-400 mt-1">Por Cotización</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-black text-white">4.8
+                <span className="text-yellow-400 text-2xl ml-1">★</span>
+              </p>
+              <p className="text-sm text-slate-400 mt-1">Calificación Promedio</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl sm:text-4xl font-black text-green-400">+40%</p>
+              <p className="text-sm text-slate-400 mt-1">Más Ventas Promedio</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="bg-gray-50 py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Confían en CotizaPro
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+      {/* ── Features Section ────────────────────────────────────────── */}
+      <section id="caracteristicas" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
+              Todo lo que necesitas para crecer
+            </h2>
+            <div className="w-16 h-1 bg-orange-500 rounded-full mx-auto mb-4" />
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Herramientas diseñadas para técnicos que quieren profesionalizarse y ganar más clientes.
+            </p>
+          </div>
+
+          {/* Category 1: Cotización */}
+          <div className="mb-20">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                {/* Lightning bolt SVG icon */}
+                <svg className="w-5 h-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-blue-700 bg-blue-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                Cotización Profesional
+              </span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {features.cotizacion.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  className={`feature-card-${(index + 1) as 1 | 2 | 3 | 4} bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-lg hover:border-blue-100 transition-all cursor-default`}
+                >
+                  <div className={`w-11 h-11 rounded-xl ${colorClasses[feature.color as keyof typeof colorClasses]} flex items-center justify-center mb-4`}>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d={getIconPath(feature.icon)} />
+                    </svg>
+                  </div>
+                  <h3 className="font-bold text-slate-800 mb-2 text-sm leading-snug">{feature.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{feature.description}</p>
+                  {feature.badge && (
+                    <span className="inline-block mt-3 text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                      {feature.badge}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Category 2: Seguimiento */}
+          <div className="mb-20">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                {/* Refresh/cycle arrows SVG icon */}
+                <svg className="w-5 h-5 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 4 23 10 17 10" />
+                  <polyline points="1 20 1 14 7 14" />
+                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                Seguimiento y Envío
+              </span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {features.seguimiento.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  className={`feature-card-${(index + 1) as 1 | 2 | 3 | 4} bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-lg hover:border-green-100 transition-all cursor-default`}
+                >
+                  <div className={`w-11 h-11 rounded-xl ${colorClasses[feature.color as keyof typeof colorClasses]} flex items-center justify-center mb-4`}>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d={getIconPath(feature.icon)} />
+                    </svg>
+                  </div>
+                  <h3 className="font-bold text-slate-800 mb-2 text-sm leading-snug">{feature.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{feature.description}</p>
+                  {feature.badge && (
+                    <span className="inline-block mt-3 text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                      {feature.badge}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Category 3: Gestión */}
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                {/* Dollar circle SVG icon */}
+                <svg className="w-5 h-5 text-purple-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v12M9 9.5c0-1.5 1.34-2.5 3-2.5s3 1 3 2.5-1.34 2.5-3 2.5-3 1-3 2.5 1.34 2.5 3 2.5 3-1 3-2.5" />
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                Gestión de Negocio
+              </span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {features.gestion.map((feature, index) => (
+                <div
+                  key={feature.title}
+                  className={`feature-card-${(index + 1) as 1 | 2 | 3 | 4} bg-white rounded-2xl border border-slate-100 p-6 hover:shadow-lg hover:border-purple-100 transition-all cursor-default`}
+                >
+                  <div className={`w-11 h-11 rounded-xl ${colorClasses[feature.color as keyof typeof colorClasses]} flex items-center justify-center mb-4`}>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d={getIconPath(feature.icon)} />
+                    </svg>
+                  </div>
+                  <h3 className="font-bold text-slate-800 mb-2 text-sm leading-snug">{feature.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{feature.description}</p>
+                  {feature.badge && (
+                    <span className="inline-block mt-3 text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                      {feature.badge}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ────────────────────────────────────────────── */}
+      <section className="py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
+              Lo que dicen nuestros técnicos
+            </h2>
+            <p className="text-lg text-slate-600">
+              Más de 500 técnicos ya transformaron su negocio con CotizaPro.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Testimonial 1 */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full mr-4 flex items-center justify-center text-white font-bold">
-                  JP
+            <div className="bg-white rounded-2xl p-7 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="flex gap-1 mb-4">
+                {[1,2,3,4,5].map((s) => (
+                  <svg key={s} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-5">
+                "Antes tardaba 2 horas haciendo una cotización en Word. Ahora en 5 minutos tengo el PDF y se lo mando por WhatsApp al cliente. Mis ventas subieron 40%."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  RM
                 </div>
                 <div>
-                  <div className="font-semibold">Juan Pérez</div>
-                  <div className="text-sm text-gray-600">Técnico HVAC - Ciudad de México</div>
+                  <p className="text-sm font-bold text-slate-800">Roberto Martínez</p>
+                  <p className="text-xs text-slate-500">Técnico HVAC — Guadalajara</p>
                 </div>
               </div>
-              <p className="text-gray-700">
-                &quot;Antes tardaba 30 minutos en hacer una cotización a mano. Ahora las hago en 2 minutos y las envío directo por WhatsApp. Mis clientes están impresionados.&quot;
-              </p>
-              <div className="text-yellow-500 mt-4">★★★★★</div>
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-600 rounded-full mr-4 flex items-center justify-center text-white font-bold">
-                  MG
+            <div className="bg-white rounded-2xl p-7 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="flex gap-1 mb-4">
+                {[1,2,3,4,5].map((s) => (
+                  <svg key={s} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-5">
+                "El historial de clientes es increíble. Ya no pierdo clientes por no recordar cuándo fue su último mantenimiento. CotizaPro se paga solo en el primer mes."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  AG
                 </div>
                 <div>
-                  <div className="font-semibold">María González</div>
-                  <div className="text-sm text-gray-600">Pintora Profesional - Guadalajara</div>
+                  <p className="text-sm font-bold text-slate-800">Ana González</p>
+                  <p className="text-xs text-slate-500">Plomera — Ciudad de México</p>
                 </div>
               </div>
-              <p className="text-gray-700">
-                &quot;Mis clientes aman recibir cotizaciones profesionales por WhatsApp. He cerrado 40% más ventas desde que uso CotizaPro. La inversión se paga sola.&quot;
-              </p>
-              <div className="text-yellow-500 mt-4">★★★★★</div>
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-600 rounded-full mr-4 flex items-center justify-center text-white font-bold">
+            <div className="bg-white rounded-2xl p-7 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="flex gap-1 mb-4">
+                {[1,2,3,4,5].map((s) => (
+                  <svg key={s} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-5">
+                "El PDF profesional con mi logo marca la diferencia. Mis clientes me ven como una empresa seria. Ya conseguí contratos con empresas que antes ni me consideraban."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                   CR
                 </div>
                 <div>
-                  <div className="font-semibold">Carlos Ramírez</div>
-                  <div className="text-sm text-gray-600">Plomero - Monterrey</div>
+                  <p className="text-sm font-bold text-slate-800">Carlos Ramírez</p>
+                  <p className="text-xs text-slate-500">Electricista — Monterrey</p>
                 </div>
               </div>
-              <p className="text-gray-700">
-                &quot;La gestión de clientes es increíble. Tengo todo el historial organizado y puedo hacer seguimiento fácilmente. Ya no pierdo clientes por desorganización.&quot;
-              </p>
-              <div className="text-yellow-500 mt-4">★★★★★</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold text-center mb-4">
-          Planes que se ajustan a tu negocio
-        </h2>
-        <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-          Precios en pesos mexicanos (MXN). Todos los planes incluyen 14 días de prueba gratis.
-        </p>
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Plan Gratis */}
-          <div className="border rounded-lg p-8 bg-white">
-            <h3 className="text-2xl font-bold mb-2">Gratis</h3>
-            <div className="text-4xl font-bold mb-4">
-              $0<span className="text-lg text-gray-600 font-normal">/mes</span>
-            </div>
-            <p className="text-sm text-gray-600 mb-6">Perfecto para comenzar</p>
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>10 cotizaciones/mes</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>5 clientes</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Envío por email</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>PDF profesional</span>
-              </li>
-            </ul>
-            <Link href="/signup" className="block">
-              <Button variant="outline" className="w-full">Comenzar Gratis</Button>
-            </Link>
+      {/* ── Pricing Section ─────────────────────────────────────────── */}
+      <section id="precios" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
+              Planes para cada técnico
+            </h2>
+            <p className="text-lg text-slate-600">
+              Empieza gratis y escala cuando tu negocio crezca.
+            </p>
           </div>
 
-          {/* Plan Pro */}
-          <div className="border-2 border-blue-600 rounded-lg p-8 relative bg-white">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-              Más Popular
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
+            {/* Plan Gratis */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-7">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Gratis</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-black text-slate-900">$0</span>
+                <span className="text-slate-500 text-sm">/mes</span>
+              </div>
+              <p className="text-xs text-slate-500 mb-6">Para empezar sin riesgo</p>
+              <Link href="/signup">
+                <button className="w-full border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold py-3 rounded-xl text-sm transition-colors cursor-pointer mb-6">
+                  Empieza Gratis
+                </button>
+              </Link>
+              <ul className="space-y-3">
+                {[
+                  "5 cotizaciones por mes",
+                  "1 plantilla de PDF",
+                  "Envío por Email",
+                  "Historial 30 días",
+                  "Soporte básico"
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <h3 className="text-2xl font-bold mb-2">Pro</h3>
-            <div className="text-4xl font-bold mb-4">
-              $299<span className="text-lg text-gray-600 font-normal">/mes</span>
-            </div>
-            <p className="text-sm text-gray-600 mb-6">Para técnicos profesionales</p>
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Cotizaciones ilimitadas</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Clientes ilimitados</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>WhatsApp + Email</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Recordatorios automáticos</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Calendario de servicios</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Dashboard completo</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Soporte prioritario</span>
-              </li>
-            </ul>
-            <Link href="/signup" className="block">
-              <Button className="w-full">Comenzar Ahora</Button>
-            </Link>
-          </div>
 
-          {/* Plan Empresa */}
-          <div className="border rounded-lg p-8 bg-white">
-            <h3 className="text-2xl font-bold mb-2">Empresa</h3>
-            <div className="text-4xl font-bold mb-4">
-              $799<span className="text-lg text-gray-600 font-normal">/mes</span>
+            {/* Plan Pro */}
+            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-7 relative overflow-hidden shadow-2xl">
+              {/* Most popular badge */}
+              <div className="absolute top-4 right-4">
+                <span className="text-xs font-bold bg-orange-500 text-white px-3 py-1 rounded-full">Más Popular</span>
+              </div>
+              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-2">Pro</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-black text-white">$299</span>
+                <span className="text-blue-200 text-sm">/mes</span>
+              </div>
+              <p className="text-xs text-blue-200 mb-6">Para técnicos en crecimiento</p>
+              <Link href="/signup">
+                <button className="btn-glow-orange w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition-colors cursor-pointer mb-6">
+                  Empieza 14 días gratis
+                </button>
+              </Link>
+              <ul className="space-y-3">
+                {[
+                  "Cotizaciones ilimitadas",
+                  "PDF con logo personalizado",
+                  "Envío por WhatsApp y Email",
+                  "Historial completo",
+                  "CRM de clientes",
+                  "Dashboard de ventas",
+                  "Soporte prioritario"
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-white">
+                    <svg className="w-4 h-4 text-blue-200 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-sm text-gray-600 mb-6">Para equipos y empresas</p>
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Todo en Pro +</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Múltiples usuarios</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Link de pago (Stripe)</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="font-semibold">Facturación CFDI 4.0</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>API de acceso</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Logo personalizado</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Soporte dedicado 24/7</span>
-              </li>
-            </ul>
-            <Link href="/signup" className="block">
-              <Button variant="outline" className="w-full">Contactar Ventas</Button>
-            </Link>
+
+            {/* Plan Empresa */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-7">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Empresa</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-black text-slate-900">$799</span>
+                <span className="text-slate-500 text-sm">/mes</span>
+              </div>
+              <p className="text-xs text-slate-500 mb-6">Para equipos y empresas</p>
+              <Link href="/signup">
+                <button className="w-full border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold py-3 rounded-xl text-sm transition-colors cursor-pointer mb-6">
+                  Contactar ventas
+                </button>
+              </Link>
+              <ul className="space-y-3">
+                {[
+                  "Todo lo del plan Pro",
+                  "Hasta 10 técnicos",
+                  "Múltiples logos/plantillas",
+                  "Facturación CFDI 4.0",
+                  "Link de pago integrado",
+                  "API de integración",
+                  "Soporte dedicado 24/7"
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
+                    <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="container mx-auto px-4 py-20 bg-gray-50">
-        <h2 className="text-4xl font-bold text-center mb-4">
-          Preguntas Frecuentes
-        </h2>
-        <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-          Todo lo que necesitas saber sobre CotizaPro
-        </p>
-        <div className="max-w-3xl mx-auto space-y-4">
-          {/* FAQ 1 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Cómo funciona la prueba gratis de 14 días?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              No necesitas tarjeta de crédito para comenzar. Al registrarte, obtienes acceso completo a todas las funciones del plan Pro por 14 días. Si decides no continuar, tu cuenta simplemente pasa al plan gratuito automáticamente.
-            </p>
-          </details>
-
-          {/* FAQ 2 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Puedo enviar cotizaciones por WhatsApp?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              Sí. Los planes Pro y Empresa incluyen envío directo por WhatsApp. Genera tu cotización en PDF y envíala al WhatsApp del cliente con un solo clic. También puedes enviar por Email en todos los planes.
-            </p>
-          </details>
-
-          {/* FAQ 3 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Incluye facturación electrónica (CFDI 4.0)?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              La facturación CFDI 4.0 estará disponible próximamente en el plan Empresa. Te notificaremos cuando esté lista. Actualmente puedes generar cotizaciones profesionales en PDF con todos tus datos fiscales.
-            </p>
-          </details>
-
-          {/* FAQ 4 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Puedo personalizar mis cotizaciones?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              Completamente. Puedes agregar tu logo, personalizar términos y condiciones, ajustar precios, agregar descuentos, configurar IVA y definir tus propias plantillas. Todo se guarda para reutilizar en futuras cotizaciones.
-            </p>
-          </details>
-
-          {/* FAQ 5 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Qué pasa si quiero cancelar?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              Puedes cancelar tu suscripción en cualquier momento desde tu panel de control. No hay contratos ni penalidades. Si cancelas, tu cuenta pasa automáticamente al plan gratuito y mantienes acceso a tus cotizaciones anteriores.
-            </p>
-          </details>
-
-          {/* FAQ 6 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Funciona en mi celular?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              Sí. CotizaPro funciona perfecto en celulares, tabletas y computadoras. Puedes crear y enviar cotizaciones desde cualquier dispositivo con internet. No necesitas instalar ninguna aplicación.
-            </p>
-          </details>
-
-          {/* FAQ 7 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Cómo funcionan los recordatorios automáticos?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              Esta función estará disponible próximamente en el plan Pro. Te permitirá programar mensajes automáticos por WhatsApp para mantenimientos anuales, seguimiento de cotizaciones y recordatorios de servicio. Nunca más perderás un cliente por olvido.
-            </p>
-          </details>
-
-          {/* FAQ 8 */}
-          <details className="bg-white rounded-lg p-6 shadow-sm group">
-            <summary className="font-semibold text-lg cursor-pointer flex items-center justify-between">
-              ¿Ofrecen soporte técnico?
-              <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <p className="text-gray-600 mt-4">
-              Sí. Todos los planes incluyen soporte por email en español. El plan Empresa incluye soporte prioritario 24/7 con respuesta en menos de 4 horas. También tenemos un centro de ayuda completo con tutoriales y guías.
-            </p>
-          </details>
+      {/* ── FAQ Section ─────────────────────────────────────────────── */}
+      <section id="faq" className="py-24 bg-slate-50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
+              Preguntas frecuentes
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {[
+              {
+                q: "¿Necesito saber de tecnología para usar CotizaPro?",
+                a: "No. CotizaPro está diseñado para técnicos, no para ingenieros de software. Si sabes usar WhatsApp, puedes usar CotizaPro. La interfaz es simple e intuitiva."
+              },
+              {
+                q: "¿Puedo usar CotizaPro desde mi celular?",
+                a: "Sí. CotizaPro funciona perfectamente en móvil, tablet y computadora. Puedes crear cotizaciones en obra desde tu smartphone y enviarlas al instante."
+              },
+              {
+                q: "¿Cómo funciona el período de prueba?",
+                a: "El plan Pro incluye 14 días gratis sin necesidad de tarjeta de crédito. Exploras todas las funciones premium y decides si se adapta a tu negocio."
+              },
+              {
+                q: "¿Mis datos y los de mis clientes están seguros?",
+                a: "Sí. Usamos cifrado SSL de nivel bancario y servidores certificados en México. Cumplimos con la Ley Federal de Protección de Datos Personales (LFPDPPP)."
+              },
+              {
+                q: "¿Puedo cancelar en cualquier momento?",
+                a: "Sí. Sin penalizaciones, sin contratos anuales obligatorios. Cancelas cuando quieras directamente desde tu cuenta en menos de 1 minuto."
+              },
+              {
+                q: "¿Qué pasa con mis cotizaciones si cancelo?",
+                a: "Puedes exportar todas tus cotizaciones en PDF antes de cancelar. Tus datos son tuyos y siempre tienes acceso a ellos."
+              },
+              {
+                q: "¿Funciona para mi giro? No solo HVAC",
+                a: "Sí. CotizaPro es ideal para HVAC, plomería, electricidad, pintura, albañilería, refrigeración, fumigación y cualquier servicio técnico de mantenimiento."
+              },
+              {
+                q: "¿Puedo agregar mi propio catálogo de servicios?",
+                a: "Sí. Puedes personalizar completamente tu catálogo de servicios, precios, unidades y descripciones. También incluimos plantillas por giro para que empieces rápido."
+              }
+            ].map((item) => (
+              <details key={item.q} className="bg-white border border-slate-200 rounded-xl group">
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer text-sm font-semibold text-slate-800 hover:text-blue-800 transition-colors list-none">
+                  {item.q}
+                  <svg className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </summary>
+                <div className="px-6 pb-5 pt-1 text-sm text-slate-600 leading-relaxed">
+                  {item.a}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="bg-blue-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Comienza a cotizar profesionalmente hoy
+      {/* ── Final CTA Section ───────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 to-blue-900 py-24">
+        {/* Blob decorations */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="animate-blob absolute -top-24 -left-24 w-[400px] h-[400px] rounded-full bg-blue-500/30 blur-3xl" />
+          <div className="animate-blob-delay-2 absolute -bottom-24 -right-24 w-[350px] h-[350px] rounded-full bg-blue-400/25 blur-3xl" />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-5xl font-black text-white mb-4 leading-tight">
+            Únete a más de 500 técnicos que ya crecen con CotizaPro
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Únete a cientos de técnicos que ya están cerrando más ventas con cotizaciones profesionales. Prueba gratis por 14 días.
+          <p className="text-lg text-blue-200 mb-10">
+            Comienza gratis hoy. Sin tarjeta de crédito. Cancela cuando quieras.
           </p>
-          <Link href="/signup">
-            <Button size="lg" variant="secondary" className="text-lg px-8">
-              Prueba Gratis por 14 Días
-            </Button>
-          </Link>
-          <p className="text-sm mt-4 opacity-90">
-            Sin tarjeta de crédito • Cancelación cuando quieras • Soporte en español
-          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup">
+              <button className="btn-glow-orange bg-orange-500 hover:bg-orange-600 text-white font-bold px-10 py-4 rounded-xl text-base transition-colors cursor-pointer">
+                Empieza Gratis Ahora
+              </button>
+            </Link>
+            <Link href="/login">
+              <button className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-10 py-4 rounded-xl text-base transition-colors cursor-pointer">
+                Ver demo
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+      {/* ── Footer ──────────────────────────────────────────────────── */}
+      <footer className="bg-slate-900 text-slate-400 pt-14 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+            {/* Logo & tagline */}
             <div>
-              <div className="text-xl font-bold text-blue-600 mb-4">CotizaPro</div>
-              <p className="text-gray-600 text-sm">
-                La herramienta de cotizaciones profesionales para técnicos de mantenimiento en México.
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <span className="text-white font-bold">Cotiza<span className="text-blue-400">Pro</span></span>
+              </div>
+              <p className="text-sm leading-relaxed">
+                Cotizaciones profesionales para técnicos de mantenimiento en México.
               </p>
             </div>
+
+            {/* Producto */}
             <div>
-              <h3 className="font-semibold mb-4">Producto</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="#features" className="hover:text-blue-600">Características</Link></li>
-                <li><Link href="#pricing" className="hover:text-blue-600">Precios</Link></li>
-                <li><Link href="/signup" className="hover:text-blue-600">Prueba Gratis</Link></li>
+              <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Producto</p>
+              <ul className="space-y-2.5">
+                <li><Link href="#caracteristicas" className="text-sm hover:text-white transition-colors cursor-pointer">Características</Link></li>
+                <li><Link href="#precios" className="text-sm hover:text-white transition-colors cursor-pointer">Precios</Link></li>
+                <li><Link href="#faq" className="text-sm hover:text-white transition-colors cursor-pointer">FAQ</Link></li>
+                <li><Link href="/changelog" className="text-sm hover:text-white transition-colors cursor-pointer">Novedades</Link></li>
               </ul>
             </div>
+
+            {/* Empresa */}
             <div>
-              <h3 className="font-semibold mb-4">Soporte</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/ayuda" className="hover:text-blue-600">Centro de Ayuda</Link></li>
-                <li><Link href="/contacto" className="hover:text-blue-600">Contacto</Link></li>
-                <li><Link href="/terminos" className="hover:text-blue-600">Términos</Link></li>
-                <li><Link href="/privacidad" className="hover:text-blue-600">Privacidad</Link></li>
+              <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Empresa</p>
+              <ul className="space-y-2.5">
+                <li><Link href="/about" className="text-sm hover:text-white transition-colors cursor-pointer">Nosotros</Link></li>
+                <li><Link href="/blog" className="text-sm hover:text-white transition-colors cursor-pointer">Blog</Link></li>
+                <li><Link href="/contact" className="text-sm hover:text-white transition-colors cursor-pointer">Contacto</Link></li>
+                <li><Link href="/careers" className="text-sm hover:text-white transition-colors cursor-pointer">Trabaja con nosotros</Link></li>
               </ul>
             </div>
+
+            {/* Legal */}
             <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/terminos" className="hover:text-blue-600">Términos de Servicio</Link></li>
-                <li><Link href="/privacidad" className="hover:text-blue-600">Política de Privacidad</Link></li>
-                <li><Link href="/cookies" className="hover:text-blue-600">Política de Cookies</Link></li>
+              <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Legal</p>
+              <ul className="space-y-2.5">
+                <li><Link href="/privacy" className="text-sm hover:text-white transition-colors cursor-pointer">Privacidad</Link></li>
+                <li><Link href="/terms" className="text-sm hover:text-white transition-colors cursor-pointer">Términos de Uso</Link></li>
+                <li><Link href="/cookies" className="text-sm hover:text-white transition-colors cursor-pointer">Cookies</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t pt-8 text-center text-gray-600 text-sm">
-            <p>&copy; 2026 CotizaPro. Todos los derechos reservados. Hecho con ❤️ en México para técnicos mexicanos.</p>
+
+          {/* Bottom bar */}
+          <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-slate-500">
+              &copy; {new Date().getFullYear()} CotizaPro. Hecho con pasión en México.
+            </p>
+            <div className="flex items-center gap-4">
+              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">SSL Seguro</span>
+              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Stripe</span>
+              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Privacidad LFPDPPP</span>
+            </div>
           </div>
         </div>
       </footer>

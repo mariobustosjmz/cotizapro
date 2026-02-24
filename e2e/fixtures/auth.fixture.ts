@@ -35,7 +35,7 @@ export async function logout(page: Page) {
       localStorage.clear()
       sessionStorage.clear()
     })
-    await page.goto('/login', { waitUntil: 'networkidle' })
+    await page.goto('/login', { waitUntil: 'load' })
   } catch {
     await page.reload()
   }

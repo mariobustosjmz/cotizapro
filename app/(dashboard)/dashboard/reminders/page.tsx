@@ -3,8 +3,44 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { Bell, Plus, AlertCircle } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { ReminderFilters } from './filters'
 
-export default async function RemindersPage() {
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const REMINDER_TYPE_LABELS: Record<string, string> = {
+  follow_up: 'Seguimiento',
+  maintenance: 'Mantenimiento',
+  renewal: 'Renovación',
+  custom: 'Personalizado',
+}
+
+const REMINDER_PRIORITY_LABELS: Record<string, string> = {
+  urgent: 'Urgente',
+  high: 'Alta',
+  normal: 'Normal',
+  low: 'Baja',
+}
+
+const REMINDER_STATUS_LABELS: Record<string, string> = {
+  pending: 'Pendiente',
+  sent: 'Enviado',
+  completed: 'Completado',
+  snoozed: 'Pospuesto',
+  cancelled: 'Cancelado',
+}
+
+export default async function RemindersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; q?: string }>
+}) {
+  const { status, q } = await searchParams
+  const activeStatus = status && ['pending', 'sent', 'completed', 'snoozed', 'cancelled'].includes(status)
+    ? status
+    : undefined
+
   const supabase = await createServerClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -20,12 +56,38 @@ export default async function RemindersPage() {
 
   const today = new Date().toISOString().split('T')[0]
 
-  const { data: reminders } = await supabase
+  let remindersQuery = supabase
     .from('follow_up_reminders')
-    .select('*, clients(name, company_name)')
+    .select('*')
     .eq('organization_id', profile.organization_id)
     .order('scheduled_date', { ascending: true })
     .limit(50)
+
+  if (activeStatus) {
+    remindersQuery = remindersQuery.eq('status', activeStatus)
+  }
+  if (q) {
+    remindersQuery = remindersQuery.ilike('title', `%${q}%`)
+  }
+
+  // Try without join first to debug
+  const { data: reminders } = await remindersQuery
+
+
+  // If we got reminders, fetch client names separately
+  if (reminders && reminders.length > 0) {
+    const clientIds = [...new Set(reminders.map(r => r.client_id))]
+    const { data: clients } = await supabase
+      .from('clients')
+      .select('id, name, email, phone')
+      .in('id', clientIds)
+
+    // Map client data to reminders
+    const clientsMap = new Map(clients?.map(c => [c.id, c]) || [])
+    reminders.forEach(r => {
+      r.clients = clientsMap.get(r.client_id) || null
+    })
+  }
 
   const statusCounts = {
     pending: reminders?.filter(r => r.status === 'pending').length || 0,
@@ -38,13 +100,13 @@ export default async function RemindersPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Recordatorios</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Recordatorios · {reminders?.length || 0}</h2>
           <p className="text-gray-600">
             Gestiona el seguimiento de tus clientes
           </p>
         </div>
         <Link href="/dashboard/reminders/new">
-          <Button className="flex items-center space-x-2">
+          <Button className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white">
             <Plus className="w-4 h-4" />
             <span>Nuevo Recordatorio</span>
           </Button>
@@ -84,8 +146,9 @@ export default async function RemindersPage() {
 
       {/* Reminders List */}
       <Card>
-        <CardHeader>
+        <CardHeader className="space-y-3">
           <CardTitle>Lista de Recordatorios</CardTitle>
+          <ReminderFilters activeStatus={activeStatus} defaultSearch={q} />
         </CardHeader>
         <CardContent>
           {!reminders || reminders.length === 0 ? (
@@ -97,7 +160,7 @@ export default async function RemindersPage() {
               </p>
               <div className="mt-6">
                 <Link href="/dashboard/reminders/new">
-                  <Button>
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
                     <Plus className="w-4 h-4 mr-2" />
                     Nuevo Recordatorio
                   </Button>
@@ -170,54 +233,24 @@ export default async function RemindersPage() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            {reminder.reminder_type === 'maintenance' && 'Mantenimiento'}
-                            {reminder.reminder_type === 'follow_up' && 'Seguimiento'}
-                            {reminder.reminder_type === 'renewal' && 'Renovación'}
-                            {reminder.reminder_type === 'custom' && 'Personalizado'}
-                          </span>
+                          <Badge variant={reminder.reminder_type as 'follow_up' | 'maintenance' | 'renewal' | 'custom'}>
+                            {REMINDER_TYPE_LABELS[reminder.reminder_type] ?? reminder.reminder_type}
+                          </Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              reminder.priority === 'urgent'
-                                ? 'bg-red-100 text-red-800'
-                                : reminder.priority === 'high'
-                                ? 'bg-orange-100 text-orange-800'
-                                : reminder.priority === 'normal'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
-                          >
-                            {reminder.priority === 'urgent' && 'Urgente'}
-                            {reminder.priority === 'high' && 'Alta'}
-                            {reminder.priority === 'normal' && 'Normal'}
-                            {reminder.priority === 'low' && 'Baja'}
-                          </span>
+                          <Badge variant={reminder.priority as 'urgent' | 'high' | 'normal' | 'low'}>
+                            {REMINDER_PRIORITY_LABELS[reminder.priority] ?? reminder.priority}
+                          </Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              reminder.status === 'completed'
-                                ? 'bg-green-100 text-green-800'
-                                : reminder.status === 'sent'
-                                ? 'bg-blue-100 text-blue-800'
-                                : reminder.status === 'snoozed'
-                                ? 'bg-purple-100 text-purple-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}
-                          >
-                            {reminder.status === 'pending' && 'Pendiente'}
-                            {reminder.status === 'sent' && 'Enviado'}
-                            {reminder.status === 'completed' && 'Completado'}
-                            {reminder.status === 'snoozed' && 'Pospuesto'}
-                            {reminder.status === 'cancelled' && 'Cancelado'}
-                          </span>
+                          <Badge variant={reminder.status as 'pending' | 'sent' | 'completed' | 'snoozed' | 'cancelled'}>
+                            {REMINDER_STATUS_LABELS[reminder.status] ?? reminder.status}
+                          </Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
                             href={`/dashboard/reminders/${reminder.id}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="text-orange-600 hover:text-orange-700"
                           >
                             Ver detalles
                           </Link>

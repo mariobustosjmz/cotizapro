@@ -5,15 +5,18 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
+import type { CustomFieldValues } from '@/types/custom-fields'
 
 export default function NewClientPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [customFields, setCustomFields] = useState<CustomFieldValues>({})
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -31,6 +34,7 @@ export default function NewClientPage() {
       address: formData.get('address'),
       notes: formData.get('notes'),
       tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      custom_fields: customFields,
     }
 
     try {
@@ -84,85 +88,73 @@ export default function NewClientPage() {
             )}
 
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Name */}
-              <div className="space-y-2">
-                <Label htmlFor="name">Nombre Completo *</Label>
+              <FormField label="Nombre Completo" htmlFor="name" required>
                 <Input
                   id="name"
                   name="name"
                   required
                   placeholder="Juan Pérez"
                 />
-              </div>
+              </FormField>
 
-              {/* Company Name */}
-              <div className="space-y-2">
-                <Label htmlFor="company_name">Empresa (Opcional)</Label>
+              <FormField label="Empresa" htmlFor="company_name">
                 <Input
                   id="company_name"
                   name="company_name"
                   placeholder="Empresa SA de CV"
                 />
-              </div>
+              </FormField>
 
-              {/* Email */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <FormField label="Email" htmlFor="email">
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   placeholder="juan@ejemplo.com"
                 />
-              </div>
+              </FormField>
 
-              {/* Phone */}
-              <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono *</Label>
+              <FormField label="Teléfono" htmlFor="phone">
                 <Input
                   id="phone"
                   name="phone"
                   type="tel"
-                  required
                   placeholder="5512345678"
                 />
-              </div>
+              </FormField>
             </div>
 
-            {/* Address */}
-            <div className="space-y-2">
-              <Label htmlFor="address">Dirección</Label>
+            <FormField label="Dirección" htmlFor="address">
               <Textarea
                 id="address"
                 name="address"
                 rows={3}
                 placeholder="Calle, número, colonia, ciudad, estado, CP"
               />
-            </div>
+            </FormField>
 
-            {/* Tags */}
-            <div className="space-y-2">
-              <Label htmlFor="tags">Etiquetas</Label>
+            <FormField label="Etiquetas" htmlFor="tags" hint="Separa las etiquetas con comas">
               <Input
                 id="tags"
                 name="tags"
                 placeholder="HVAC, Mantenimiento, VIP (separadas por comas)"
               />
-              <p className="text-sm text-gray-500">
-                Separa las etiquetas con comas
-              </p>
-            </div>
+            </FormField>
 
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notas</Label>
+            <FormField label="Notas" htmlFor="notes">
               <Textarea
                 id="notes"
                 name="notes"
                 rows={4}
                 placeholder="Información adicional sobre el cliente..."
               />
-            </div>
+            </FormField>
+
+            <DynamicFieldsSection
+              entityType="client"
+              values={customFields}
+              onChange={setCustomFields}
+            />
 
             {/* Actions */}
             <div className="flex justify-end space-x-4">
@@ -171,7 +163,7 @@ export default function NewClientPage() {
                   Cancelar
                 </Button>
               </Link>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
                 {loading ? 'Creando...' : 'Crear Cliente'}
               </Button>
             </div>

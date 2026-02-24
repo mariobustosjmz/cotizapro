@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CotizaPro — Guia para Tecnicos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:     #0F172A;
+      --secondary:   #334155;
+      --cta:         #0369A1;
+      --cta-light:   #0EA5E9;
+      --bg:          #F8FAFC;
+      --bg-card:     #FFFFFF;
+      --text:        #020617;
+      --muted:       #475569;
+      --border:      #E2E8F0;
+      --accent:      #0369A1;
+      --success:     #059669;
+      --radius:      12px;
+      --radius-lg:   20px;
+      --shadow:      0 4px 24px rgba(15,23,42,0.08);
+      --shadow-md:   0 8px 40px rgba(15,23,42,0.12);
+      --font:        'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    html { font-size: 10pt; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ============================================================
+       PAGE LAYOUT
+    ============================================================ */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: white;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       COVER PAGE
+    ============================================================ */
+    .cover {
+      background: linear-gradient(145deg, #0F172A 0%, #1E3A5F 50%, #0369A1 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 297mm;
+      padding: 0;
+    }
+
+    .cover-bg-pattern {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0.06;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.5) 40px, rgba(255,255,255,0.5) 41px),
+        repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.5) 40px, rgba(255,255,255,0.5) 41px);
+    }
+
+    .cover-glow {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(14,165,233,0.35) 0%, transparent 70%);
+      top: 60px;
+      right: -60px;
+      border-radius: 50%;
+    }
+    .cover-glow-2 {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%);
+      bottom: 120px;
+      left: -40px;
+      border-radius: 50%;
+    }
+
+    .cover-content {
+      position: relative;
+      z-index: 2;
+      padding: 56px 52px 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #BAE6FD;
+      font-size: 8pt;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      width: fit-content;
+      margin-bottom: 32px;
+    }
+
+    .cover-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .cover-logo-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #0EA5E9, #0369A1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(14,165,233,0.35);
+    }
+
+    .cover-logo-text {
+      font-size: 28pt;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -1px;
+    }
+
+    .cover-logo-pro {
+      color: #38BDF8;
+    }
+
+    .cover-tagline {
+      font-size: 13pt;
+      font-weight: 400;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 48px;
+      letter-spacing: 0.3px;
+    }
+
+    .cover-headline {
+      font-size: 30pt;
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      letter-spacing: -1.5px;
+    }
+
+    .cover-headline em {
+      font-style: normal;
+      color: #38BDF8;
+    }
+
+    .cover-sub {
+      font-size: 11pt;
+      color: rgba(255,255,255,0.7);
+      max-width: 380px;
+      line-height: 1.7;
+      margin-bottom: 52px;
+    }
+
+    .cover-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .cover-stat {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      text-align: center;
+    }
+
+    .cover-stat-value {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #38BDF8;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .cover-stat-label {
+      font-size: 7.5pt;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+
+    .cover-footer {
+      position: relative;
+      z-index: 2;
+      padding: 20px 52px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cover-footer-text {
+      font-size: 8pt;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .cover-footer-version {
+      font-size: 8pt;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ============================================================
+       SECTION PAGES SHARED LAYOUT
+    ============================================================ */
+    .doc-page {
+      background: white;
+      min-height: 297mm;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .doc-header {
+      background: var(--primary);
+      padding: 18px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .doc-header-logo {
+      font-size: 12pt;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    .doc-header-logo span { color: #38BDF8; }
+
+    .doc-header-section {
+      font-size: 7.5pt;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 600;
+    }
+
+    .doc-body {
+      flex: 1;
+      padding: 44px 48px 36px;
+    }
+
+    .doc-footer {
+      padding: 14px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .doc-footer-text {
+      font-size: 7.5pt;
+      color: var(--muted);
+    }
+
+    .doc-footer-page {
+      font-size: 7.5pt;
+      color: var(--muted);
+    }
+
+    /* ============================================================
+       SECTION HEADING
+    ============================================================ */
+    .section-number {
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: var(--cta);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 22pt;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      font-size: 10pt;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 520px;
+    }
+
+    .divider {
+      width: 48px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cta), var(--cta-light));
+      border-radius: 3px;
+      margin-bottom: 28px;
+    }
+
+    /* ============================================================
+       COMPONENTS — CARDS
+    ============================================================ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-accent {
+      border-left: 3px solid var(--cta);
+    }
+
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: 8.5pt;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       HERO STAT STRIP
+    ============================================================ */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .stat-block {
+      background: linear-gradient(135deg, var(--primary) 0%, #1E3A5F 100%);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      text-align: center;
+    }
+
+    .stat-block-value {
+      font-size: 17pt;
+      font-weight: 800;
+      color: #38BDF8;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-block-label {
+      font-size: 7pt;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* ============================================================
+       PROBLEM BOXES
+    ============================================================ */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .problem-card {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .problem-card-icon {
+      width: 32px;
+      height: 32px;
+      background: #FCA5A5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .problem-card-title {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #991B1B;
+      margin-bottom: 5px;
+    }
+
+    .problem-card-body {
+      font-size: 8pt;
+      color: #B91C1C;
+      line-height: 1.55;
+    }
+
+    .solution-highlight {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .solution-highlight-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--cta), var(--cta-light));
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .solution-highlight-text {
+      font-size: 9pt;
+      color: #1E40AF;
+      line-height: 1.65;
+    }
+
+    .solution-highlight-text strong {
+      display: block;
+      font-size: 10pt;
+      color: #1E3A8A;
+      margin-bottom: 4px;
+    }
+
+    /* ============================================================
+       BENEFIT CARDS
+    ============================================================ */
+    .benefit-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .benefit-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cta), var(--cta-light));
+    }
+
+    .benefit-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .benefit-title {
+      font-size: 10pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .benefit-body {
+      font-size: 8.5pt;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .benefit-metric {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 8pt;
+      color: var(--cta);
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       WORKFLOW STEPS
+    ============================================================ */
+    .step-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      background: var(--cta);
+      color: white;
+      border-radius: 50%;
+      font-size: 10pt;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-connector {
+      width: 2px;
+      flex: 1;
+      min-height: 20px;
+      background: linear-gradient(to bottom, var(--cta), var(--border));
+      margin: 4px 0;
+    }
+
+    .step-content {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      flex: 1;
+    }
+
+    .step-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .step-body {
+      font-size: 8pt;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .step-tip {
+      margin-top: 6px;
+      font-size: 7.5pt;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       FEATURE TABLE
+    ============================================================ */
+    .feature-section {
+      margin-bottom: 20px;
+    }
+
+    .feature-section-title {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--cta);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .feature-check {
+      width: 16px;
+      height: 16px;
+      background: var(--success);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-text {
+      font-size: 8pt;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    .feature-text strong {
+      display: block;
+      color: var(--primary);
+      font-size: 8.5pt;
+      margin-bottom: 1px;
+    }
+
+    /* ============================================================
+       ROADMAP
+    ============================================================ */
+    .roadmap-phases {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+
+    .roadmap-phase {
+      flex: 1;
+      position: relative;
+    }
+
+    .roadmap-phase-header {
+      padding: 12px 14px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      margin-right: 4px;
+    }
+
+    .roadmap-phase-header.done {
+      background: linear-gradient(135deg, #059669, #10B981);
+    }
+
+    .roadmap-phase-header.soon {
+      background: linear-gradient(135deg, var(--cta), var(--cta-light));
+    }
+
+    .roadmap-phase-header.future {
+      background: linear-gradient(135deg, #7C3AED, #A78BFA);
+    }
+
+    .roadmap-phase-header.horizon {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .roadmap-phase-period {
+      font-size: 7pt;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+
+    .roadmap-phase-title {
+      font-size: 9pt;
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+    }
+
+    .roadmap-phase-body {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      margin-right: 4px;
+      padding: 12px;
+    }
+
+    .roadmap-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 7.5pt;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    .roadmap-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .dot-done { background: #10B981; }
+    .dot-soon { background: var(--cta); }
+    .dot-future { background: #7C3AED; }
+    .dot-horizon { background: var(--secondary); }
+
+    /* ============================================================
+       PLANS COMPARISON
+    ============================================================ */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1fr;
+      gap: 12px;
+    }
+
+    .plan-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .plan-card.featured {
+      border-color: var(--cta);
+      box-shadow: 0 0 0 2px rgba(3,105,161,0.15);
+    }
+
+    .plan-header {
+      padding: 16px;
+      background: var(--bg);
+      text-align: center;
+    }
+
+    .plan-card.featured .plan-header {
+      background: linear-gradient(135deg, var(--primary), #1E3A5F);
+    }
+
+    .plan-name {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--secondary);
+      margin-bottom: 4px;
+    }
+
+    .plan-card.featured .plan-name {
+      color: #BAE6FD;
+    }
+
+    .plan-price {
+      font-size: 22pt;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .plan-card.featured .plan-price { color: white; }
+
+    .plan-price-label {
+      font-size: 7.5pt;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .plan-card.featured .plan-price-label { color: rgba(255,255,255,0.5); }
+
+    .plan-body {
+      padding: 14px;
+    }
+
+    .plan-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 7px;
+      font-size: 7.5pt;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    .plan-feature svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .plan-badge {
+      display: inline-block;
+      background: #0369A1;
+      color: white;
+      font-size: 6.5pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-bottom: 6px;
+    }
+
+    /* ============================================================
+       CTA PAGE
+    ============================================================ */
+    .cta-page {
+      background: linear-gradient(145deg, #0F172A 0%, #1E3A5F 60%, #0369A1 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 52px;
+      min-height: 297mm;
+    }
+
+    .cta-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #BAE6FD;
+      font-size: 7.5pt;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+
+    .cta-title {
+      font-size: 28pt;
+      font-weight: 800;
+      color: white;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 18px;
+    }
+
+    .cta-title em {
+      font-style: normal;
+      color: #38BDF8;
+    }
+
+    .cta-sub {
+      font-size: 10.5pt;
+      color: rgba(255,255,255,0.7);
+      max-width: 420px;
+      line-height: 1.7;
+      margin: 0 auto 40px;
+    }
+
+    .cta-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .cta-step {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      padding: 18px 12px;
+    }
+
+    .cta-step-num {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #38BDF8;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .cta-step-text {
+      font-size: 8pt;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+
+    .cta-url {
+      display: inline-block;
+      background: linear-gradient(135deg, #0EA5E9, #0369A1);
+      color: white;
+      font-size: 12pt;
+      font-weight: 700;
+      padding: 14px 36px;
+      border-radius: 100px;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(14,165,233,0.4);
+    }
+
+    .cta-note {
+      font-size: 8pt;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .cta-logo {
+      margin-top: 60px;
+      font-size: 14pt;
+      font-weight: 800;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: -0.5px;
+    }
+
+    .cta-logo span { color: rgba(56,189,248,0.4); }
+
+    /* ============================================================
+       UTILITIES
+    ============================================================ */
+    .mt-4  { margin-top: 16px; }
+    .mt-6  { margin-top: 24px; }
+    .mt-8  { margin-top: 32px; }
+    .mb-4  { margin-bottom: 16px; }
+    .mb-6  { margin-bottom: 24px; }
+
+    .tag {
+      display: inline-block;
+      background: #EFF6FF;
+      color: var(--cta);
+      font-size: 7pt;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+      border: 1px solid #BFDBFE;
+    }
+
+    .tag-green {
+      background: #F0FDF4;
+      color: var(--success);
+      border-color: #BBF7D0;
+    }
+
+    .info-box {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-left: 3px solid var(--cta);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 8.5pt;
+      color: #1E40AF;
+      line-height: 1.6;
+    }
+
+    .info-box strong {
+      color: #1E3A8A;
+    }
+
+    /* ============================================================
+       PRINT
+    ============================================================ */
+    @media print {
+      body { background: white; }
+      .page { box-shadow: none; }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================
+     PAGE 1 — COVER
+================================================================ -->
+<div class="page cover">
+  <div class="cover-bg-pattern"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-glow-2"></div>
+
+  <div class="cover-content">
+    <div class="cover-badge">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+      Guia para Tecnicos — Edicion 2026
+    </div>
+
+    <div class="cover-logo">
+      <div class="cover-logo-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <rect x="9" y="3" width="6" height="4" rx="1" stroke="white" stroke-width="2"/>
+          <path d="M9 12h6M9 16h4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="cover-logo-text">Cotiza<span class="cover-logo-pro">Pro</span></span>
+    </div>
+
+    <p class="cover-tagline">Tu asistente digital de cotizaciones profesionales</p>
+
+    <h1 class="cover-headline">
+      Mas clientes.<br>
+      Mas ingresos.<br>
+      <em>Menos papeleo.</em>
+    </h1>
+
+    <p class="cover-sub">
+      Todo lo que necesitas para cotizar profesionalmente, dar seguimiento a tus clientes
+      y hacer crecer tu negocio — desde tu celular, en menos de 3 minutos.
+    </p>
+
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="cover-stat-value">3 min</div>
+        <div class="cover-stat-label">Por cotizacion</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-value">40%</div>
+        <div class="cover-stat-label">Menos clientes perdidos</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-value">$299</div>
+        <div class="cover-stat-label">MXN/mes Plan Pro</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <span class="cover-footer-text">cotizapro.mx — Para tecnicos de mantenimiento en Mexico</span>
+    <span class="cover-footer-version">Guia v1.0 · Febrero 2026</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 2 — EL PROBLEMA Y LA SOLUCION
+================================================================ -->
+<div class="page doc-page">
+  <div class="doc-header">
+    <span class="doc-header-logo">Cotiza<span>Pro</span></span>
+    <span class="doc-header-section">El Problema Real</span>
+  </div>
+
+  <div class="doc-body">
+    <div class="section-number">01 — Por que existe CotizaPro</div>
+    <h2 class="section-title">Cuanto dinero estas<br>dejando sobre la mesa?</h2>
+    <div class="divider"></div>
+
+    <div class="stat-strip">
+      <div class="stat-block">
+        <div class="stat-block-value">40%</div>
+        <div class="stat-block-label">clientes perdidos sin cotizacion formal</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-value">85%</div>
+        <div class="stat-block-label">de tecnicos sin herramientas digitales</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-value">$12K</div>
+        <div class="stat-block-label">MXN perdidos por mes en promedio</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-block-value">3x</div>
+        <div class="stat-block-label">precio inconsistente sin sistema</div>
+      </div>
+    </div>
+
+    <p class="section-subtitle">Si das presupuestos por WhatsApp o de palabra, probablemente estes perdiendo entre $8,000 y $15,000 MXN mensuales en contratos que se te escapan.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        </div>
+        <div class="problem-card-title">Sin cotizacion escrita, pierdes clientes</div>
+        <div class="problem-card-body">Los clientes comparan con otros tecnicos, desconfian del precio verbal y simplemente no vuelven a contestar el telefono.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2.5"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="problem-card-title">El seguimiento manual no funciona</div>
+        <div class="problem-card-body">Olvidas a quien llamar, cuando llamar y que oferta hiciste. Sin sistema de follow-up, pierdes ventas por falta de persistencia.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="problem-card-title">Cobros informales frenan tu crecimiento</div>
+        <div class="problem-card-body">Solo efectivo, sin recibo, sin historial de pagos. Los clientes corporativos no te contrataran si no tienes documentacion profesional.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <div class="problem-card-title">Cero visibilidad de tu propio negocio</div>
+        <div class="problem-card-body">Sin datos de cuantos presupuestos diste, cuantos se convirtieron, cuanto cobraste. Imposible crecer sin metricas reales.</div>
+      </div>
+    </div>
+
+    <div class="solution-highlight">
+      <div class="solution-highlight-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      </div>
+      <div class="solution-highlight-text">
+        <strong>CotizaPro convierte esas perdidas en ingreso recuperado</strong>
+        Un tecnico que da 10 cotizaciones por semana y recupera solo el 20% de las que perdia, gana $3,000–5,000 MXN extra al mes. CotizaPro se paga solo en los primeros dias.
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="doc-footer-text">cotizapro.mx</span>
+    <span class="doc-footer-page">Pagina 2</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 3 — QUE ES COTIZAPRO Y SUS BENEFICIOS
+================================================================ -->
+<div class="page doc-page">
+  <div class="doc-header">
+    <span class="doc-header-logo">Cotiza<span>Pro</span></span>
+    <span class="doc-header-section">Que es CotizaPro</span>
+  </div>
+
+  <div class="doc-body">
+    <div class="section-number">02 — La solucion</div>
+    <h2 class="section-title">Tu oficina completa<br>en tu smartphone</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">
+      CotizaPro es una aplicacion web profesional disenada especificamente para tecnicos de
+      mantenimiento en Mexico: HVAC, plomeria, electricidad, pintura y mas. Sin instalacion, sin computadora, sin cursos.
+    </p>
+
+    <div class="card-grid-3" style="margin-bottom: 24px;">
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        </div>
+        <div class="benefit-title">Cotizaciones en 3 minutos</div>
+        <div class="benefit-body">Selecciona tus servicios del catalogo, ajusta precios y genera un PDF profesional con tu logo automaticamente.</div>
+        <div class="benefit-metric">Tiempo promedio: 2 min 45 seg</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        </div>
+        <div class="benefit-title">Envio directo por WhatsApp</div>
+        <div class="benefit-body">Un clic y tu cliente recibe el PDF en segundos. Nada de imprimir, escanear ni adjuntar archivos manualmente.</div>
+        <div class="benefit-metric">Entrega instantanea al cliente</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </div>
+        <div class="benefit-title">Recordatorios automaticos</div>
+        <div class="benefit-body">El sistema da seguimiento por ti: a 24h, 3 dias y 7 dias. Nunca mas pierdes un contrato por olvidar llamar.</div>
+        <div class="benefit-metric">Follow-up automatico sin esfuerzo</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <div class="benefit-title">CRM de tus clientes</div>
+        <div class="benefit-body">Toda la historia de cada cliente: cotizaciones, trabajos, pagos, notas. Tu cartera de clientes organizada y accesible siempre.</div>
+        <div class="benefit-metric">Historial completo por cliente</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <div class="benefit-title">Dashboard con tus numeros</div>
+        <div class="benefit-body">Mira de un vistazo cuanto tienes en cotizaciones activas, tu tasa de cierre y los recordatorios pendientes del dia.</div>
+        <div class="benefit-metric">Datos en tiempo real</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h7"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div class="benefit-title">Catalogo de servicios</div>
+        <div class="benefit-body">Banco de servicios preconfigurado por giro (HVAC, plomeria, electrico). Personaliza precios y agrega los tuyos en segundos.</div>
+        <div class="benefit-metric">Crea cotizaciones mas rapido</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Disenado para el tecnico mexicano</strong>
+      100% en espanol, precios en MXN, con integracion nativa de WhatsApp y compatible con facturacion SAT. Sin contratos anuales, sin pagos en dolares, sin traducciones raras.
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="doc-footer-text">cotizapro.mx</span>
+    <span class="doc-footer-page">Pagina 3</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 4 — COMO USARLO: FLUJOS PRINCIPALES
+================================================================ -->
+<div class="page doc-page">
+  <div class="doc-header">
+    <span class="doc-header-logo">Cotiza<span>Pro</span></span>
+    <span class="doc-header-section">Como usarlo</span>
+  </div>
+
+  <div class="doc-body">
+    <div class="section-number">03 — Paso a paso</div>
+    <h2 class="section-title">De la obra al contrato<br>en 3 minutos</h2>
+    <div class="divider"></div>
+
+    <div class="card-grid-2" style="gap: 28px; align-items: start;">
+
+      <!-- Flujo 1 -->
+      <div>
+        <div style="font-size: 8pt; font-weight: 700; color: var(--cta); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px;">
+          Flujo 1 — Nueva Cotizacion
+        </div>
+        <div class="step-flow">
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number">1</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Busca o registra al cliente</div>
+              <div class="step-body">Escribe su nombre o telefono. Si ya es cliente tuyo aparece automaticamente con toda su historia.</div>
+              <div class="step-tip">Autocompletado desde tu historial</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number">2</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Selecciona servicios del catalogo</div>
+              <div class="step-body">Busca el servicio, indica la cantidad y el tipo de precio (fijo, por hora, por m2). El total se calcula solo.</div>
+              <div class="step-tip">Agrega varios servicios en segundos</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number">3</div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Define vigencia y condiciones</div>
+              <div class="step-body">Pon la fecha de expiracion de la cotizacion y agrega notas o condiciones especiales si las hay.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number">4</div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Envia por WhatsApp o Email</div>
+              <div class="step-body">Un clic genera el PDF y lo envia. Tu cliente recibe un mensaje profesional en segundos con tu logo y datos.</div>
+              <div class="step-tip">PDF profesional con tu marca</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flujo 2 -->
+      <div>
+        <div style="font-size: 8pt; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px;">
+          Flujo 2 — Seguimiento automatico
+        </div>
+        <div class="step-flow">
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number" style="background: #059669;">T+0</div>
+              <div class="step-connector" style="background: linear-gradient(to bottom, #059669, var(--border));"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Cotizacion enviada</div>
+              <div class="step-body">El sistema registra el envio y activa automaticamente el calendario de recordatorios.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number" style="background: #059669;">24h</div>
+              <div class="step-connector" style="background: linear-gradient(to bottom, #059669, var(--border));"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Primer recordatorio automatico</div>
+              <div class="step-body">"Hola [Nombre], pudiste revisar el presupuesto que te envie?" — Mensaje automatico, sin que hagas nada.</div>
+              <div class="step-tip">Por WhatsApp y/o Email</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number" style="background: #059669;">3d</div>
+              <div class="step-connector" style="background: linear-gradient(to bottom, #059669, var(--border));"></div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Segundo recordatorio</div>
+              <div class="step-body">Mensaje personalizable con urgencia suave. Tu puedes pausar en cualquier momento si el cliente ya te contacto.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left">
+              <div class="step-number" style="background: #059669;">7d</div>
+            </div>
+            <div class="step-content">
+              <div class="step-title">Cierre de cotizacion</div>
+              <div class="step-body">Notificacion para que decidas si cerrar o hacer una nueva oferta. La cotizacion se marca como expirada automaticamente.</div>
+              <div class="step-tip">Tu decides la accion final</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box mt-6">
+      <strong>Consejo Pro:</strong>
+      Puedes usar CotizaPro directamente desde tu celular en la obra, incluso si tienes guantes puestos. El diseno mobile-first esta pensado para que funciones rapido en cualquier condicion.
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="doc-footer-text">cotizapro.mx</span>
+    <span class="doc-footer-page">Pagina 4</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 5 — FEATURES ACTUALES
+================================================================ -->
+<div class="page doc-page">
+  <div class="doc-header">
+    <span class="doc-header-logo">Cotiza<span>Pro</span></span>
+    <span class="doc-header-section">Features disponibles hoy</span>
+  </div>
+
+  <div class="doc-body">
+    <div class="section-number">04 — MVP completo</div>
+    <h2 class="section-title">Todo lo que tienes<br>disponible ahora</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">
+      CotizaPro esta listo para usarse hoy. 338 pruebas automatizadas garantizan que todo funciona correctamente en Chrome, Firefox y Safari.
+    </p>
+
+    <div class="feature-section">
+      <div class="feature-section-title">Autenticacion y seguridad</div>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Registro e inicio de sesion</strong>
+            Tu cuenta segura, tus datos privados. Solo tu puedes ver tu informacion.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Sesion persistente</strong>
+            No tienes que iniciar sesion cada vez. El app recuerda tu cuenta.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-section">
+      <div class="feature-section-title">Gestion de clientes</div>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Agregar y editar clientes</strong>
+            Nombre, empresa, telefono, email, notas personalizadas.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Historial completo</strong>
+            Toda la historia de cotizaciones y trabajos con cada cliente.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Busqueda rapida</strong>
+            Encuentra cualquier cliente por nombre, telefono o email al instante.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Contacto multiple</strong>
+            WhatsApp, email, telefono — todos los datos en un lugar.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-section">
+      <div class="feature-section-title">Catalogo de servicios</div>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Servicios personalizables</strong>
+            Agrega tus servicios con precio por hora, fijo, por m2 o por unidad.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Plantillas por giro</strong>
+            HVAC, plomeria, electrico — plantillas preconfiguradas para empezar rapido.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-section">
+      <div class="feature-section-title">Cotizaciones profesionales</div>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Constructor multi-servicio</strong>
+            Agrega varios servicios, cantidades y precios con calculo automatico.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>PDF con tu logo</strong>
+            Documento profesional con tu marca, datos de contacto y condiciones.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Estados de cotizacion</strong>
+            Borrador, enviada, aceptada, pagada — siempre sabes donde esta cada una.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Envio por WhatsApp y Email</strong>
+            Comparte directamente desde la app sin pasos extras.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-section">
+      <div class="feature-section-title">Recordatorios y dashboard</div>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Alertas automaticas multicanal</strong>
+            Recordatorios programados por WhatsApp, email o notificacion.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-check">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="feature-text">
+            <strong>Dashboard en tiempo real</strong>
+            Ingresos proyectados, tasa de conversion, recordatorios del dia.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="doc-footer-text">cotizapro.mx</span>
+    <span class="doc-footer-page">Pagina 5</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 6 — ROADMAP DE PRODUCTO
+================================================================ -->
+<div class="page doc-page">
+  <div class="doc-header">
+    <span class="doc-header-logo">Cotiza<span>Pro</span></span>
+    <span class="doc-header-section">Lo que viene</span>
+  </div>
+
+  <div class="doc-body">
+    <div class="section-number">05 — Roadmap 2026</div>
+    <h2 class="section-title">CotizaPro crece<br>contigo</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">
+      Ya tienes el MVP completo y listo. Esto es lo que llega en los proximos meses — basado en lo que los tecnicos como tu necesitan para crecer.
+    </p>
+
+    <div class="roadmap-phases" style="margin-bottom: 20px;">
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header done">
+          <div class="roadmap-phase-period">Ene–Feb 2026</div>
+          <div class="roadmap-phase-title">Ya disponible</div>
+        </div>
+        <div class="roadmap-phase-body">
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>Autenticacion completa</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>Gestion de clientes</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>Catalogo de servicios</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>Constructor de cotizaciones</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>Recordatorios automaticos</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>Dashboard analytics</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-done"></div>API REST robusta</div>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header soon">
+          <div class="roadmap-phase-period">Mar–Abr 2026</div>
+          <div class="roadmap-phase-title">Muy pronto</div>
+        </div>
+        <div class="roadmap-phase-body">
+          <div class="roadmap-item"><div class="roadmap-dot dot-soon"></div>WhatsApp Business API</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-soon"></div>PDF personalizado con logo</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-soon"></div>Email transaccional</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-soon"></div>Planes de suscripcion</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-soon"></div>Portal de pagos Stripe</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-soon"></div>Limites por plan en API</div>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header future">
+          <div class="roadmap-phase-period">Q2–Q3 2026</div>
+          <div class="roadmap-phase-title">En desarrollo</div>
+        </div>
+        <div class="roadmap-phase-body">
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>Cotizaciones multi-opcion (Bueno/Mejor/Excelente)</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>Firma digital del cliente</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>Fotos antes/despues del trabajo</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>Portal del cliente (acepta + firma + paga)</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>Facturacion SAT / CFDI</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>App movil nativa (Android)</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-future"></div>Modo offline (sin internet)</div>
+        </div>
+      </div>
+      <div class="roadmap-phase">
+        <div class="roadmap-phase-header horizon">
+          <div class="roadmap-phase-period">Q4 2026 — 2027</div>
+          <div class="roadmap-phase-title">En el horizonte</div>
+        </div>
+        <div class="roadmap-phase-body">
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Cobro SPEI/CoDi en cotizacion</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Asistente IA por voz</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Planes de mantenimiento recurrente</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Pipeline visual tipo Kanban</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Resenias Google integradas</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Tu pagina web en cotizapro.mx</div>
+          <div class="roadmap-item"><div class="roadmap-dot dot-horizon"></div>Programa de referidos con pago</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box" style="background: #F0FDF4; border-color: #BBF7D0; border-left-color: #059669; color: #166534;">
+      <strong style="color: #14532D;">Tu opinion importa en el roadmap</strong>
+      CotizaPro se construye escuchando a los tecnicos que lo usan. Cuando seas parte de la beta, podras votar por las features que mas necesitas. Las mas votadas se desarrollan primero.
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="doc-footer-text">cotizapro.mx</span>
+    <span class="doc-footer-page">Pagina 6</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 7 — PLANES Y PRECIOS
+================================================================ -->
+<div class="page doc-page">
+  <div class="doc-header">
+    <span class="doc-header-logo">Cotiza<span>Pro</span></span>
+    <span class="doc-header-section">Planes y precios</span>
+  </div>
+
+  <div class="doc-body">
+    <div class="section-number">06 — Acceso y planes</div>
+    <h2 class="section-title">Empieza gratis,<br>crece cuando quieras</h2>
+    <div class="divider"></div>
+    <p class="section-subtitle">
+      Sin contrato anual, sin pago en dolares, sin compromisos. Empieza gratis y pasa a Pro cuando veas que vale la pena — y lo veras en los primeros dias.
+    </p>
+
+    <div class="plans-grid" style="margin-bottom: 24px;">
+      <!-- GRATIS -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <div class="plan-name">Gratis</div>
+          <div class="plan-price">$0</div>
+          <div class="plan-price-label">MXN / mes — siempre</div>
+        </div>
+        <div class="plan-body">
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Hasta 5 clientes
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Hasta 3 cotizaciones/mes
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            PDF basico
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Analytics basico
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span style="color: #94A3B8;">Sin recordatorios</span>
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span style="color: #94A3B8;">Sin WhatsApp integrado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRO (destacado) -->
+      <div class="plan-card featured">
+        <div class="plan-header">
+          <div class="plan-badge">MAS POPULAR</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$299</div>
+          <div class="plan-price-label">MXN / mes</div>
+        </div>
+        <div class="plan-body">
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Clientes ilimitados
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Cotizaciones ilimitadas
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            PDF con logo personalizado
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            WhatsApp + Email integrado
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Recordatorios inteligentes
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Analytics completo
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPRESA -->
+      <div class="plan-card">
+        <div class="plan-header">
+          <div class="plan-name">Empresa</div>
+          <div class="plan-price">$799</div>
+          <div class="plan-price-label">MXN / mes</div>
+        </div>
+        <div class="plan-body">
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Todo lo de Pro
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Hasta 5 tecnicos/usuarios
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Analytics avanzado
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            API de integracion
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Soporte prioritario
+          </div>
+          <div class="plan-feature">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Reportes exportables
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid-2" style="gap: 12px;">
+      <div class="card card-accent">
+        <div class="card-title">Por que Pro se paga solo</div>
+        <div class="card-body">Si tienes 10 cotizaciones por semana y cierras 2 mas por mes gracias a CotizaPro, probablemente recuperas $2,000–5,000 MXN extras. El plan Pro vale $299 — el ROI es inmediato.</div>
+      </div>
+      <div class="card card-accent" style="border-left-color: #059669;">
+        <div class="card-title">Sin sorpresas ni letra chica</div>
+        <div class="card-body">Sin contrato anual. Cancelas cuando quieras. Sin cobros en dolares. Sin cargos ocultos. Pagas mensual en MXN y decides si continuas mes a mes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="doc-footer-text">cotizapro.mx</span>
+    <span class="doc-footer-page">Pagina 7</span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 8 — CTA / CIERRE
+================================================================ -->
+<div class="page cta-page">
+  <div class="cta-badge">Disponible hoy — Beta gratuita</div>
+
+  <h2 class="cta-title">
+    Empieza a cotizar<br>
+    <em>como los profesionales</em>
+  </h2>
+
+  <p class="cta-sub">
+    Miles de tecnicos en Mexico estan perdiendo clientes por no tener un sistema profesional.
+    Registrate gratis hoy y envia tu primera cotizacion en menos de 3 minutos.
+  </p>
+
+  <div class="cta-steps">
+    <div class="cta-step">
+      <div class="cta-step-num">1</div>
+      <div class="cta-step-text">Crea tu cuenta gratis en 60 segundos</div>
+    </div>
+    <div class="cta-step">
+      <div class="cta-step-num">2</div>
+      <div class="cta-step-text">Configura tu catalogo de servicios</div>
+    </div>
+    <div class="cta-step">
+      <div class="cta-step-num">3</div>
+      <div class="cta-step-text">Envia tu primera cotizacion profesional</div>
+    </div>
+  </div>
+
+  <div class="cta-url">cotizapro.mx</div>
+
+  <p class="cta-note">Gratis para siempre con el plan basico. Sin tarjeta de credito requerida.</p>
+
+  <div style="margin-top: 40px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 480px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+      <div>
+        <div style="font-size: 9pt; color: rgba(255,255,255,0.4); margin-bottom: 4px;">Soporte</div>
+        <div style="font-size: 9pt; color: rgba(255,255,255,0.65);">WhatsApp directo</div>
+      </div>
+      <div>
+        <div style="font-size: 9pt; color: rgba(255,255,255,0.4); margin-bottom: 4px;">Idioma</div>
+        <div style="font-size: 9pt; color: rgba(255,255,255,0.65);">100% espanol</div>
+      </div>
+      <div>
+        <div style="font-size: 9pt; color: rgba(255,255,255,0.4); margin-bottom: 4px;">Garantia</div>
+        <div style="font-size: 9pt; color: rgba(255,255,255,0.65);">Sin contratos</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-logo">Cotiza<span>Pro</span></div>
+</div>
+
+</body>
+</html>

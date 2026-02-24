@@ -1,168 +1,372 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import type { User } from '@supabase/supabase-js'
 import { cn } from '@/lib/utils'
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Bell,
+  Briefcase,
+  BarChart3,
+  UsersRound,
+  Settings2,
+  Sliders,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  UserCircle,
+  Settings,
+} from 'lucide-react'
+
+interface ProfileOrganization {
+  name: string | null
+}
+
+interface SidebarProfile {
+  email: string | null
+  full_name: string | null
+  organizations: unknown
+}
 
 interface SidebarProps {
-  user: any
-  profile: any
+  user: User
+  profile: SidebarProfile
+}
+
+const principalNav = [
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, shortcut: 'G D' },
+  { name: 'Clientes', href: '/dashboard/clients', icon: Users, shortcut: 'G C' },
+  { name: 'Cotizaciones', href: '/dashboard/quotes', icon: FileText, shortcut: 'G Q' },
+  { name: 'Recordatorios', href: '/dashboard/reminders', icon: Bell, shortcut: 'G R' },
+  { name: 'Servicios', href: '/dashboard/services', icon: Briefcase, shortcut: 'G S' },
+]
+
+const analyticsNav = [
+  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3, shortcut: '' },
+]
+
+const configNav = [
+  { name: 'Equipo', href: '/dashboard/team', icon: UsersRound, shortcut: '' },
+  { name: 'Configuración', href: '/dashboard/settings', icon: Settings2, shortcut: '' },
+  { name: 'Campos Extra', href: '/dashboard/settings/custom-fields', icon: Sliders, shortcut: '' },
+]
+
+function getInitials(email: string | null, fullName: string | null): string {
+  if (fullName) {
+    const parts = fullName.trim().split(' ')
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
+    return parts[0].slice(0, 2).toUpperCase()
+  }
+  if (email) return email.slice(0, 2).toUpperCase()
+  return 'CP'
+}
+
+interface NavItemProps {
+  item: { name: string; href: string; icon: React.ElementType; shortcut: string }
+  isActive: boolean
+  isCollapsed: boolean
+}
+
+function NavItem({ item, isActive, isCollapsed }: NavItemProps) {
+  const Icon = item.icon
+  return (
+    <Link
+      href={item.href}
+      aria-label={isCollapsed ? item.name : undefined}
+      aria-current={isActive ? 'page' : undefined}
+      title={isCollapsed ? item.name : undefined}
+      className={cn(
+        'group relative flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-all duration-150',
+        isActive
+          ? 'bg-orange-500/10 text-orange-400 border-l-2 border-orange-500 pl-[9px]'
+          : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04] border-l-2 border-transparent pl-[9px]',
+        isCollapsed && 'justify-center px-0 pl-0 border-l-0'
+      )}
+    >
+      <Icon
+        className={cn(
+          'w-[18px] h-[18px] shrink-0 transition-colors',
+          isActive ? 'text-orange-400' : 'text-white/40 group-hover:text-white/60'
+        )}
+      />
+      {!isCollapsed && (
+        <>
+          <span className="flex-1 truncate">{item.name}</span>
+          {item.shortcut && (
+            <span className="text-[10px] text-white/20 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+              {item.shortcut}
+            </span>
+          )}
+        </>
+      )}
+    </Link>
+  )
+}
+
+interface NavSectionProps {
+  label: string
+  items: { name: string; href: string; icon: React.ElementType; shortcut: string }[]
+  pathname: string
+  isCollapsed: boolean
+  className?: string
+}
+
+function NavSection({ label, items, pathname, isCollapsed, className }: NavSectionProps) {
+  return (
+    <div className={className}>
+      {!isCollapsed && (
+        <p className="px-3 mb-1.5 text-[10px] font-semibold text-white/25 uppercase tracking-widest">
+          {label}
+        </p>
+      )}
+      <div className="space-y-0.5">
+        {items.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/dashboard' && pathname.startsWith(item.href))
+          return (
+            <NavItem
+              key={item.name}
+              item={item}
+              isActive={isActive}
+              isCollapsed={isCollapsed}
+            />
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 export function DashboardSidebar({ user, profile }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
-  const navigation = [
-    {
-      name: 'Dashboard',
-      href: '/dashboard',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Clientes',
-      href: '/dashboard/clients',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Cotizaciones',
-      href: '/dashboard/quotes',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Recordatorios',
-      href: '/dashboard/reminders',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Servicios',
-      href: '/dashboard/services',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Analytics',
-      href: '/dashboard/analytics',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-    },
-  ]
+  const orgName =
+    (profile.organizations as ProfileOrganization | null)?.name ?? 'Mi Organización'
+  const initials = getInitials(user.email ?? null, profile.full_name)
+  const displayName = profile.full_name ?? user.email ?? 'Usuario'
 
-  const settingsNav = [
-    {
-      name: 'Equipo',
-      href: '/dashboard/team',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Configuración',
-      href: '/dashboard/settings',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-    },
-  ]
+  // Restore collapsed state from localStorage; auto-collapse below 1280px
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsed')
+    if (saved === 'true') setIsCollapsed(true)
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1280) {
+        setIsCollapsed(true)
+        localStorage.setItem('sidebar-collapsed', 'true')
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const toggleCollapsed = () => {
+    const next = !isCollapsed
+    setIsCollapsed(next)
+    localStorage.setItem('sidebar-collapsed', String(next))
+  }
+
+  // Close user menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    if (userMenuOpen) document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [userMenuOpen])
+
+  // Close user menu on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setUserMenuOpen(false)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [])
+
+  const handleLogout = async () => {
+    setUserMenuOpen(false)
+    const response = await fetch('/api/auth/logout', { method: 'POST' })
+    if (response.ok) router.push('/login')
+  }
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-      {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+    <aside
+      aria-label="Navegación principal"
+      className={cn(
+        'bg-[#0F1117] flex flex-col shrink-0 transition-all duration-200 relative',
+        isCollapsed ? 'w-[64px]' : 'w-[240px]'
+      )}
+    >
+      {/* Logo area */}
+      <div className="h-16 flex items-center border-b border-white/[0.06] shrink-0 overflow-hidden">
+        <Link
+          href="/dashboard"
+          className={cn(
+            'flex items-center gap-2.5 px-4 min-w-0',
+            isCollapsed && 'justify-center px-0 w-full'
+          )}
+        >
+          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
             C
           </div>
-          <span className="text-xl font-bold text-gray-900">CotizaPro</span>
+          {!isCollapsed && (
+            <span className="text-[15px] font-semibold text-white tracking-tight truncate">
+              CotizaPro
+            </span>
+          )}
+        </Link>
+      </div>
+
+      {/* Quick action — Nueva Cotización */}
+      <div className={cn('px-3 pt-4 pb-2 shrink-0', isCollapsed && 'px-2')}>
+        <Link
+          href="/dashboard/quotes/new"
+          title={isCollapsed ? 'Nueva Cotización' : undefined}
+          className={cn(
+            'flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm rounded-lg transition-colors',
+            isCollapsed
+              ? 'justify-center w-full h-9'
+              : 'px-3 py-2'
+          )}
+        >
+          <Plus className="w-4 h-4 shrink-0" />
+          {!isCollapsed && <span>Nueva Cotización</span>}
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                'flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </Link>
-          )
-        })}
+      <nav className={cn('flex-1 overflow-y-auto py-2', isCollapsed ? 'px-2' : 'px-3')}>
+        <NavSection
+          label="Principal"
+          items={principalNav}
+          pathname={pathname}
+          isCollapsed={isCollapsed}
+        />
+        <NavSection
+          label="Análisis"
+          items={analyticsNav}
+          pathname={pathname}
+          isCollapsed={isCollapsed}
+          className="mt-5"
+        />
+        <NavSection
+          label="Configuración"
+          items={configNav}
+          pathname={pathname}
+          isCollapsed={isCollapsed}
+          className="mt-5"
+        />
       </nav>
 
-      {/* Settings */}
-      <div className="px-4 py-4 border-t border-gray-200">
-        {settingsNav.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
+      {/* User section */}
+      <div className="shrink-0 border-t border-white/[0.06]">
+        {/* Collapse toggle */}
+        <div className={cn('px-3 py-2', isCollapsed && 'px-2 flex justify-center')}>
+          <button
+            onClick={toggleCollapsed}
+            aria-label={isCollapsed ? 'Expandir barra lateral' : 'Colapsar barra lateral'}
+            title={isCollapsed ? 'Expandir barra' : 'Colapsar barra'}
+            className="flex items-center gap-2 px-2 py-1.5 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors text-xs w-full"
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4 mx-auto" />
+            ) : (
+              <>
+                <ChevronLeft className="w-4 h-4 shrink-0" />
+                <span>Colapsar</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* User menu trigger */}
+        <div className={cn('px-3 pb-4', isCollapsed && 'px-2 flex justify-center')} ref={userMenuRef}>
+          <div className="relative">
+            <button
+              onClick={() => setUserMenuOpen((prev) => !prev)}
+              aria-expanded={userMenuOpen}
+              aria-haspopup="menu"
+              aria-label={`Menú de usuario: ${displayName}`}
+              title={isCollapsed ? displayName : undefined}
               className={cn(
-                'flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
+                'flex items-center gap-2.5 rounded-md hover:bg-white/[0.06] transition-colors w-full',
+                isCollapsed ? 'justify-center p-1.5' : 'px-2 py-2'
               )}
             >
-              {item.icon}
-              <span>{item.name}</span>
-            </Link>
-          )
-        })}
-      </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-semibold text-xs shrink-0">
+                {initials}
+              </div>
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-xs font-medium text-white/80 truncate">{displayName}</p>
+                  <p className="text-[10px] text-white/35 truncate">{orgName}</p>
+                </div>
+              )}
+            </button>
 
-      {/* User Info */}
-      <div className="px-4 py-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
-            {user.email?.[0]?.toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {user.email}
-            </p>
-            <p className="text-xs text-gray-500 truncate">
-              {(profile.organizations as any)?.name || 'Mi Organización'}
-            </p>
+            {/* Dropdown menu */}
+            {userMenuOpen && (
+              <div
+                role="menu"
+                aria-label="Opciones de usuario"
+                className={cn(
+                  'absolute bottom-full mb-2 bg-[#1a1e2e] border border-white/[0.08] rounded-lg shadow-lg py-1 z-50 min-w-[180px]',
+                  isCollapsed ? 'left-0' : 'left-0 right-0'
+                )}
+              >
+                <div className="px-3 py-2 border-b border-white/[0.06] mb-1" aria-hidden="true">
+                  <p className="text-xs font-medium text-white/80 truncate">{displayName}</p>
+                  <p className="text-[10px] text-white/35 truncate">{user.email}</p>
+                </div>
+                <Link
+                  href="/dashboard/settings"
+                  role="menuitem"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+                >
+                  <UserCircle className="w-4 h-4" aria-hidden="true" />
+                  Perfil
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  role="menuitem"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+                >
+                  <Settings className="w-4 h-4" aria-hidden="true" />
+                  Configuración
+                </Link>
+                <div className="border-t border-white/[0.06] mt-1 pt-1">
+                  <button
+                    role="menuitem"
+                    onClick={handleLogout}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors w-full"
+                  >
+                    <LogOut className="w-4 h-4" aria-hidden="true" />
+                    Cerrar sesión
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </aside>
   )
 }

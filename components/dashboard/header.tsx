@@ -1,48 +1,89 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Bell, ChevronRight } from 'lucide-react'
+import type { User } from '@supabase/supabase-js'
 
 interface HeaderProps {
-  user: any
-  profile: any
+  user: User
+  profile: Record<string, unknown>
 }
 
-export function DashboardHeader({ user, profile }: HeaderProps) {
-  const router = useRouter()
+const segmentLabels: Record<string, string> = {
+  dashboard: 'Dashboard',
+  clients: 'Clientes',
+  quotes: 'Cotizaciones',
+  reminders: 'Recordatorios',
+  services: 'Servicios',
+  analytics: 'Analytics',
+  team: 'Equipo',
+  settings: 'Configuración',
+  'custom-fields': 'Campos Extra',
+  new: 'Nuevo',
+}
 
-  const handleLogout = async () => {
-    const response = await fetch('/api/auth/logout', { method: 'POST' })
-    if (response.ok) {
-      router.push('/login')
-    }
+interface Crumb {
+  label: string
+  href: string
+}
+
+function buildBreadcrumbs(pathname: string): Crumb[] {
+  const segments = pathname.split('/').filter(Boolean)
+  const crumbs: Crumb[] = []
+  let path = ''
+
+  for (const seg of segments) {
+    path += `/${seg}`
+    const label = segmentLabels[seg]
+    if (!label) continue // skip UUIDs / dynamic segments without a label
+    crumbs.push({ label, href: path })
   }
 
+  return crumbs
+}
+
+export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps) {
+  const pathname = usePathname()
+  const crumbs = buildBreadcrumbs(pathname)
+
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      <div className="flex items-center space-x-4">
-        <h1 className="text-lg font-semibold text-gray-900">
-          Dashboard
-        </h1>
-      </div>
+    <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0">
+      {/* Breadcrumbs */}
+      <nav aria-label="Navegación" className="flex items-center gap-1 min-w-0">
+        {crumbs.map((crumb, idx) => {
+          const isLast = idx === crumbs.length - 1
+          return (
+            <span key={crumb.href} className="flex items-center gap-1">
+              {idx > 0 && (
+                <ChevronRight className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+              )}
+              {isLast ? (
+                <span className="text-[15px] font-semibold text-gray-900 truncate">
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link
+                  href={crumb.href}
+                  className="text-sm text-gray-400 hover:text-gray-600 transition-colors truncate"
+                >
+                  {crumb.label}
+                </Link>
+              )}
+            </span>
+          )
+        })}
+      </nav>
 
-      <div className="flex items-center space-x-4">
-        {/* Quick Actions */}
-        <Button
-          onClick={() => router.push('/dashboard/quotes/new')}
-          size="sm"
+      {/* Right actions */}
+      <div className="flex items-center gap-1 shrink-0">
+        {/* Notifications */}
+        <button
+          className="relative w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          aria-label="Notificaciones"
         >
-          + Nueva Cotización
-        </Button>
-
-        {/* Logout */}
-        <Button
-          onClick={handleLogout}
-          variant="outline"
-          size="sm"
-        >
-          Salir
-        </Button>
+          <Bell className="w-4 h-4" />
+        </button>
       </div>
     </header>
   )

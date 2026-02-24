@@ -1,7 +1,7 @@
 # CotizaPro MVP - Feature Tracker
 
-**Última Actualización**: 2026-02-13
-**Estado General**: 🎉 **MVP ROBUSTO 100% COMPLETO** 🎉 (25/25 tareas)
+**Última Actualización**: 2026-02-17
+**Estado General**: **MVP COMPLETO + DASHBOARD UI** (33/33 tareas)
 
 ---
 
@@ -22,6 +22,14 @@
 | ⏰ **Cron Jobs & Analytics** | ✅ Completo | 2/2 | Tasks 22-23 |
 | 📤 **Sistema de Exportación** | ✅ Completo | 1/1 | Task 24 |
 | 🔗 **Webhooks & Templates** | ✅ Completo | 1/1 | Task 25 |
+| 🔐 **Auth UI** | ✅ Completo | 1/1 | Task 26 |
+| 🖥️ **Dashboard Layout & Home** | ✅ Completo | 1/1 | Task 27 |
+| 👥 **Clientes UI** | ✅ Completo | 1/1 | Task 28 |
+| 🛠️ **Servicios UI** | ✅ Completo | 1/1 | Task 29 |
+| 📋 **Cotizaciones UI** | ✅ Completo | 1/1 | Task 30 |
+| 🔔 **Recordatorios UI** | ✅ Completo | 1/1 | Task 31 |
+| 📊 **Analytics UI** | ✅ Completo | 1/1 | Task 32 |
+| 🌱 **Demo Seed Data** | ✅ Completo | 1/1 | Task 33 |
 
 ### Por Semana
 
@@ -485,35 +493,104 @@ GET /api/reminders/due?days_ahead=7
 
 ---
 
-## ❌ Features NO Incluidas en MVP (Fases Posteriores)
+## ✅ Módulo 12: Dashboard UI Completo (2026-02-17)
 
-### Frontend Dashboard (NO en plan actual)
-- ❌ Página de login/signup
-- ❌ Dashboard principal
-- ❌ Lista de clientes (tabla)
-- ❌ Formulario de crear/editar cliente
-- ❌ Lista de cotizaciones (tabla)
-- ❌ Quote builder (formulario dinámico)
-- ❌ Vista de detalle de cotización
-- ❌ Gestión de catálogo de servicios
-- ❌ Gráficas y analytics
+### Task 26: Auth UI (Login / Signup)
+- **Estado**: Completo
+- **Archivos**: `app/(auth)/login/page.tsx`, `app/(auth)/signup/page.tsx`
+- **Features**:
+  - [x] Login con email/password via Supabase Auth
+  - [x] Registro de nueva cuenta + creación automática de org
+  - [x] Redirect a dashboard tras autenticación
+  - [x] Manejo de errores con mensajes en español
 
-### Testing (NO en plan actual)
-- ❌ Unit tests (Vitest)
-- ❌ E2E tests (Playwright)
+### Task 27: Dashboard Layout & Home
+- **Estado**: Completo
+- **Archivos**: `app/(dashboard)/layout.tsx`, `app/(dashboard)/dashboard/page.tsx`
+- **Features**:
+  - [x] Sidebar con navegación principal
+  - [x] Cards de estadísticas (cotizaciones, clientes, servicios, recordatorios)
+  - [x] Actividad reciente
+  - [x] Carga datos desde `/api/analytics/dashboard`
+
+### Task 28: Clientes UI
+- **Estado**: Completo
+- **Archivos**: `app/(dashboard)/dashboard/clients/page.tsx`, `clients/new/page.tsx`, `clients/[id]/page.tsx`
+- **Features**:
+  - [x] Lista de clientes con búsqueda en tiempo real
+  - [x] Formulario crear cliente (nombre, empresa, email, teléfono, tags)
+  - [x] Vista detalle + edición inline
+  - [x] Eliminación con confirmación
+  - [x] `company_name` añadida via migración 010
+
+### Task 29: Servicios UI
+- **Estado**: Completo
+- **Archivos**: `app/(dashboard)/dashboard/services/page.tsx`, `services/new/page.tsx`, `services/[id]/page.tsx`
+- **Bug Fixes Aplicados (2026-02-17)**:
+  - [x] Tabla: `service_catalog` (no `services`)
+  - [x] Columna: `unit_price` (no `default_price`)
+  - [x] Select columns explícitas (no `select('*')`)
+  - [x] `unit_type` options: valores DB válidos (`fixed|per_hour|per_sqm|per_unit`)
+  - [x] Display agrupado por categoría con `unitTypeLabels` map
+
+### Task 30: Cotizaciones UI
+- **Estado**: Completo
+- **Archivos**: `app/(dashboard)/dashboard/quotes/page.tsx`, `quotes/new/page.tsx`, `quotes/[id]/page.tsx`
+- **Bug Fixes Aplicados (2026-02-17)**:
+  - [x] Join `clients(name, company_name)` funciona tras migración 010
+  - [x] TypeScript cast: `quote.clients as unknown as ClientShape | null`
+  - [x] `service.unit_price` (no `service.default_price`) en selector de servicios
+  - [x] Builder con selector de servicios del catálogo, multi-items, IVA 16%
+  - [x] Resumen de totales en tiempo real
+
+### Task 31: Recordatorios UI
+- **Estado**: Completo
+- **Archivos**: `app/(dashboard)/dashboard/reminders/page.tsx`, `reminders/new/page.tsx`, `reminders/[id]/page.tsx`
+- **Features**:
+  - [x] Lista filtrable por estado/tipo/prioridad
+  - [x] Crear recordatorio vinculado a cliente y/o cotización
+  - [x] Marcar completado, posponer (snooze)
+  - [x] Badge visual por prioridad
+
+### Task 32: Analytics UI
+- **Estado**: Completo
+- **Archivo**: `app/(dashboard)/dashboard/analytics/page.tsx`
+- **Features**:
+  - [x] Cards de métricas (tasa conversión, ingreso del mes, cotizaciones enviadas)
+  - [x] Top 5 servicios más usados
+  - [x] Recordatorios próximos 7 días y vencidos
+  - [x] Consume `/api/analytics/dashboard`
+
+### Task 33: Demo Seed Data
+- **Estado**: Completo
+- **Archivos**: `supabase/migrations/005_through_010_*.sql`
+- **Credenciales**: `demo@climasol.mx` / `ClimaSol2026!`
+- **Datos**:
+  - [x] Organización: ClimaSol HVAC (org `00000000-0000-0000-0000-000000000002`)
+  - [x] 10 clientes con nombres/empresas mexicanas reales
+  - [x] 5+ servicios HVAC con `unit_price` y `unit_type` válidos
+  - [x] Cotizaciones de ejemplo en varios estados
+  - [x] Recordatorios de mantenimiento de ejemplo
+
+---
+
+## Features Pendientes (Fases Posteriores)
+
+### Testing
+- ❌ Unit tests (Vitest) — 0% cobertura actual
+- ✅ E2E tests (Playwright) — 338/338 tests pasando (2026-02-17)
 - ❌ API integration tests
 
-### DevOps (NO en plan actual)
-- ❌ Docker deployment
-- ❌ CI/CD pipeline
+### DevOps
+- ⏳ Docker deployment — Dockerfile y docker-compose.yml ya creados
+- ⏳ CI/CD pipeline — `.github/workflows/` scaffolded, pendiente env vars
 - ❌ Monitoring & logging
 
-### Features Avanzadas (NO en plan actual)
-- ❌ Recordatorios automáticos
-- ❌ Follow-up automation
+### Features Avanzadas
+- ❌ Recordatorios automáticos por cron (infraestructura lista, falta Twilio/Resend reales)
 - ❌ Integración con CRM
 - ❌ Firma electrónica
-- ❌ Pagos en línea
+- ❌ Pagos en línea (Stripe conectado pero no activado)
 - ❌ Multi-idioma
 
 ---
@@ -530,9 +607,10 @@ GET /api/reminders/due?days_ahead=7
 | **Analytics** | 1 | 1 | 100% ✅ |
 | **Export** | 1 | 1 | 100% ✅ |
 | **Webhooks & Templates** | 1 | 1 | 100% ✅ |
-| **Frontend (UI)** | 1 | 1 | 100% ✅ |
+| **UI Components** | 1 | 1 | 100% ✅ |
 | **Landing Page** | 3 | 3 | 100% ✅ |
-| **TOTAL MVP ROBUSTO** | **25** | **25** | **100% ✅** |
+| **Dashboard UI (Auth + CRUD + Analytics)** | 8 | 8 | 100% ✅ |
+| **TOTAL** | **33** | **33** | **100% ✅** |
 
 ### Línea de Tiempo Estimada
 

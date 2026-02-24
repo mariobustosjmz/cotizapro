@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { DashboardSidebar } from '@/components/dashboard/sidebar'
 import { DashboardHeader } from '@/components/dashboard/header'
+import { ClientLayout } from '@/components/dashboard/client-layout'
 
 export default async function DashboardLayout({
   children,
@@ -29,7 +30,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-slate-50">
       {/* Sidebar */}
       <DashboardSidebar
         user={user}
@@ -41,10 +42,10 @@ export default async function DashboardLayout({
         {/* Header */}
         <DashboardHeader user={user} profile={profile} />
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* Page Content — ClientLayout adds: ToastProvider, keyboard shortcuts, page transitions */}
+        <ClientLayout>
           {children}
-        </main>
+        </ClientLayout>
       </div>
     </div>
   )

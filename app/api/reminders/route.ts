@@ -61,13 +61,10 @@ export async function GET(request: NextRequest) {
 
     const { limit, offset, client_id, status, priority, reminder_type, from_date, to_date, due_only, days_ahead } = validation.data
 
-    // Build query
+    // Build query without join (split queries to avoid RLS issues)
     let query = supabase
       .from('follow_up_reminders')
-      .select(`
-        *,
-        client:clients(id, name, email, phone, whatsapp_phone)
-      `, { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('organization_id', profile.organization_id)
       .order('scheduled_date', { ascending: true })
       .range(offset, offset + limit - 1)
@@ -116,6 +113,21 @@ export async function GET(request: NextRequest) {
         ApiErrors.INTERNAL_ERROR('Failed to fetch reminders'),
         'GET /api/reminders - query error'
       )
+    }
+
+    // If we got reminders, fetch client names separately
+    if (reminders && reminders.length > 0) {
+      const clientIds = [...new Set(reminders.map(r => r.client_id))]
+      const { data: clients } = await supabase
+        .from('clients')
+        .select('id, name, email, phone, whatsapp_phone')
+        .in('id', clientIds)
+
+      // Map client data to reminders
+      const clientsMap = new Map(clients?.map(c => [c.id, c]) || [])
+      reminders.forEach(r => {
+        r.client = clientsMap.get(r.client_id) || null
+      })
     }
 
     logger.api('GET', '/api/reminders', 200, 0, { count: count || 0, userId: user.id })
@@ -198,7 +210,7 @@ export async function POST(request: NextRequest) {
       return handleApiError(ApiErrors.NOT_FOUND('Client in organization'), 'POST /api/reminders')
     }
 
-    // Insert reminder
+    // Insert reminder without join (split queries to avoid RLS issues)
     const { data: reminder, error } = await supabase
       .from('follow_up_reminders')
       .insert({
@@ -207,10 +219,7 @@ export async function POST(request: NextRequest) {
         created_by: user.id,
         status: 'pending',
       })
-      .select(`
-        *,
-        client:clients(id, name, email, phone, whatsapp_phone)
-      `)
+      .select('*')
       .single()
 
     if (error) {
@@ -221,9 +230,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Fetch client separately
+    const { data: clientData } = await supabase
+      .from('clients')
+      .select('id, name, email, phone, whatsapp_phone')
+      .eq('id', reminder.client_id)
+      .single()
+
+    // Map client data to reminder
+    const reminderWithClient = {
+      ...reminder,
+      client: clientData
+    }
+
     logger.api('POST', '/api/reminders', 201, 0, { reminderId: reminder.id, userId: user.id })
 
-    return NextResponse.json({ reminder }, { status: 201 })
+    return NextResponse.json({ reminder: reminderWithClient }, { status: 201 })
   } catch (error) {
     logger.error('Unexpected error in POST /api/reminders', error as Error)
     return handleApiError(

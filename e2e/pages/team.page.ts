@@ -42,7 +42,7 @@ export class TeamPage extends BasePage {
   }
 
   async submitInviteForm() {
-    await this.page.locator('button[type="submit"]:has-text("Invitar"), button[type="submit"]:has-text("Send")').click()
+    await this.page.locator('button[type="submit"]:has-text("Enviar Invitación"), button[type="submit"]:has-text("Invitar"), button[type="submit"]:has-text("Send")').click()
     await this.page.waitForTimeout(1000)
   }
 

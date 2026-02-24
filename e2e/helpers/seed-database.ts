@@ -87,18 +87,27 @@ export async function seedTestDatabase() {
           throw authError
         }
 
-        // 3. Create profile for new user
+        // 3. Create profile for new user (retry once on transient upstream errors)
         if (authData?.user) {
-          const { error: profileError } = await supabase.from('profiles').upsert(
-            {
-              id: authData.user.id,
-              organization_id: TEST_ORG_ID,
-              role: role,
-              email: user.email,
-              full_name: `Test ${role.charAt(0).toUpperCase() + role.slice(1)}`,
-            },
-            { onConflict: 'id' }
-          )
+          let profileError = null
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            const result = await supabase.from('profiles').upsert(
+              {
+                id: authData.user.id,
+                organization_id: TEST_ORG_ID,
+                role: role,
+                email: user.email,
+                full_name: `Test ${role.charAt(0).toUpperCase() + role.slice(1)}`,
+              },
+              { onConflict: 'id' }
+            )
+            profileError = result.error
+            if (!profileError) break
+            if (attempt < 3) {
+              console.warn(`  ⚠️  Profile upsert attempt ${attempt} failed for ${role}, retrying...`)
+              await new Promise(resolve => setTimeout(resolve, 500 * attempt))
+            }
+          }
 
           if (profileError) {
             throw new Error(`Failed to create profile for ${role}: ${profileError.message}`)

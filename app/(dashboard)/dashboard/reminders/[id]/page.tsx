@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,7 +13,6 @@ import Link from 'next/link'
 interface Client {
   id: string
   name: string
-  company_name: string | null
 }
 
 interface Reminder {
@@ -21,7 +20,7 @@ interface Reminder {
   client_id: string
   clients: Client
   title: string
-  message: string | null
+  description: string | null
   reminder_type: string
   scheduled_date: string
   priority: string
@@ -33,31 +32,48 @@ interface Reminder {
   completed_at: string | null
 }
 
-export default function ReminderDetailPage({ params }: { params: { id: string } }) {
+export default function ReminderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const resolvedParams = use(params)
+  const id = resolvedParams.id
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [reminder, setReminder] = useState<Reminder | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
+  console.log('[ReminderDetails] Component mounted, resolvedParams:', resolvedParams, 'id:', id)
+
   useEffect(() => {
     async function fetchReminder() {
+      console.log('[ReminderDetails] useEffect triggered, id:', id, 'type:', typeof id)
+      if (!id || id === 'undefined') {
+        console.error('[ReminderDetails] No valid ID provided!')
+        setError('ID de recordatorio inválido')
+        return
+      }
       try {
-        const response = await fetch(`/api/reminders/${params.id}`)
+        console.log('[ReminderDetails] Fetching reminder:', id)
+        const response = await fetch(`/api/reminders/${id}`)
+        console.log('[ReminderDetails] Response status:', response.status, response.statusText)
+
         if (response.ok) {
           const data = await response.json()
+          console.log('[ReminderDetails] Response data:', data)
           setReminder(data.data)
         } else {
+          const errorText = await response.text()
+          console.error('[ReminderDetails] Error response:', response.status, errorText)
           setError('Recordatorio no encontrado')
         }
       } catch (err) {
+        console.error('[ReminderDetails] Fetch error:', err)
         setError('Error al cargar recordatorio')
       }
     }
 
     fetchReminder()
-  }, [params.id])
+  }, [id])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -68,7 +84,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
 
     const data = {
       title: formData.get('title'),
-      message: formData.get('message'),
+      description: formData.get('description'),
       reminder_type: formData.get('reminder_type'),
       scheduled_date: formData.get('scheduled_date'),
       priority: formData.get('priority'),
@@ -76,7 +92,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
     }
 
     try {
-      const response = await fetch(`/api/reminders/${params.id}`, {
+      const response = await fetch(`/api/reminders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -106,7 +122,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
     setError('')
 
     try {
-      const response = await fetch(`/api/reminders/${params.id}`, {
+      const response = await fetch(`/api/reminders/${id}`, {
         method: 'DELETE',
       })
 
@@ -128,7 +144,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
     setError('')
 
     try {
-      const response = await fetch(`/api/reminders/${params.id}`, {
+      const response = await fetch(`/api/reminders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -185,7 +201,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
           </Link>
           <div>
             <div className="flex items-center space-x-3">
-              <h2 className="text-2xl font-bold text-gray-900">{reminder.title}</h2>
+              <h1 className="text-2xl font-bold text-gray-900">{reminder.title}</h1>
               {isOverdue && (
                 <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium flex items-center">
                   <AlertCircle className="w-4 h-4 mr-1" />
@@ -195,7 +211,6 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
             </div>
             <p className="text-gray-600">
               {reminder.clients.name}
-              {reminder.clients.company_name && ` - ${reminder.clients.company_name}`}
             </p>
           </div>
         </div>
@@ -339,14 +354,14 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
                 </div>
               </div>
 
-              {/* Message */}
+              {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="message">Mensaje</Label>
+                <Label htmlFor="description">Descripción</Label>
                 <Textarea
-                  id="message"
-                  name="message"
+                  id="description"
+                  name="description"
                   rows={4}
-                  defaultValue={reminder.message || ''}
+                  defaultValue={reminder.description || ''}
                 />
               </div>
 
@@ -365,7 +380,6 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
                   <Label className="text-sm text-gray-500">Cliente</Label>
                   <p className="text-gray-900 font-medium">
                     {reminder.clients.name}
-                    {reminder.clients.company_name && ` (${reminder.clients.company_name})`}
                   </p>
                 </div>
 
@@ -391,7 +405,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
 
                 <div>
                   <Label className="text-sm text-gray-500">Estado</Label>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColors[reminder.status as keyof typeof statusColors]}`}>
+                  <span data-testid="reminder-status" className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColors[reminder.status as keyof typeof statusColors]}`}>
                     {reminder.status === 'pending' && 'Pendiente'}
                     {reminder.status === 'completed' && 'Completado'}
                     {reminder.status === 'cancelled' && 'Cancelado'}
@@ -400,7 +414,7 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
 
                 <div>
                   <Label className="text-sm text-gray-500">Fecha Programada</Label>
-                  <p className={`text-gray-900 ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+                  <p data-testid="due-date" className={`text-gray-900 ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
                     {new Date(reminder.scheduled_date).toLocaleDateString('es-MX', {
                       year: 'numeric',
                       month: 'long',
@@ -423,10 +437,10 @@ export default function ReminderDetailPage({ params }: { params: { id: string } 
                 )}
               </div>
 
-              {reminder.message && (
+              {reminder.description && (
                 <div>
-                  <Label className="text-sm text-gray-500">Mensaje</Label>
-                  <p className="text-gray-900 whitespace-pre-wrap">{reminder.message}</p>
+                  <Label className="text-sm text-gray-500">Descripción</Label>
+                  <p className="text-gray-900 whitespace-pre-wrap">{reminder.description}</p>
                 </div>
               )}
 

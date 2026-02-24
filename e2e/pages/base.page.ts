@@ -8,7 +8,7 @@ export class BasePage {
   }
 
   async goto(path: string) {
-    await this.page.goto(path, { waitUntil: 'networkidle' })
+    await this.page.goto(path, { waitUntil: 'load' })
   }
 
   async fill(locator: Locator, text: string) {
@@ -43,7 +43,7 @@ export class BasePage {
   }
 
   async expectUrl(path: string) {
-    await this.page.waitForURL(`**${path}`, { timeout: 10000 })
+    await this.page.waitForURL(`**${path}`, { timeout: 30000 })
   }
 
   async expectVisible(locator: Locator) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,30 +15,39 @@ interface QuoteItem {
   description: string
   quantity: number
   unit_price: number
-  total: number
+  subtotal: number
+}
+
+interface Client {
+  id: string
+  name: string
+  email: string | null
+  phone: string | null
+  company_name: string | null
 }
 
 interface Quote {
   id: string
   quote_number: string
   client_id: string
-  client_name: string
-  client_email: string | null
-  client_phone: string | null
+  client: Client | null
   status: string
   subtotal: number
-  tax: number
-  total: number
+  tax_amount: number
+  tax_rate: number
   discount_rate: number
+  discount_amount: number
+  total: number
   notes: string | null
-  terms: string | null
+  terms_and_conditions: string | null
   valid_until: string
   created_at: string
   items: QuoteItem[]
 }
 
-export default function QuoteDetailPage({ params }: { params: { id: string } }) {
+export default function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const { id } = use(params)
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
@@ -48,7 +57,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     async function fetchQuote() {
       try {
-        const response = await fetch(`/api/quotes/${params.id}`)
+        const response = await fetch(`/api/quotes/${id}`)
         if (response.ok) {
           const data = await response.json()
           setQuote(data.data)
@@ -61,7 +70,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
     }
 
     fetchQuote()
-  }, [params.id])
+  }, [id])
 
   async function handleDelete() {
     if (!confirm('¿Estás seguro de eliminar esta cotización? Esta acción no se puede deshacer.')) {
@@ -72,7 +81,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
     setError('')
 
     try {
-      const response = await fetch(`/api/quotes/${params.id}`, {
+      const response = await fetch(`/api/quotes/${id}`, {
         method: 'DELETE',
       })
 
@@ -94,7 +103,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
     setError('')
 
     try {
-      const response = await fetch(`/api/quotes/${params.id}`, {
+      const response = await fetch(`/api/quotes/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -116,7 +125,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
 
   async function handleExportPDF() {
     try {
-      const response = await fetch(`/api/export/quote/${params.id}`)
+      const response = await fetch(`/api/export/quote/${id}`)
       if (response.ok) {
         const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
@@ -144,6 +153,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
   const statusColors = {
     draft: 'bg-gray-100 text-gray-700',
     sent: 'bg-blue-100 text-blue-700',
+    viewed: 'bg-purple-100 text-purple-700',
     accepted: 'bg-green-100 text-green-700',
     rejected: 'bg-red-100 text-red-700',
     expired: 'bg-yellow-100 text-yellow-700',
@@ -166,12 +176,13 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[quote.status as keyof typeof statusColors]}`}>
                 {quote.status === 'draft' && 'Borrador'}
                 {quote.status === 'sent' && 'Enviada'}
+                {quote.status === 'viewed' && 'Vista'}
                 {quote.status === 'accepted' && 'Aceptada'}
                 {quote.status === 'rejected' && 'Rechazada'}
                 {quote.status === 'expired' && 'Expirada'}
               </span>
             </div>
-            <p className="text-gray-600">{quote.client_name}</p>
+            <p className="text-gray-600">{quote.client?.name || '—'}</p>
           </div>
         </div>
 
@@ -220,20 +231,20 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
           <div className="grid gap-4 md:grid-cols-3">
             <div>
               <Label className="text-sm text-gray-500">Nombre</Label>
-              <p className="text-gray-900 font-medium">{quote.client_name}</p>
+              <p className="text-gray-900 font-medium">{quote.client?.name || '—'}</p>
             </div>
 
-            {quote.client_email && (
+            {quote.client?.email && (
               <div>
                 <Label className="text-sm text-gray-500">Email</Label>
-                <p className="text-gray-900">{quote.client_email}</p>
+                <p className="text-gray-900">{quote.client.email}</p>
               </div>
             )}
 
-            {quote.client_phone && (
+            {quote.client?.phone && (
               <div>
                 <Label className="text-sm text-gray-500">Teléfono</Label>
-                <p className="text-gray-900">{quote.client_phone}</p>
+                <p className="text-gray-900">{quote.client.phone}</p>
               </div>
             )}
           </div>
@@ -262,10 +273,10 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
                     <td className="py-3 px-4">{item.description}</td>
                     <td className="text-right py-3 px-4">{item.quantity}</td>
                     <td className="text-right py-3 px-4">
-                      ${item.unit_price.toLocaleString('es-MX')}
+                      ${Number(item.unit_price).toLocaleString('es-MX')}
                     </td>
                     <td className="text-right py-3 px-4 font-medium">
-                      ${item.total.toLocaleString('es-MX')}
+                      ${Number(item.subtotal).toLocaleString('es-MX')}
                     </td>
                   </tr>
                 ))}
@@ -276,25 +287,25 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
           <div className="mt-6 space-y-2 ml-auto max-w-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span className="font-semibold">${quote.subtotal.toLocaleString('es-MX')}</span>
+              <span className="font-semibold">${Number(quote.subtotal).toLocaleString('es-MX')}</span>
             </div>
 
-            {quote.discount_rate > 0 && (
+            {Number(quote.discount_rate) > 0 && (
               <div className="flex justify-between text-green-600">
-                <span>Descuento ({quote.discount_rate}%):</span>
-                <span>-${((quote.subtotal * quote.discount_rate) / 100).toLocaleString('es-MX')}</span>
+                <span>Descuento ({Number(quote.discount_rate)}%):</span>
+                <span>-${((Number(quote.subtotal) * Number(quote.discount_rate)) / 100).toLocaleString('es-MX')}</span>
               </div>
             )}
 
             <div className="flex justify-between">
-              <span className="text-gray-600">IVA (16%):</span>
-              <span className="font-semibold">${quote.tax.toLocaleString('es-MX')}</span>
+              <span className="text-gray-600">IVA ({Number(quote.tax_rate) || 16}%):</span>
+              <span className="font-semibold">${Number(quote.tax_amount).toLocaleString('es-MX')}</span>
             </div>
 
             <div className="flex justify-between pt-2 border-t">
               <span className="text-lg font-bold">Total:</span>
               <span className="text-lg font-bold text-blue-600">
-                ${quote.total.toLocaleString('es-MX')}
+                ${Number(quote.total).toLocaleString('es-MX')}
               </span>
             </div>
           </div>
@@ -314,13 +325,13 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
           </Card>
         )}
 
-        {quote.terms && (
+        {quote.terms_and_conditions && (
           <Card>
             <CardHeader>
               <CardTitle>Términos y Condiciones</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-900 whitespace-pre-wrap">{quote.terms}</p>
+              <p className="text-gray-900 whitespace-pre-wrap">{quote.terms_and_conditions}</p>
             </CardContent>
           </Card>
         )}

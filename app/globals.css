@@ -129,3 +129,255 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================================
+   CotizaPro Dashboard — Design Tokens
+   ============================================================ */
+
+:root {
+  /* Sidebar */
+  --sidebar-bg: #0F1117;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-item-hover: rgba(255, 255, 255, 0.04);
+  --sidebar-item-active-bg: rgba(249, 115, 22, 0.1);
+  --sidebar-item-active-border: #f97316;
+
+  /* Accent */
+  --accent-primary: #f97316;
+  --accent-primary-hover: #ea6c0a;
+  --accent-muted: rgba(249, 115, 22, 0.15);
+
+  /* Text hierarchy (dashboard) */
+  --text-primary: rgba(255, 255, 255, 0.90);
+  --text-secondary: rgba(255, 255, 255, 0.60);
+  --text-muted: rgba(255, 255, 255, 0.35);
+  --text-disabled: rgba(255, 255, 255, 0.20);
+
+  /* Status colors */
+  --status-success: #22c55e;
+  --status-success-bg: rgba(34, 197, 94, 0.1);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.1);
+  --status-error: #ef4444;
+  --status-error-bg: rgba(239, 68, 68, 0.1);
+  --status-info: #3b82f6;
+  --status-info-bg: rgba(59, 130, 246, 0.1);
+
+  /* Shadow scale */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.08);
+}
+
+/* ============================================================
+   CotizaPro Landing Page — Animation Keyframes & Utilities
+   All animations are CSS-only (Server Component safe)
+   ============================================================ */
+
+@keyframes gradientFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-8px) rotate(1.5deg); }
+}
+
+@keyframes blobPulse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(20px, -20px) scale(1.07); }
+  66%       { transform: translate(-15px, 12px) scale(0.95); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.35), 0 4px 14px rgba(249, 115, 22, 0.25); }
+  50%       { box-shadow: 0 0 40px rgba(249, 115, 22, 0.60), 0 4px 24px rgba(249, 115, 22, 0.40); }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Gradient text — animated */
+.gradient-text-animated {
+  background: linear-gradient(270deg, #1E40AF, #3B82F6, #F97316, #3B82F6, #1E40AF);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 5s ease infinite;
+}
+
+/* Float animations */
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: floatSlow 5s ease-in-out 1.5s infinite;
+}
+
+/* Blob animations */
+.animate-blob {
+  animation: blobPulse 10s ease-in-out infinite;
+}
+
+.animate-blob-delay-2 {
+  animation: blobPulse 12s ease-in-out 2s infinite;
+}
+
+.animate-blob-delay-4 {
+  animation: blobPulse 11s ease-in-out 4s infinite;
+}
+
+/* Feature card staggered fade-in */
+.feature-card-1 {
+  animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+.feature-card-2 {
+  animation: fadeInUp 0.6s ease-out 0.25s both;
+}
+
+.feature-card-3 {
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.feature-card-4 {
+  animation: fadeInUp 0.6s ease-out 0.55s both;
+}
+
+/* Slide-in for hero content */
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out both;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fadeInUp 0.7s ease-out 0.15s both;
+}
+
+.animate-fade-in-up-delay-2 {
+  animation: fadeInUp 0.7s ease-out 0.30s both;
+}
+
+.animate-fade-in-up-delay-3 {
+  animation: fadeInUp 0.7s ease-out 0.45s both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.7s ease-out 0.2s both;
+}
+
+.animate-slide-in-right-delay {
+  animation: slideInRight 0.7s ease-out 0.5s both;
+}
+
+/* CTA orange glow button */
+.btn-glow-orange {
+  animation: ctaGlow 2.5s ease-in-out infinite;
+}
+
+/* Reduced motion — disable ALL animations */
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text-animated,
+  .animate-float,
+  .animate-float-slow,
+  .animate-float-delay,
+  .animate-blob,
+  .animate-blob-delay-2,
+  .animate-blob-delay-4,
+  .feature-card-1,
+  .feature-card-2,
+  .feature-card-3,
+  .feature-card-4,
+  .animate-fade-in-up,
+  .animate-fade-in-up-delay-1,
+  .animate-fade-in-up-delay-2,
+  .animate-fade-in-up-delay-3,
+  .animate-slide-in-right,
+  .animate-slide-in-right-delay,
+  .btn-glow-orange,
+  .page-transition,
+  .animate-toast-in {
+    animation: none;
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
+}
+
+/* ============================================================
+   Dashboard — Page Transitions (Phase 7.1)
+   ============================================================ */
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageEnter 0.2s ease-out both;
+}
+
+/* ============================================================
+   Toast Notifications — Animations (Phase 7.3)
+   ============================================================ */
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+.animate-toast-in {
+  animation: toastIn 0.2s ease-out both;
+}

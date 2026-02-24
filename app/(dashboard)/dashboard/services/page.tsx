@@ -4,19 +4,27 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
+import { ServiceFilters } from './filters'
 
 interface Service {
   id: string
   name: string
   description: string | null
   category: string
-  default_price: number
+  unit_price: number
   unit_type: string
   is_active: boolean
   created_at: string
 }
 
-export default async function ServicesPage() {
+export default async function ServicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ unit_type?: string; active?: string; q?: string }>
+}) {
+  const { unit_type, active, q } = await searchParams
+
   const supabase = await createServerClient()
 
   const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -34,13 +42,25 @@ export default async function ServicesPage() {
     redirect('/login')
   }
 
-  const { data: services } = await supabase
-    .from('services')
-    .select('*')
+  let servicesQuery = supabase
+    .from('service_catalog')
+    .select('id, name, description, category, unit_price, unit_type, is_active, created_at')
     .eq('organization_id', profile.organization_id)
     .order('category', { ascending: true })
     .order('name', { ascending: true })
     .limit(100)
+
+  if (unit_type) {
+    servicesQuery = servicesQuery.eq('unit_type', unit_type)
+  }
+  if (active !== undefined && active !== '') {
+    servicesQuery = servicesQuery.eq('is_active', active === 'true')
+  }
+  if (q) {
+    servicesQuery = servicesQuery.ilike('name', `%${q}%`)
+  }
+
+  const { data: services } = await servicesQuery
 
   const servicesByCategory = (services || []).reduce((acc, service) => {
     const category = service.category || 'other'
@@ -59,6 +79,13 @@ export default async function ServicesPage() {
     other: 'Otros'
   }
 
+  const unitTypeLabels: Record<string, string> = {
+    fixed: 'Fijo',
+    per_hour: 'Por Hora',
+    per_sqm: 'Por m²',
+    per_unit: 'Por Unidad',
+  }
+
   const activeServices = services?.filter(s => s.is_active) || []
   const inactiveServices = services?.filter(s => !s.is_active) || []
 
@@ -67,11 +94,11 @@ export default async function ServicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Servicios</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Servicios · {services?.length || 0}</h2>
           <p className="text-gray-600">Gestiona tu catálogo de servicios</p>
         </div>
         <Link href="/dashboard/services/new">
-          <Button>
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Servicio
           </Button>
@@ -109,10 +136,17 @@ export default async function ServicesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-blue-600">{Object.keys(servicesByCategory).length}</p>
+            <p className="text-3xl font-bold text-orange-600">{Object.keys(servicesByCategory).length}</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-4">
+          <ServiceFilters activeUnitType={unit_type} activeFilter={active} defaultSearch={q} />
+        </CardContent>
+      </Card>
 
       {/* Services by Category */}
       {Object.keys(servicesByCategory).length > 0 ? (
@@ -143,19 +177,15 @@ export default async function ServicesPage() {
                             {service.description || '-'}
                           </td>
                           <td className="text-right py-3 px-4">
-                            ${service.default_price.toLocaleString('es-MX')}
+                            ${Number(service.unit_price).toLocaleString('es-MX')}
                           </td>
                           <td className="text-center py-3 px-4 text-gray-600">
-                            {service.unit_type}
+                            {unitTypeLabels[service.unit_type] || service.unit_type}
                           </td>
                           <td className="text-center py-3 px-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              service.is_active
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-700'
-                            }`}>
+                            <Badge variant={service.is_active ? 'active' : 'inactive'}>
                               {service.is_active ? 'Activo' : 'Inactivo'}
-                            </span>
+                            </Badge>
                           </td>
                           <td className="text-right py-3 px-4">
                             <Link href={`/dashboard/services/${service.id}`}>
@@ -179,7 +209,7 @@ export default async function ServicesPage() {
             <div className="text-center">
               <p className="text-gray-500 mb-4">No tienes servicios registrados</p>
               <Link href="/dashboard/services/new">
-                <Button>
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white">
                   <Plus className="w-4 h-4 mr-2" />
                   Crear Primer Servicio
                 </Button>

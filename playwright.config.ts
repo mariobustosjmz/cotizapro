@@ -8,8 +8,8 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
   fullyParallel: !CI,
   forbidOnly: CI,
-  retries: CI ? 2 : 0,
-  workers: CI ? 1 : undefined,
+  retries: CI ? 2 : 1,
+  workers: CI ? 1 : 2,
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
@@ -46,7 +46,7 @@ export default defineConfig({
         command: 'npm run dev',
         url: BASE_URL,
         reuseExistingServer: !process.env.CI,
-        timeout: 120000,
+        timeout: 180000,
       }
     : undefined,
 

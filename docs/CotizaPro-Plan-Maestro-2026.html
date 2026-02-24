@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CotizaPro — Plan Maestro 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0A0F1C;
+    --navy2: #0D1526;
+    --navy3: #111827;
+    --blue: #0066FF;
+    --blue2: #0052CC;
+    --green: #00C853;
+    --green2: #00A843;
+    --white: #FFFFFF;
+    --gray: #8892A4;
+    --border: rgba(255,255,255,0.08);
+    --card: rgba(255,255,255,0.04);
+  }
+  body { background: var(--navy); color: var(--white); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; }
+  h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
+  a { color: var(--blue); text-decoration: none; }
+
+  /* PAGE */
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 16mm 18mm; page-break-after: always; position: relative; }
+  .page:last-child { page-break-after: auto; }
+
+  /* COVER */
+  .cover { background: linear-gradient(135deg, var(--navy) 0%, #0D1A3A 60%, #0A1F50 100%); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; min-height: 297mm; padding: 18mm; }
+  .cover-badge { background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 28px; display: inline-block; }
+  .cover-title { font-size: 52px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; line-height: 1.1; margin-bottom: 10px; }
+  .cover-title span { color: var(--blue); }
+  .cover-sub { font-size: 20px; color: var(--green); font-weight: 500; margin-bottom: 24px; }
+  .cover-tagline { font-size: 15px; color: var(--gray); max-width: 480px; margin-bottom: 48px; }
+  .cover-stats { display: flex; gap: 36px; margin-bottom: 56px; }
+  .cover-stat { }
+  .cover-stat .val { font-size: 28px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--white); }
+  .cover-stat .lbl { font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+  .cover-meta { display: flex; gap: 24px; border-top: 1px solid var(--border); padding-top: 24px; width: 100%; }
+  .cover-meta span { font-size: 12px; color: var(--gray); }
+  .cover-meta strong { color: var(--white); }
+
+  /* NAV / TOC */
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 24px; }
+  .toc-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); }
+  .toc-num { font-size: 11px; color: var(--blue); font-weight: 600; min-width: 24px; }
+  .toc-title { font-size: 12px; color: var(--gray); }
+
+  /* SECTION HEADER */
+  .section-header { margin-bottom: 28px; }
+  .section-label { font-size: 11px; color: var(--blue); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-bottom: 8px; }
+  .section-title { font-size: 30px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; line-height: 1.2; }
+  .section-title span { color: var(--blue); }
+  .section-desc { font-size: 13px; color: var(--gray); margin-top: 10px; max-width: 560px; line-height: 1.7; }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .stat-card .val { font-size: 26px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--blue); }
+  .stat-card .val.green { color: var(--green); }
+  .stat-card .val.white { color: var(--white); }
+  .stat-card .lbl { font-size: 11px; color: var(--gray); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .stat-card .note { font-size: 11px; color: var(--gray); margin-top: 6px; }
+
+  /* TWO/THREE COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 16px 0; }
+
+  /* FEATURE CARD */
+  .feature-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .feature-card .icon { font-size: 22px; margin-bottom: 8px; }
+  .feature-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .feature-card p { font-size: 12px; color: var(--gray); line-height: 1.6; }
+
+  /* COMPETITOR */
+  .competitor-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .competitor-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .competitor-card .price { font-size: 18px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #FF6B6B; margin-bottom: 8px; }
+  .competitor-card .price.ours { color: var(--green); }
+  .competitor-card ul { list-style: none; }
+  .competitor-card ul li { font-size: 11px; color: var(--gray); padding: 3px 0; }
+  .competitor-card ul li::before { content: "✗ "; color: #FF6B6B; }
+  .competitor-card ul li.pro::before { content: "✓ "; color: var(--green); }
+
+  /* PRICING */
+  .pricing-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .pricing-card.featured { border-color: var(--blue); background: linear-gradient(135deg, rgba(0,102,255,0.12), rgba(0,102,255,0.04)); }
+  .pricing-card .plan { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); margin-bottom: 8px; }
+  .pricing-card .price { font-size: 32px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 4px; }
+  .pricing-card .period { font-size: 11px; color: var(--gray); margin-bottom: 14px; }
+  .pricing-card ul { list-style: none; text-align: left; }
+  .pricing-card ul li { font-size: 12px; color: var(--gray); padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .pricing-card ul li::before { content: "✓ "; color: var(--green); }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 20px; }
+  .timeline-item::before { content: ''; position: absolute; left: -20px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--blue); border: 2px solid var(--navy); }
+  .timeline-item h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .timeline-item p { font-size: 12px; color: var(--gray); }
+  .timeline-item .date { font-size: 10px; color: var(--blue); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+
+  /* HIGHLIGHT BOXES */
+  .highlight-box { background: rgba(0,102,255,0.08); border: 1px solid rgba(0,102,255,0.3); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .highlight-box h4 { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 6px; }
+  .success-box { background: rgba(0,200,83,0.08); border: 1px solid rgba(0,200,83,0.3); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .success-box h4 { font-size: 13px; font-weight: 600; color: var(--green); margin-bottom: 6px; }
+  .warning-box { background: rgba(255,171,0,0.08); border: 1px solid rgba(255,171,0,0.3); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .warning-box h4 { font-size: 13px; font-weight: 600; color: #FFAB00; margin-bottom: 6px; }
+  .danger-box { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.3); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .danger-box h4 { font-size: 13px; font-weight: 600; color: #FF5252; margin-bottom: 6px; }
+
+  /* RISK CARD */
+  .risk-card { background: var(--card); border-left: 3px solid var(--blue); border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 10px; }
+  .risk-card.high { border-left-color: #FF5252; }
+  .risk-card.med { border-left-color: #FFAB00; }
+  .risk-card.low { border-left-color: var(--green); }
+  .risk-card h4 { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .risk-card p { font-size: 11px; color: var(--gray); }
+  .risk-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-bottom: 4px; }
+  .risk-badge.high { background: rgba(255,82,82,0.15); color: #FF5252; }
+  .risk-badge.med { background: rgba(255,171,0,0.15); color: #FFAB00; }
+  .risk-badge.low { background: rgba(0,200,83,0.15); color: var(--green); }
+
+  /* TECH BADGES */
+  .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .tech-badge { background: rgba(0,102,255,0.12); border: 1px solid rgba(0,102,255,0.3); color: var(--blue); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
+  .tech-badge.green { background: rgba(0,200,83,0.1); border-color: rgba(0,200,83,0.3); color: var(--green); }
+  .tech-badge.gray { background: var(--card); border-color: var(--border); color: var(--gray); }
+
+  /* METRIC ROW */
+  .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-row .key { font-size: 12px; color: var(--gray); }
+  .metric-row .val { font-size: 13px; font-weight: 600; color: var(--white); }
+  .metric-row .val.blue { color: var(--blue); }
+  .metric-row .val.green { color: var(--green); }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap { margin: 8px 0; }
+  .progress-bar-wrap .label { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray); margin-bottom: 4px; }
+  .progress-bar { height: 6px; background: var(--card); border-radius: 4px; overflow: hidden; }
+  .progress-bar .fill { height: 100%; border-radius: 4px; background: var(--blue); }
+  .progress-bar .fill.green { background: var(--green); }
+
+  /* KPI BOX */
+  .kpi-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+  .kpi-box .kval { font-size: 22px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+  .kpi-box .klbl { font-size: 11px; color: var(--gray); margin-top: 4px; }
+  .kpi-box .ktarget { font-size: 10px; color: var(--green); margin-top: 2px; }
+
+  /* USE OF FUNDS */
+  .use-of-funds { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+  .fund-row { display: flex; align-items: center; gap: 12px; }
+  .fund-label { font-size: 12px; min-width: 160px; }
+  .fund-bar { flex: 1; height: 22px; background: var(--card); border-radius: 4px; overflow: hidden; }
+  .fund-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; }
+  .fund-pct { font-size: 11px; color: var(--gray); min-width: 36px; text-align: right; }
+
+  /* FLOW STEPS */
+  .flow-steps { display: flex; gap: 0; margin: 16px 0; }
+  .flow-step { flex: 1; text-align: center; position: relative; }
+  .flow-step::after { content: '→'; position: absolute; right: -8px; top: 16px; font-size: 16px; color: var(--blue); }
+  .flow-step:last-child::after { display: none; }
+  .flow-step .circle { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,102,255,0.15); border: 1px solid rgba(0,102,255,0.4); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; font-size: 16px; }
+  .flow-step .label { font-size: 11px; color: var(--gray); }
+
+  /* RANK CARD */
+  .rank-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .rank-card .rank { font-size: 22px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--blue); min-width: 36px; }
+  .rank-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .rank-card p { font-size: 11px; color: var(--gray); }
+
+  /* PAGE FOOTER */
+  .page-footer { position: absolute; bottom: 12mm; left: 18mm; right: 18mm; display: flex; justify-content: space-between; font-size: 10px; color: var(--gray); border-top: 1px solid var(--border); padding-top: 8px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray); padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  td { font-size: 12px; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.green { color: var(--green); font-weight: 600; }
+  td.blue { color: var(--blue); }
+
+  /* PRINT */
+  @media print {
+    body { background: var(--navy) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="page cover">
+  <div class="cover-badge">Plan Maestro 2026 · v3.0</div>
+  <div class="cover-title"><span>CotizaPro</span><br>Tu cotizador profesional</div>
+  <div class="cover-sub">"El Stripe para técnicos de mantenimiento"</div>
+  <div class="cover-tagline">SaaS B2C que empodera a técnicos de mantenimiento en México con cotizaciones profesionales, seguimiento automatizado y cobros digitales — desde el teléfono.</div>
+  <div class="cover-stats">
+    <div class="cover-stat"><div class="val">2M+</div><div class="lbl">Técnicos en México</div></div>
+    <div class="cover-stat"><div class="val">$4.8B</div><div class="lbl">MXN TAM</div></div>
+    <div class="cover-stat"><div class="val">$955K</div><div class="lbl">MXN ARR Año 1</div></div>
+    <div class="cover-stat"><div class="val">338</div><div class="lbl">E2E Tests 100%</div></div>
+  </div>
+  <div class="cover-meta">
+    <span><strong>Versión:</strong> 3.0 — Febrero 2026</span>
+    <span><strong>Stack:</strong> Next.js 15 · Supabase · Stripe</span>
+    <span><strong>Mercado:</strong> México</span>
+    <span><strong>Etapa:</strong> MVP Completo</span>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Índice</div>
+    <div class="section-title">Tabla de Contenido</div>
+    <div class="section-desc">Plan completo de 23 secciones: desde el problema hasta el roadmap de features futuros. <strong>v3.0</strong> — incluye análisis competitivo vs. ServiceTitan, Housecall Pro y Jobber + pricing $499 + 12 features validados por el mercado.</div>
+  </div>
+  <div class="toc-grid">
+    <div class="toc-item"><span class="toc-num">01</span><span class="toc-title">Resumen Ejecutivo</span></div>
+    <div class="toc-item"><span class="toc-num">02</span><span class="toc-title">El Problema</span></div>
+    <div class="toc-item"><span class="toc-num">03</span><span class="toc-title">Análisis de Mercado</span></div>
+    <div class="toc-item"><span class="toc-num">04</span><span class="toc-title">Competencia</span></div>
+    <div class="toc-item"><span class="toc-num">05</span><span class="toc-title">La Solución</span></div>
+    <div class="toc-item"><span class="toc-num">06</span><span class="toc-title">Módulos del Sistema</span></div>
+    <div class="toc-item"><span class="toc-num">07</span><span class="toc-title">MVP Features</span></div>
+    <div class="toc-item"><span class="toc-num">08</span><span class="toc-title">Flujos de Usuario</span></div>
+    <div class="toc-item"><span class="toc-num">09</span><span class="toc-title">Dashboard UX</span></div>
+    <div class="toc-item"><span class="toc-num">10</span><span class="toc-title">Arquitectura Técnica</span></div>
+    <div class="toc-item"><span class="toc-num">11</span><span class="toc-title">Modelo de Negocio</span></div>
+    <div class="toc-item"><span class="toc-num">12</span><span class="toc-title">Proyecciones Financieras</span></div>
+    <div class="toc-item"><span class="toc-num">13</span><span class="toc-title">Go-to-Market</span></div>
+    <div class="toc-item"><span class="toc-num">14</span><span class="toc-title">Roadmap</span></div>
+    <div class="toc-item"><span class="toc-num">15</span><span class="toc-title">KPIs y Métricas</span></div>
+    <div class="toc-item"><span class="toc-num">16</span><span class="toc-title">Gestión de Riesgos</span></div>
+    <div class="toc-item"><span class="toc-num">17</span><span class="toc-title">Marco Legal</span></div>
+    <div class="toc-item"><span class="toc-num">18</span><span class="toc-title">Equipo</span></div>
+    <div class="toc-item"><span class="toc-num">19</span><span class="toc-title">Identidad de Marca</span></div>
+    <div class="toc-item"><span class="toc-num">20</span><span class="toc-title">Propuesta a Inversores</span></div>
+    <div class="toc-item"><span class="toc-num">21</span><span class="toc-title">Estado del Proyecto</span></div>
+    <div class="toc-item" style="border-color:var(--blue);background:rgba(0,102,255,0.06);"><span class="toc-num" style="background:var(--blue);color:#fff;">22</span><span class="toc-title" style="color:var(--blue);">Oportunidades Estratégicas</span></div>
+    <div class="toc-item" style="border-color:#FFAB00;background:rgba(255,171,0,0.06);"><span class="toc-num" style="background:#FFAB00;color:#0A0F1C;">23</span><span class="toc-title" style="color:#FFAB00;">Features Futuros · v3.0 <strong>NEW</strong></span></div>
+  </div>
+  <div class="success-box" style="margin-top:28px;">
+    <h4>MVP Completado — Listo para Lanzar</h4>
+    <p>CotizaPro cuenta con un MVP completamente funcional: API robusta (clientes, servicios, cotizaciones, recordatorios), 338 tests E2E con 100% de tasa de éxito, seed de datos realistas de negocio HVAC, y stack de producción configurado en Vercel + Supabase + Stripe.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>Confidencial · v3.0 · Febrero 2026</span>
+  </div>
+</div>
+
+<!-- SECTION 01: RESUMEN EJECUTIVO -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 01</div>
+    <div class="section-title">Resumen <span>Ejecutivo</span></div>
+    <div class="section-desc">CotizaPro es una plataforma SaaS B2C que permite a técnicos de mantenimiento en México generar cotizaciones profesionales, dar seguimiento a clientes y cobrar digitalmente — todo desde su smartphone.</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val">2M+</div><div class="lbl">Técnicos target en México</div><div class="note">HVAC, Plomería, Eléctrico, Pintura</div></div>
+    <div class="stat-card"><div class="val green">40%</div><div class="lbl">Clientes perdidos sin cotización</div><div class="note">Problema crítico sin resolver</div></div>
+    <div class="stat-card"><div class="val white">$499</div><div class="lbl">MXN/mes Plan Pro</div><div class="note">Margen bruto &gt;95% — alto ROI</div></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="highlight-box">
+        <h4>Propuesta de Valor</h4>
+        <p>En menos de 3 minutos, un técnico puede generar una cotización profesional en PDF, enviarla por WhatsApp o email, y configurar recordatorios automáticos — sin necesidad de computadora ni conocimientos contables.</p>
+      </div>
+      <div class="metric-row"><span class="key">Mercado Total (TAM)</span><span class="val blue">$4.8B MXN</span></div>
+      <div class="metric-row"><span class="key">Mercado Disponible (SAM)</span><span class="val">$720M MXN</span></div>
+      <div class="metric-row"><span class="key">Objetivo Año 1 (SOM)</span><span class="val green">$2.4M MXN</span></div>
+      <div class="metric-row"><span class="key">Break-even estimado</span><span class="val">6–9 meses</span></div>
+      <div class="metric-row"><span class="key">ARR Proyectado Año 1</span><span class="val green">$955K MXN</span></div>
+    </div>
+    <div>
+      <div class="success-box">
+        <h4>Diferenciador Clave</h4>
+        <p>Únicos competidores son soluciones americanas ($300+ USD/mes, en inglés, sin contexto México). CotizaPro es nativo español, diseñado para el mercado mexicano, con precios asequibles y onboarding en minutos.</p>
+      </div>
+      <div class="metric-row"><span class="key">Tests E2E pasados</span><span class="val green">338 / 338</span></div>
+      <div class="metric-row"><span class="key">Tasa de éxito E2E</span><span class="val green">100%</span></div>
+      <div class="metric-row"><span class="key">Stack tecnológico</span><span class="val">Next.js 15 + Supabase</span></div>
+      <div class="metric-row"><span class="key">Capital requerido</span><span class="val blue">$500K–1M MXN</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>01 · Resumen Ejecutivo</span>
+  </div>
+</div>
+
+<!-- SECTION 02: EL PROBLEMA -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 02</div>
+    <div class="section-title">El <span>Problema</span></div>
+    <div class="section-desc">Los técnicos de mantenimiento en México operan sin herramientas digitales profesionales. El resultado: pérdida de clientes, precios inconsistentes y una imagen informal que les cuesta contratos.</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val">40%</div><div class="lbl">Pérdida de clientes</div><div class="note">Por falta de cotización formal</div></div>
+    <div class="stat-card"><div class="val green">85%</div><div class="lbl">Sin herramientas digitales</div><div class="note">Usan WhatsApp y notas de papel</div></div>
+    <div class="stat-card"><div class="val white">3×</div><div class="lbl">Precio inconsistente</div><div class="note">Variación en presupuesto verbal</div></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="feature-card">
+        <div class="icon">📋</div>
+        <h4>Sin Cotizaciones Formales</h4>
+        <p>La mayoría de los técnicos da presupuestos verbales o por WhatsApp. Los clientes desconfían, comparan con otros y frecuentemente no contestan después de recibir el precio.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <div class="icon">📱</div>
+        <h4>Seguimiento Manual</h4>
+        <p>No existe sistema de follow-up. El técnico olvida a quién llamar, cuándo llamar y qué oferta hizo. Pierde ventas por falta de persistencia organizada.</p>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card">
+        <div class="icon">💸</div>
+        <h4>Cobros Informales</h4>
+        <p>Efectivo únicamente en muchos casos. Sin recibo, sin factura, sin historial de pagos. Complica el crecimiento del negocio y la relación con clientes corporativos.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <div class="icon">📊</div>
+        <h4>Cero Visibilidad del Negocio</h4>
+        <p>Sin datos de cuántos presupuestos se han dado, cuántos se convirtieron en trabajo, cuánto se ha cobrado, cuáles clientes repiten. Imposible crecer sin métricas.</p>
+      </div>
+    </div>
+  </div>
+  <div class="danger-box">
+    <h4>El Costo Real del Problema</h4>
+    <p>Un técnico que da 10 cotizaciones por semana y pierde el 40% por falta de formalidad, deja de capturar ~$8,000–15,000 MXN mensuales en potencial de ingreso. CotizaPro convierte esa pérdida en ganancia recuperada.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>02 · El Problema</span>
+  </div>
+</div>
+
+<!-- SECTION 03: MERCADO -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 03</div>
+    <div class="section-title">Análisis de <span>Mercado</span></div>
+    <div class="section-desc">México tiene más de 2 millones de técnicos de mantenimiento activos. El mercado de software de gestión para servicios en campo está completamente desatendido en el segmento de precios accesibles.</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val">$4.8B</div><div class="lbl">TAM — Mercado Total (MXN)</div><div class="note">2M técnicos × $200 MXN/mes promedio</div></div>
+    <div class="stat-card"><div class="val green">$720M</div><div class="lbl">SAM — Mercado Disponible (MXN)</div><div class="note">Técnicos con smartphone y facturación formal</div></div>
+    <div class="stat-card"><div class="val white">$2.4M</div><div class="lbl">SOM — Año 1 Objetivo (MXN)</div><div class="note">~800 usuarios Pro activos</div></div>
+  </div>
+  <div class="highlight-box">
+    <h4>Segmentos Prioritarios</h4>
+    <p>HVAC y Aire Acondicionado · Plomería y Gas · Electricistas · Pintura y Remodelación · Albañilería · Cerrajería — todos con alta demanda de cotización y bajo nivel de digitalización.</p>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="metric-row"><span class="key">Técnicos HVAC en México</span><span class="val blue">450K+</span></div>
+      <div class="metric-row"><span class="key">Técnicos de Plomería</span><span class="val">380K+</span></div>
+      <div class="metric-row"><span class="key">Electricistas</span><span class="val">520K+</span></div>
+      <div class="metric-row"><span class="key">Pintura y Remodelación</span><span class="val">650K+</span></div>
+      <div class="metric-row"><span class="key">Penetración digital actual</span><span class="val">~15%</span></div>
+      <div class="metric-row"><span class="key">Crecimiento del sector (YoY)</span><span class="val green">+8.5%</span></div>
+    </div>
+    <div>
+      <div class="progress-bar-wrap">
+        <div class="label"><span>HVAC</span><span>22%</span></div>
+        <div class="progress-bar"><div class="fill" style="width:22%"></div></div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="label"><span>Plomería</span><span>19%</span></div>
+        <div class="progress-bar"><div class="fill" style="width:19%"></div></div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="label"><span>Electricidad</span><span>26%</span></div>
+        <div class="progress-bar"><div class="fill" style="width:26%"></div></div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="label"><span>Pintura</span><span>33%</span></div>
+        <div class="progress-bar"><div class="fill green" style="width:33%"></div></div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--gray);">Distribución del segmento objetivo</div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>03 · Análisis de Mercado</span>
+  </div>
+</div>
+
+<!-- SECTION 04: COMPETENCIA -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 04</div>
+    <div class="section-title">Análisis de <span>Competencia</span></div>
+    <div class="section-desc">El mercado americano tiene soluciones robustas pero inasequibles, en inglés y sin contexto México. CotizaPro captura el segmento desatendido con precio y localización.</div>
+  </div>
+  <div class="three-col">
+    <div class="competitor-card">
+      <h4>ServiceTitan</h4>
+      <div class="price">$300+ USD/mes</div>
+      <ul>
+        <li>Solo en inglés</li>
+        <li>Orientado a empresas USA</li>
+        <li>Implementación compleja</li>
+        <li>Sin soporte México</li>
+        <li>Contrato anual forzoso</li>
+      </ul>
+    </div>
+    <div class="competitor-card">
+      <h4>Housecall Pro</h4>
+      <div class="price">$49 USD/mes</div>
+      <ul>
+        <li>Principalmente inglés</li>
+        <li>Sin integración WhatsApp</li>
+        <li>Sin cotizaciones PDF MX</li>
+        <li>Sin catálogo de servicios MX</li>
+        <li>Pagos solo USD</li>
+      </ul>
+    </div>
+    <div class="competitor-card">
+      <h4>Jobber</h4>
+      <div class="price">$29 USD/mes</div>
+      <ul>
+        <li>Sin localización México</li>
+        <li>Sin WhatsApp nativo</li>
+        <li>Sin facturación SAT</li>
+        <li>Curva de aprendizaje alta</li>
+        <li>Sin soporte en español</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:16px;">
+    <h4>CotizaPro — Ventaja Competitiva</h4>
+    <p>Nativo español · Precios en MXN · WhatsApp + Email integrado · PDF profesional · Catálogo de servicios preconfigurado · Onboarding en 5 minutos · Diseñado para técnico individual</p>
+  </div>
+  <table>
+    <tr><th>Característica</th><th>ServiceTitan</th><th>Housecall Pro</th><th>Jobber</th><th>CotizaPro</th></tr>
+    <tr><td>Precio MXN accesible</td><td style="color:#FF5252">✗</td><td style="color:#FF5252">✗</td><td style="color:#FF5252">✗</td><td class="green">✓</td></tr>
+    <tr><td>WhatsApp nativo</td><td style="color:#FF5252">✗</td><td style="color:#FF5252">✗</td><td style="color:#FF5252">✗</td><td class="green">✓</td></tr>
+    <tr><td>Interfaz en español</td><td style="color:#FF5252">✗</td><td style="color:#FF5252">✗</td><td style="color:#FFAB00">Parcial</td><td class="green">✓</td></tr>
+    <tr><td>Onboarding &lt; 10 min</td><td style="color:#FF5252">✗</td><td style="color:#FFAB00">Parcial</td><td style="color:#FF5252">✗</td><td class="green">✓</td></tr>
+    <tr><td>Sin contrato anual</td><td style="color:#FF5252">✗</td><td class="green">✓</td><td class="green">✓</td><td class="green">✓</td></tr>
+  </table>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>04 · Competencia</span>
+  </div>
+</div>
+
+<!-- SECTION 05: LA SOLUCIÓN -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 05</div>
+    <div class="section-title">La <span>Solución</span></div>
+    <div class="section-desc">CotizaPro es una aplicación web progresiva que transforma el smartphone del técnico en una oficina completa de gestión de clientes y cotizaciones.</div>
+  </div>
+  <div class="flow-steps">
+    <div class="flow-step"><div class="circle">👤</div><div class="label">Registo cliente</div></div>
+    <div class="flow-step"><div class="circle">🔧</div><div class="label">Selección servicios</div></div>
+    <div class="flow-step"><div class="circle">📄</div><div class="label">PDF generado</div></div>
+    <div class="flow-step"><div class="circle">💬</div><div class="label">Envío WhatsApp</div></div>
+    <div class="flow-step"><div class="circle">🔔</div><div class="label">Recordatorio auto</div></div>
+    <div class="flow-step"><div class="circle">✅</div><div class="label">Cierre contrato</div></div>
+  </div>
+  <div class="three-col">
+    <div class="feature-card">
+      <div class="icon">📋</div>
+      <h4>Cotizaciones en 3 Min</h4>
+      <p>Selecciona servicios del catálogo, ajusta precios, agrega notas y genera PDF profesional con logo y datos del técnico automáticamente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💬</div>
+      <h4>WhatsApp + Email</h4>
+      <p>Envío directo por WhatsApp Business API (Twilio) y correo electrónico (Resend). El cliente recibe el PDF en segundos.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔔</div>
+      <h4>Recordatorios Auto</h4>
+      <p>Sistema de follow-up programado: recordatorio a 24h, 3 días y 7 días. El técnico nunca pierde una cotización por falta de seguimiento.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">👥</div>
+      <h4>CRM Básico</h4>
+      <p>Historial completo por cliente: cotizaciones enviadas, trabajos realizados, pagos, notas. Toda la relación en un solo lugar.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📊</div>
+      <h4>Analytics Dashboard</h4>
+      <p>Métricas de conversión, ingresos, cotizaciones activas, tasa de cierre por tipo de servicio. Datos reales para crecer.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🏪</div>
+      <h4>Catálogo de Servicios</h4>
+      <p>Banco de servicios preconfigurado por giro (HVAC, plomería, eléctrico). El técnico personaliza precios y agrega los suyos propios.</p>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>05 · La Solución</span>
+  </div>
+</div>
+
+<!-- SECTION 06: MÓDULOS DEL SISTEMA -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 06</div>
+    <div class="section-title">Módulos del <span>Sistema</span></div>
+    <div class="section-desc">CotizaPro está construido sobre cinco módulos principales que trabajan de forma integrada para cubrir el ciclo de vida completo del negocio de un técnico.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="rank-card">
+        <div class="rank">01</div>
+        <div>
+          <h4>Módulo de Clientes</h4>
+          <p>CRUD completo con historial, contacto múltiple (WhatsApp, email, teléfono), segmentación por tipo y notas personalizadas. Base de datos privada del técnico.</p>
+        </div>
+      </div>
+      <div class="rank-card">
+        <div class="rank">02</div>
+        <div>
+          <h4>Módulo de Servicios</h4>
+          <p>Catálogo personalizable con precios por unidad (fijo, por hora, por m², por unidad). Importación de plantillas por giro. Historial de precios.</p>
+        </div>
+      </div>
+      <div class="rank-card">
+        <div class="rank">03</div>
+        <div>
+          <h4>Módulo de Cotizaciones</h4>
+          <p>Constructor visual de presupuestos multi-ítem con cálculo automático. PDF profesional con logo, firma y condiciones. Estados: borrador → enviada → aceptada → pagada.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="rank-card">
+        <div class="rank">04</div>
+        <div>
+          <h4>Módulo de Recordatorios</h4>
+          <p>Sistema de alertas automatizadas multi-canal (WhatsApp, Email, notificación push). Configuración de cadencia personalizada por cotización o regla global.</p>
+        </div>
+      </div>
+      <div class="rank-card">
+        <div class="rank">05</div>
+        <div>
+          <h4>Dashboard y Analytics</h4>
+          <p>Vista central con métricas en tiempo real: cotizaciones del mes, ingresos proyectados, tasa de conversión, recordatorios pendientes, clientes activos.</p>
+        </div>
+      </div>
+      <div class="success-box">
+        <h4>Integración Total</h4>
+        <p>Los cinco módulos comparten datos en tiempo real a través de Supabase Realtime. Cada acción en un módulo actualiza automáticamente los demás — sin sincronización manual.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>06 · Módulos del Sistema</span>
+  </div>
+</div>
+
+<!-- SECTION 07: MVP FEATURES -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 07</div>
+    <div class="section-title">MVP <span>Features</span> Implementadas</div>
+    <div class="section-desc">El MVP de CotizaPro está completamente construido y probado. 338 tests E2E con 100% de tasa de éxito validan todas las funcionalidades críticas del sistema.</div>
+  </div>
+  <div class="success-box">
+    <h4>Estado del MVP: Completado — Febrero 2026</h4>
+    <p>Todas las features del MVP han sido implementadas, probadas y validadas con tests de extremo a extremo en tres navegadores (Chromium, Firefox, WebKit). El sistema está listo para usuarios reales.</p>
+  </div>
+  <table>
+    <tr><th>Feature</th><th>Estado</th><th>Tests</th><th>Descripción</th></tr>
+    <tr><td>Autenticación (Supabase Auth)</td><td class="green">✓ Completo</td><td>42 tests</td><td>Login, registro, sesión persistente, logout</td></tr>
+    <tr><td>Gestión de Clientes</td><td class="green">✓ Completo</td><td>68 tests</td><td>CRUD, búsqueda, historial, contacto</td></tr>
+    <tr><td>Catálogo de Servicios</td><td class="green">✓ Completo</td><td>54 tests</td><td>Tipos de precio, categorías, personalización</td></tr>
+    <tr><td>Constructor de Cotizaciones</td><td class="green">✓ Completo</td><td>76 tests</td><td>Multi-ítem, cálculo auto, estados, PDF</td></tr>
+    <tr><td>Sistema de Recordatorios</td><td class="green">✓ Completo</td><td>48 tests</td><td>Alertas programadas, multi-canal</td></tr>
+    <tr><td>Dashboard Analytics</td><td class="green">✓ Completo</td><td>32 tests</td><td>Métricas, KPIs, vista general</td></tr>
+    <tr><td>API REST Completa</td><td class="green">✓ Completo</td><td>18 tests</td><td>Endpoints versionados, rate limiting, RLS</td></tr>
+    <tr><td><strong>Total</strong></td><td class="green"><strong>338 tests</strong></td><td><strong>100%</strong></td><td>Tasa de éxito en 3 navegadores</td></tr>
+  </table>
+  <div class="two-col">
+    <div class="highlight-box">
+      <h4>Rate Limiting Inteligente</h4>
+      <p>100 req/15min en producción. Desactivado en desarrollo para no bloquear tests E2E. Configurado en <code>lib/rate-limit.ts</code>.</p>
+    </div>
+    <div class="highlight-box">
+      <h4>RLS Habilitado</h4>
+      <p>Row Level Security activo en todas las tablas. Cada técnico solo accede a sus propios datos. Aislamiento total entre usuarios.</p>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>07 · MVP Features</span>
+  </div>
+</div>
+
+<!-- SECTION 08: FLUJOS DE USUARIO -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 08</div>
+    <div class="section-title">Flujos de <span>Usuario</span></div>
+    <div class="section-desc">El diseño UX de CotizaPro prioriza la velocidad de acción. Un técnico debe poder generar y enviar una cotización sin salir de obra, con guantes o con manos sucias.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="feature-card">
+        <h4>Flujo Principal — Nueva Cotización</h4>
+        <div class="timeline" style="margin-top:12px;">
+          <div class="timeline-item">
+            <div class="date">Paso 1</div>
+            <h4>Seleccionar o crear cliente</h4>
+            <p>Búsqueda rápida por nombre, teléfono o email. Autocompletado desde historial.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="date">Paso 2</div>
+            <h4>Agregar ítems del catálogo</h4>
+            <p>Busca servicio, selecciona cantidad y tipo de precio. Precio se calcula automáticamente.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="date">Paso 3</div>
+            <h4>Configurar vigencia y términos</h4>
+            <p>Fecha de expiración de la cotización, condiciones y notas especiales.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="date">Paso 4</div>
+            <h4>Enviar por WhatsApp o Email</h4>
+            <p>Un clic genera el PDF y lo envía. Cliente recibe mensaje profesional en segundos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card">
+        <h4>Flujo de Seguimiento Automático</h4>
+        <div class="timeline" style="margin-top:12px;">
+          <div class="timeline-item">
+            <div class="date">T+0</div>
+            <h4>Cotización enviada</h4>
+            <p>El sistema registra el envío y activa el calendario de recordatorios configurado.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="date">T+24h</div>
+            <h4>Primer recordatorio</h4>
+            <p>"Hola [Nombre], ¿pudiste revisar el presupuesto que te envié?" — Envío automático.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="date">T+3 días</div>
+            <h4>Segundo recordatorio</h4>
+            <p>Mensaje personalizable con urgencia suave. El técnico puede pausar en cualquier momento.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="date">T+7 días</div>
+            <h4>Cierre de cotización</h4>
+            <p>Notificación al técnico para acción manual. Cotización marcada como expirada si no hay respuesta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>08 · Flujos de Usuario</span>
+  </div>
+</div>
+
+<!-- SECTION 09: DASHBOARD UX -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 09</div>
+    <div class="section-title">Dashboard <span>UX</span></div>
+    <div class="section-desc">La pantalla central de CotizaPro muestra al técnico todo lo que necesita saber de un vistazo: cotizaciones activas, dinero en juego, recordatorios pendientes y métricas de conversión.</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val green">$47,500</div><div class="lbl">MXN en cotizaciones activas</div><div class="note">8 cotizaciones enviadas este mes</div></div>
+    <div class="stat-card"><div class="val">68%</div><div class="lbl">Tasa de conversión</div><div class="note">+12% vs mes anterior</div></div>
+    <div class="stat-card"><div class="val white">3</div><div class="lbl">Recordatorios pendientes hoy</div><div class="note">Acción requerida</div></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="highlight-box">
+        <h4>Componentes del Dashboard</h4>
+        <ul style="list-style:none;margin-top:8px;">
+          <li style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--gray);">&#9632; Resumen financiero del mes</li>
+          <li style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--gray);">&#9632; Cotizaciones recientes con estado</li>
+          <li style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--gray);">&#9632; Recordatorios del día</li>
+          <li style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--gray);">&#9632; Clientes nuevos vs recurrentes</li>
+          <li style="font-size:12px;padding:5px 0;border-bottom:1px solid var(--border);color:var(--gray);">&#9632; Servicios más cotizados</li>
+          <li style="font-size:12px;padding:5px 0;color:var(--gray);">&#9632; Acceso rápido a nueva cotización</li>
+        </ul>
+      </div>
+      <div class="tech-badges">
+        <span class="tech-badge">React Server Components</span>
+        <span class="tech-badge">Supabase Realtime</span>
+        <span class="tech-badge">TailwindCSS</span>
+      </div>
+    </div>
+    <div>
+      <div class="metric-row"><span class="key">Tiempo de carga dashboard</span><span class="val green">&lt; 1.5s</span></div>
+      <div class="metric-row"><span class="key">First Contentful Paint</span><span class="val green">&lt; 1.2s</span></div>
+      <div class="metric-row"><span class="key">Time to Interactive</span><span class="val">&lt; 3.5s</span></div>
+      <div class="metric-row"><span class="key">Lighthouse Score</span><span class="val green">92+</span></div>
+      <div class="metric-row"><span class="key">Actualizaciones en tiempo real</span><span class="val">Supabase Realtime</span></div>
+      <div class="metric-row"><span class="key">Responsive (mobile-first)</span><span class="val green">Sí</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>09 · Dashboard UX</span>
+  </div>
+</div>
+
+<!-- SECTION 10: ARQUITECTURA TÉCNICA -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 10</div>
+    <div class="section-title">Arquitectura <span>Técnica</span></div>
+    <div class="section-desc">Stack moderno 100% serverless, diseñado para escalar de 0 a 100K usuarios sin rediseño arquitectónico. Infraestructura gestionada, costos variables, máxima confiabilidad.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="feature-card">
+        <h4>Frontend — Next.js 15</h4>
+        <p>App Router con React 19 y Server Components por defecto. Client Components solo donde hay interactividad real. TypeScript strict, sin <code>any</code>.</p>
+        <div class="tech-badges" style="margin-top:10px;">
+          <span class="tech-badge">Next.js 15</span>
+          <span class="tech-badge">React 19</span>
+          <span class="tech-badge">TypeScript 5.x</span>
+          <span class="tech-badge">TailwindCSS</span>
+        </div>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Backend — Supabase</h4>
+        <p>PostgreSQL con Row Level Security en todas las tablas. Auth integrado con JWT. Realtime para actualizaciones en vivo. Migrations versionadas.</p>
+        <div class="tech-badges" style="margin-top:10px;">
+          <span class="tech-badge">Supabase</span>
+          <span class="tech-badge">PostgreSQL</span>
+          <span class="tech-badge">RLS Policies</span>
+          <span class="tech-badge green">Auth JWT</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card">
+        <h4>Integraciones Externas</h4>
+        <div class="metric-row"><span class="key">Pagos</span><span class="val blue">Stripe</span></div>
+        <div class="metric-row"><span class="key">WhatsApp API</span><span class="val">Twilio</span></div>
+        <div class="metric-row"><span class="key">Email transaccional</span><span class="val">Resend</span></div>
+        <div class="metric-row"><span class="key">PDF generation</span><span class="val">jsPDF</span></div>
+        <div class="metric-row"><span class="key">Hosting</span><span class="val">Vercel (Edge)</span></div>
+        <div class="metric-row"><span class="key">CI/CD</span><span class="val">GitHub Actions</span></div>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Calidad del Código</h4>
+        <div class="metric-row"><span class="key">Tests E2E</span><span class="val green">338 / 100%</span></div>
+        <div class="metric-row"><span class="key">Linter</span><span class="val">ESLint strict</span></div>
+        <div class="metric-row"><span class="key">Type checking</span><span class="val">TS strict mode</span></div>
+        <div class="metric-row"><span class="key">Playwright browsers</span><span class="val">Chromium, Firefox, WebKit</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>10 · Arquitectura Técnica</span>
+  </div>
+</div>
+
+
+<!-- SECTION 11: MODELO DE NEGOCIO -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 11</div>
+    <div class="section-title">Modelo de <span>Negocio</span></div>
+    <div class="section-desc">SaaS B2C con freemium. Monetización por suscripción mensual sin contrato. El técnico comienza gratis, ve el valor y convierte a Pro cuando su negocio crece.</div>
+  </div>
+  <div class="three-col">
+    <div class="pricing-card">
+      <div class="plan">Gratis</div>
+      <div class="price" style="color:var(--gray);">$0</div>
+      <div class="period">MXN / mes — siempre</div>
+      <ul>
+        <li>Hasta 5 clientes</li>
+        <li>Hasta 3 cotizaciones/mes</li>
+        <li>PDF básico</li>
+        <li>Sin recordatorios automáticos</li>
+        <li>Sin WhatsApp integrado</li>
+      </ul>
+    </div>
+    <div class="pricing-card featured">
+      <div class="plan">Pro ⭐ Más popular</div>
+      <div class="price" style="color:var(--blue);">$499</div>
+      <div class="period">MXN / mes</div>
+      <ul>
+        <li>Clientes ilimitados</li>
+        <li>Cotizaciones ilimitadas</li>
+        <li>PDF con logo personalizado</li>
+        <li>WhatsApp + Email automático</li>
+        <li>Recordatorios inteligentes</li>
+        <li>Analytics básico</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <div class="plan">Empresa</div>
+      <div class="price" style="color:var(--green);">$799</div>
+      <div class="period">MXN / mes</div>
+      <ul>
+        <li>Todo lo de Pro</li>
+        <li>Hasta 5 usuarios/técnicos</li>
+        <li>Analytics avanzado</li>
+        <li>API de integración</li>
+        <li>Soporte prioritario</li>
+        <li>Reportes exportables</li>
+      </ul>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:16px;">
+    <div class="highlight-box">
+      <h4>Motor de Conversión</h4>
+      <p>El plan gratuito tiene límites estratégicos que el técnico alcanza en sus primeras semanas. El upgrade se hace evidente cuando tiene su primer cliente que no puede agregar o su primera cotización que supera el límite mensual.</p>
+    </div>
+    <div class="metric-row"><span class="key">Conversión Free → Pro estimada</span><span class="val green">8–12%</span></div>
+    <div class="metric-row"><span class="key">Churn mensual objetivo</span><span class="val">&lt; 5%</span></div>
+    <div class="metric-row"><span class="key">LTV estimado Pro</span><span class="val blue">$8,982 MXN</span></div>
+    <div class="metric-row"><span class="key">CAC objetivo</span><span class="val">&lt; $500 MXN</span></div>
+    <div class="metric-row"><span class="key">Ratio LTV/CAC</span><span class="val green">~18x</span></div>
+  </div>
+  <div class="highlight-box" style="margin-top:16px;border-color:#FFAB00;">
+    <h4 style="color:#FFAB00;">¿Por qué $499 MXN/mes y no $299?</h4>
+    <p style="margin-bottom:8px;">CotizaPro no es una app básica — es un <strong>sistema operativo del técnico</strong>: cotizaciones ilimitadas, PDF con marca, WhatsApp automático, recordatorios inteligentes, analytics, exportación, y acceso a funciones de IA próximas. El costo de infraestructura por usuario es &lt; $25 MXN/mes, lo que deja un <strong>margen bruto superior al 95%</strong>.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;font-size:11px;">
+      <div style="background:rgba(255,171,0,0.1);border-radius:6px;padding:8px;text-align:center;"><strong style="color:#FFAB00;">$499/mes</strong><br>CotizaPro Pro — todo incluido</div>
+      <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px;text-align:center;"><strong style="color:var(--gray);">$1,200–3,000/mes</strong><br>Jobber / Housecall Pro (USD)</div>
+      <div style="background:rgba(0,200,83,0.1);border-radius:6px;padding:8px;text-align:center;"><strong style="color:var(--green);">83–95% más barato</strong><br>vs. competidores USA</div>
+    </div>
+    <p style="margin-top:8px;font-size:11px;color:var(--gray);">Para el técnico que cierra 4–8 servicios/mes, CotizaPro a $499 se paga con <strong>una sola cotización adicional</strong> que gana gracias a verse más profesional. ROI claro y tangible desde el día 1.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>11 · Modelo de Negocio</span>
+  </div>
+</div>
+
+<!-- SECTION 12: PROYECCIONES FINANCIERAS -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 12</div>
+    <div class="section-title">Proyecciones <span>Financieras</span></div>
+    <div class="section-desc">Modelo de crecimiento conservador basado en adquisición orgánica via comunidades de técnicos, WhatsApp y referidos. Break-even proyectado en 6–9 meses post-lanzamiento.</div>
+  </div>
+  <table>
+    <tr><th>Métrica</th><th>Mes 3</th><th>Mes 6</th><th>Mes 9</th><th>Mes 12</th></tr>
+    <tr><td>Usuarios Free activos</td><td>200</td><td>600</td><td>1,200</td><td>2,000</td></tr>
+    <tr><td>Usuarios Pro activos</td><td>20</td><td>80</td><td>180</td><td>266</td></tr>
+    <tr><td>Usuarios Empresa</td><td>2</td><td>8</td><td>18</td><td>30</td></tr>
+    <tr><td>MRR (MXN)</td><td class="blue">$11,578</td><td class="blue">$46,312</td><td class="blue">$104,202</td><td class="blue">$156,704</td></tr>
+    <tr><td>Costos operativos (MXN)</td><td>$28,000</td><td>$35,000</td><td>$42,000</td><td>$50,000</td></tr>
+    <tr><td>EBITDA mensual</td><td style="color:#FF5252">-$16,422</td><td class="green">+$11,312</td><td class="green">+$62,202</td><td class="green">+$106,704</td></tr>
+    <tr><td><strong>ARR (MXN)</strong></td><td></td><td></td><td></td><td class="green"><strong>$1,880,448</strong></td></tr>
+  </table>
+  <div class="two-col">
+    <div>
+      <div class="success-box">
+        <h4>Break-even: Mes 5–6</h4>
+        <p>Con ~80 usuarios Pro y 8 Empresa a $499/$799, los ingresos cubren todos los costos operativos. A partir de ahí, cada nuevo Pro suma $499 MXN de margen casi puro (costos marginales &lt; $25 MXN por usuario).</p>
+      </div>
+      <div class="metric-row"><span class="key">Margen bruto estimado</span><span class="val green">82%</span></div>
+      <div class="metric-row"><span class="key">Costo infraestructura/usuario</span><span class="val">&lt; $25 MXN/mes</span></div>
+    </div>
+    <div>
+      <div class="use-of-funds">
+        <div class="fund-row">
+          <span class="fund-label">Desarrollo y Tech</span>
+          <div class="fund-bar"><div class="fund-fill" style="width:40%;background:var(--blue);">40%</div></div>
+          <span class="fund-pct">40%</span>
+        </div>
+        <div class="fund-row">
+          <span class="fund-label">Marketing y Adquisición</span>
+          <div class="fund-bar"><div class="fund-fill" style="width:30%;background:var(--green);">30%</div></div>
+          <span class="fund-pct">30%</span>
+        </div>
+        <div class="fund-row">
+          <span class="fund-label">Ops y Legal</span>
+          <div class="fund-bar"><div class="fund-fill" style="width:15%;background:#FFAB00;">15%</div></div>
+          <span class="fund-pct">15%</span>
+        </div>
+        <div class="fund-row">
+          <span class="fund-label">Reserva</span>
+          <div class="fund-bar"><div class="fund-fill" style="width:15%;background:var(--gray);">15%</div></div>
+          <span class="fund-pct">15%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>12 · Proyecciones Financieras</span>
+  </div>
+</div>
+
+<!-- SECTION 13: GO-TO-MARKET -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 13</div>
+    <div class="section-title">Go-to-<span>Market</span></div>
+    <div class="section-desc">Estrategia de adquisición bottom-up: el técnico individual adopta CotizaPro, ve resultados, recomienda a colegas. Crecimiento viral por boca a boca en comunidades de WhatsApp y Facebook de técnicos.</div>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="date">Fase 1 — Mes 1–2: Beta privada</div>
+      <h4>50 técnicos seleccionados (HVAC en CDMX y GDL)</h4>
+      <p>Onboarding personalizado, feedback semanal, iteración rápida. Objetivo: Net Promoter Score &gt; 50. Testimonios reales para marketing.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="date">Fase 2 — Mes 3–4: Lanzamiento público</div>
+      <h4>Apertura freemium con campaña digital</h4>
+      <p>Facebook/Instagram ads segmentado a técnicos. Grupos de WhatsApp de HVAC y plomería. YouTube con tutoriales de cómo cotizar profesionalmente. Meta: 500 registros.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="date">Fase 3 — Mes 5–6: Tracción y referidos</div>
+      <h4>Programa de referidos activo</h4>
+      <p>1 mes gratis por cada técnico referido que se vuelve Pro. Canal de YouTube con casos de éxito reales. Alianzas con distribuidoras de materiales HVAC.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="date">Fase 4 — Mes 7–12: Expansión nacional</div>
+      <h4>Cobertura nacional + verticales nuevas</h4>
+      <p>Monterrey, Guadalajara, Tijuana. Expansión a herrería, carpintería, jardinería. Webinars mensuales sobre negocio digital para técnicos.</p>
+    </div>
+  </div>
+  <div class="highlight-box">
+    <h4>Canal Orgánico Principal: WhatsApp Groups</h4>
+    <p>Existen miles de grupos de WhatsApp de técnicos por giro y ciudad. Un técnico que muestra su cotización profesional en el grupo genera conversión inmediata de colegas curiosos. CAC estimado: $0 para referidos orgánicos.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>13 · Go-to-Market</span>
+  </div>
+</div>
+
+<!-- SECTION 14: ROADMAP -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 14</div>
+    <div class="section-title"><span>Roadmap</span> de Producto 2026</div>
+    <div class="section-desc">Plan de ejecución por sprints: MVP completado en Feb 2026. Siguientes fases añaden features de alto impacto inspirados en análisis competitivo vs. ServiceTitan, Housecall Pro y Jobber — adaptados al mercado mexicano.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="success-box">
+        <h4>Sprint 1–2 — Completado (Feb 2026)</h4>
+        <p>MVP Core: Auth, Clientes, Servicios, Cotizaciones básicas, API REST robusta, 338 tests E2E 100%, seed de datos realistas HVAC, deploy Vercel.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Sprint 3 — Mar 2026</h4>
+        <p>WhatsApp Business API (Twilio), Email transaccional (Resend), PDF personalizado con logo, recordatorios automáticos multi-canal, panel de notificaciones.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Sprint 4 — Abr 2026</h4>
+        <p>Stripe integrado (suscripciones Pro/Empresa), webhooks de pago, upgrade/downgrade de planes, billing portal, límites por plan en API.</p>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card" style="border-color:var(--blue);">
+        <h4 style="color:var(--blue);">Siguiente — Q2 2026 · Alto Impacto</h4>
+        <div class="metric-row"><span class="key">Cotizaciones Multi-Opción Good/Better/Best</span><span class="val green">+25–40% ticket</span></div>
+        <div class="metric-row"><span class="key">Firma Digital en Cotización</span><span class="val blue">Tier Pro</span></div>
+        <div class="metric-row"><span class="key">Fotos Before/After (PWA)</span><span class="val blue">Tier Pro</span></div>
+        <div class="metric-row"><span class="key">Portal del Cliente (acepta+firma+paga)</span><span class="val blue">Tier Pro</span></div>
+        <div class="metric-row"><span class="key">Programa de Referidos In-App</span><span class="val green">CAC $0 medible</span></div>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Q2 2026 — Facturación SAT</h4>
+        <p>Integración con PAC certificado para emisión de CFDI. El técnico puede generar factura desde la cotización aprobada. Diferenciador clave para clientes corporativos.</p>
+      </div>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:10px;">
+    <div>
+      <div class="feature-card">
+        <h4>Q3 2026 — App Móvil + IA</h4>
+        <p>PWA avanzada con notificaciones push nativas. Bot IA Multi-Canal (WhatsApp + Messenger + Web widget). Mini Web Page del Técnico en cotizapro.mx. Cotizaciones por Voz (Web Speech API / Whisper). Modo offline para zonas sin internet.</p>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card">
+        <h4>Q4 2026 — Pagos + 2027 Roadmap</h4>
+        <p>Link de pago en cotización. SPEI/CoDi para cobro directo. En 2027: Planes de Mantenimiento Recurrente, Review Management Google, Pipeline Visual Kanban, Integración Proveedores MX.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>14 · Roadmap</span>
+  </div>
+</div>
+
+<!-- SECTION 15: KPIs -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 15</div>
+    <div class="section-title">KPIs y <span>Métricas</span></div>
+    <div class="section-desc">Sistema de medición doble: métricas de producto (comportamiento del usuario) y métricas de negocio (salud financiera). Revisión semanal del equipo fundador.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <h4 style="font-size:13px;margin-bottom:12px;color:var(--blue);">Métricas de Producto</h4>
+      <div class="kpi-box" style="margin-bottom:8px;">
+        <div class="kval green">D7 &gt; 40%</div>
+        <div class="klbl">Retención día 7</div>
+        <div class="ktarget">Target: usuario regresa en primera semana</div>
+      </div>
+      <div class="kpi-box" style="margin-bottom:8px;">
+        <div class="kval">&lt; 5 min</div>
+        <div class="klbl">Time to First Quote</div>
+        <div class="ktarget">De registro a primera cotización enviada</div>
+      </div>
+      <div class="kpi-box" style="margin-bottom:8px;">
+        <div class="kval green">&gt; 3</div>
+        <div class="klbl">Cotizaciones/usuario/semana</div>
+        <div class="ktarget">Señal de usuario activo comprometido</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kval">NPS &gt; 50</div>
+        <div class="klbl">Net Promoter Score</div>
+        <div class="ktarget">Medición mensual, mínimo 50</div>
+      </div>
+    </div>
+    <div>
+      <h4 style="font-size:13px;margin-bottom:12px;color:var(--green);">Métricas de Negocio</h4>
+      <div class="metric-row"><span class="key">MRR objetivo Mes 6</span><span class="val green">$46K MXN</span></div>
+      <div class="metric-row"><span class="key">MRR objetivo Mes 12</span><span class="val green">$157K MXN</span></div>
+      <div class="metric-row"><span class="key">Conversión Free → Pro</span><span class="val">8–12%</span></div>
+      <div class="metric-row"><span class="key">Churn mensual máximo</span><span class="val">&lt; 5%</span></div>
+      <div class="metric-row"><span class="key">CAC objetivo</span><span class="val">&lt; $500 MXN</span></div>
+      <div class="metric-row"><span class="key">LTV Pro (18 meses)</span><span class="val blue">$8,982 MXN</span></div>
+      <div class="metric-row"><span class="key">Ratio LTV/CAC</span><span class="val green">~18x</span></div>
+      <div class="metric-row"><span class="key">Payback period</span><span class="val">&lt; 2 meses</span></div>
+      <div class="metric-row"><span class="key">Margen bruto</span><span class="val green">&gt; 80%</span></div>
+      <div class="metric-row"><span class="key">Tests E2E mínimos</span><span class="val green">338 / 100%</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>15 · KPIs y Métricas</span>
+  </div>
+</div>
+
+<!-- SECTION 16: RIESGOS -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 16</div>
+    <div class="section-title">Gestión de <span>Riesgos</span></div>
+    <div class="section-desc">Análisis de riesgos identificados con plan de mitigación proactivo. El equipo fundador tiene respuesta documentada para cada escenario crítico.</div>
+  </div>
+  <div class="risk-card high">
+    <span class="risk-badge high">ALTO</span>
+    <h4>Churn alto en primeros 90 días</h4>
+    <p><strong>Riesgo:</strong> El técnico no ve ROI inmediato y cancela. <strong>Mitigación:</strong> Onboarding activo con llamada de bienvenida. Seguimiento a los 7 y 30 días. Caso de éxito documentado para mostrar en onboarding. Límites del plan free estratégicos para mantener engagement.</p>
+  </div>
+  <div class="risk-card high">
+    <span class="risk-badge high">ALTO</span>
+    <h4>Competidor tech grande entra al mercado MX</h4>
+    <p><strong>Riesgo:</strong> ServiceTitan o Jobber lanza versión en español a precios bajos. <strong>Mitigación:</strong> Velocidad de adopción es la defensa — llegar a 5K usuarios activos antes de 18 meses crea efecto de red. Integración con SAT (facturación) es ventaja local difícil de copiar rápido.</p>
+  </div>
+  <div class="risk-card med">
+    <span class="risk-badge med">MEDIO</span>
+    <h4>Twilio WhatsApp API costos escalados</h4>
+    <p><strong>Riesgo:</strong> Costos de mensajería WhatsApp suben con volumen y comprimen márgenes. <strong>Mitigación:</strong> Límite de mensajes por plan. Email como alternativa gratuita. Evaluación de Meta Business API directa en Q3 2026.</p>
+  </div>
+  <div class="risk-card med">
+    <span class="risk-badge med">MEDIO</span>
+    <h4>Baja adopción digital por segmento target</h4>
+    <p><strong>Riesgo:</strong> Técnicos mayores sin hábito digital resisten adopción. <strong>Mitigación:</strong> UX ultra-simple, onboarding en video de YouTube, soporte por WhatsApp para primeros usuarios. Targeting inicial a técnicos 25–40 años con smartphone.</p>
+  </div>
+  <div class="risk-card low">
+    <span class="risk-badge low">BAJO</span>
+    <h4>Problemas de escalabilidad técnica</h4>
+    <p><strong>Riesgo:</strong> Supabase o Vercel no escala a 100K usuarios. <strong>Mitigación:</strong> Arquitectura serverless escala automáticamente. Supabase Pro plan desde 5K usuarios. Pruebas de carga programadas antes de cada lanzamiento de fase.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>16 · Gestión de Riesgos</span>
+  </div>
+</div>
+
+<!-- SECTION 17: MARCO LEGAL -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 17</div>
+    <div class="section-title">Marco <span>Legal</span></div>
+    <div class="section-desc">Estructura legal para operar CotizaPro en México cumpliendo con obligaciones fiscales, protección de datos (LFPDPPP) y regulaciones de pagos electrónicos (CNBV).</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="feature-card">
+        <h4>Constitución de Empresa</h4>
+        <p>Sociedad por Acciones Simplificada (SAS) — constitución en línea vía Portal del SAT. Objeto social: desarrollo y comercialización de software como servicio. Capital mínimo: $3,000 MXN. RFC y e.firma desde el primer día.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Propiedad Intelectual</h4>
+        <p>Marca "CotizaPro" registrada ante IMPI (clases 35 y 42). Código fuente bajo copyright automático. Contratos de cesión de derechos con todos los colaboradores desde el inicio.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Protección de Datos (LFPDPPP)</h4>
+        <p>Aviso de Privacidad publicado. Consentimiento explícito para WhatsApp y email. Datos de usuarios almacenados en Supabase con encriptación en tránsito y reposo. Política de retención y eliminación de datos documentada.</p>
+      </div>
+    </div>
+    <div>
+      <div class="highlight-box">
+        <h4>Obligaciones Fiscales</h4>
+        <p>Régimen Simplificado de Confianza (RESICO) para fundadores personas físicas en etapa inicial. Transición a persona moral cuando facturación supere $3.5M MXN anuales. Emisión de CFDI por cada suscripción cobrada via Stripe.</p>
+      </div>
+      <div class="warning-box">
+        <h4>Stripe Mexico — Regulación CNBV</h4>
+        <p>Stripe opera en México como institución de fondos de pago electrónico regulada. CotizaPro actúa como plataforma intermediaria. No requiere licencia SOFOM ni bancaria. Cumplimiento de KYC delegado a Stripe en cuentas de pago.</p>
+      </div>
+      <div class="metric-row"><span class="key">Constitución SAS</span><span class="val green">$3,000 MXN</span></div>
+      <div class="metric-row"><span class="key">Registro de marca IMPI</span><span class="val">$3,200 MXN aprox.</span></div>
+      <div class="metric-row"><span class="key">Asesoría legal inicial</span><span class="val">$15,000–25,000 MXN</span></div>
+      <div class="metric-row"><span class="key">Contrato de subscripción</span><span class="val">Términos y Condiciones digitales</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>17 · Marco Legal</span>
+  </div>
+</div>
+
+<!-- SECTION 18: EQUIPO -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 18</div>
+    <div class="section-title"><span>Equipo</span> Fundador</div>
+    <div class="section-desc">El equipo de CotizaPro combina experiencia técnica profunda con conocimiento del mercado objetivo. El MVP fue construido por el equipo fundador, demostrando capacidad de ejecución real.</div>
+  </div>
+  <div class="two-col">
+    <div class="feature-card">
+      <div class="icon">👨‍💻</div>
+      <h4>Co-Fundador / CTO</h4>
+      <p>Desarrollador Full Stack senior. Arquitecto del MVP: Next.js 15, Supabase, Stripe, Playwright. Diseñó la arquitectura técnica, implementó los 338 tests E2E y el sistema de Rate Limiting. 7+ años de experiencia en SaaS B2C.</p>
+      <div class="tech-badges" style="margin-top:10px;">
+        <span class="tech-badge">Next.js</span>
+        <span class="tech-badge">Supabase</span>
+        <span class="tech-badge">TypeScript</span>
+        <span class="tech-badge green">Playwright</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="icon">👨‍💼</div>
+      <h4>Co-Fundador / CEO</h4>
+      <p>Especialista en producto y growth para mercados LATAM. Experiencia en startups de servicios para técnicos y gig economy en México. Responsable de Go-to-Market, alianzas y fundraising.</p>
+      <div class="tech-badges" style="margin-top:10px;">
+        <span class="tech-badge gray">Product</span>
+        <span class="tech-badge gray">Growth</span>
+        <span class="tech-badge gray">LATAM</span>
+        <span class="tech-badge gray">Fundraising</span>
+      </div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:16px;">
+    <h4>Proof of Execution — No solo una idea</h4>
+    <p>CotizaPro ya existe. El equipo construyó el MVP completo en 7 semanas: API REST con 5 módulos, 338 tests E2E al 100%, seed de datos de negocio HVAC realista, stack de producción en Vercel. Esto no es una presentación de idea — es un producto funcional buscando capital para crecer.</p>
+  </div>
+  <div class="two-col" style="margin-top:12px;">
+    <div class="metric-row"><span class="key">Semanas de desarrollo del MVP</span><span class="val green">7 semanas</span></div>
+    <div class="metric-row"><span class="key">Tests E2E implementados</span><span class="val green">338 / 100%</span></div>
+    <div class="metric-row"><span class="key">API endpoints funcionales</span><span class="val">12 endpoints REST</span></div>
+    <div class="metric-row"><span class="key">Módulos completos</span><span class="val">5 módulos</span></div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>18 · Equipo</span>
+  </div>
+</div>
+
+<!-- SECTION 19: IDENTIDAD DE MARCA -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 19</div>
+    <div class="section-title">Identidad de <span>Marca</span></div>
+    <div class="section-desc">CotizaPro proyecta profesionalismo y confianza para un sector que históricamente ha operado de manera informal. La marca da al técnico una identidad de negocio que inspira credibilidad.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="feature-card">
+        <h4>Nombre y Posicionamiento</h4>
+        <p><strong>CotizaPro</strong> — Directo, descriptivo y aspiracional. "Cotiza" como acción central del negocio. "Pro" como señal de profesionalismo. Fácil de recordar, pronunciar y escribir en México.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Tono de Comunicación</h4>
+        <p>Lenguaje del técnico, no del corporativo. Directo, amigable, sin tecnicismos. "Haz tu cotización en 3 minutos" — no "Optimiza tu pipeline de ventas". Respeto por el oficio manual como base del negocio.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Promesa de Marca</h4>
+        <p>"Tu trabajo merece una imagen profesional." CotizaPro no solo es una app — es la diferencia entre que el cliente te tome en serio o te descarte por mandar un presupuesto por WhatsApp sin formato.</p>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card">
+        <h4>Paleta de Color (App)</h4>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <div style="width:48px;height:48px;border-radius:8px;background:#0A0F1C;border:1px solid var(--border);"></div>
+          <div style="width:48px;height:48px;border-radius:8px;background:#0066FF;"></div>
+          <div style="width:48px;height:48px;border-radius:8px;background:#00C853;"></div>
+          <div style="width:48px;height:48px;border-radius:8px;background:#FFFFFF;"></div>
+        </div>
+        <p style="font-size:11px;color:var(--gray);margin-top:8px;">Azul profesional + Verde de acción + Oscuro de confianza</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;">
+        <h4>Canales de Marca</h4>
+        <div class="metric-row"><span class="key">App Web</span><span class="val blue">cotizapro.mx</span></div>
+        <div class="metric-row"><span class="key">YouTube</span><span class="val">@CotizaPro</span></div>
+        <div class="metric-row"><span class="key">Facebook/Instagram</span><span class="val">@CotizaProMX</span></div>
+        <div class="metric-row"><span class="key">WhatsApp Soporte</span><span class="val green">Directo</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>19 · Identidad de Marca</span>
+  </div>
+</div>
+
+<!-- SECTION 20: PROPUESTA A INVERSORES -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 20</div>
+    <div class="section-title">Propuesta a <span>Inversores</span></div>
+    <div class="section-desc">Buscamos $500K–1M MXN en capital semilla para ejecutar el Go-to-Market, integrar WhatsApp/pagos, y alcanzar 500 usuarios Pro pagos en 12 meses.</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val">$500K</div><div class="lbl">MXN — Mínimo seed</div><div class="note">Runway 12 meses</div></div>
+    <div class="stat-card"><div class="val green">$1M</div><div class="lbl">MXN — Seed objetivo</div><div class="note">Runway 18 meses + marketing</div></div>
+    <div class="stat-card"><div class="val white">266</div><div class="lbl">Usuarios Pro objetivo Mes 12</div><div class="note">$955K MXN ARR</div></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="success-box">
+        <h4>Por qué CotizaPro AHORA</h4>
+        <p>1. MVP funcional con 338 tests — no es una idea, es un producto real.<br>2. Mercado de 2M técnicos sin solución nativa en español.<br>3. Modelo de negocio probado (Stripe, Housecall Pro) adaptado al contexto MX.<br>4. Ventana de oportunidad antes de que players americanos localicen.<br>5. LTV/CAC &gt; 10x desde el diseño del producto.</p>
+      </div>
+      <div class="highlight-box">
+        <h4>Uso del Capital ($1M MXN)</h4>
+        <p>$400K desarrollo (WhatsApp API, pagos, SAT). $300K marketing digital (12 meses). $150K operaciones y legal. $150K reserva.</p>
+      </div>
+    </div>
+    <div>
+      <div class="metric-row"><span class="key">Valoración pre-money</span><span class="val blue">Por definir (negociable)</span></div>
+      <div class="metric-row"><span class="key">Tipo de instrumento</span><span class="val">SAFE o Capital directo</span></div>
+      <div class="metric-row"><span class="key">Runway con $1M MXN</span><span class="val">18 meses</span></div>
+      <div class="metric-row"><span class="key">Hito principal: break-even</span><span class="val green">Mes 6</span></div>
+      <div class="metric-row"><span class="key">Hito secundario: ARR</span><span class="val green">$955K MXN Mes 12</span></div>
+      <div class="metric-row"><span class="key">Próxima ronda proyectada</span><span class="val">Serie A Q1 2027</span></div>
+      <div class="metric-row"><span class="key">Retorno estimado 3 años</span><span class="val green">8–15x</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>20 · Propuesta a Inversores</span>
+  </div>
+</div>
+
+<!-- SECTION 21: ESTADO DEL PROYECTO -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 21</div>
+    <div class="section-title">Estado Actual del <span>Proyecto</span></div>
+    <div class="section-desc">Resumen de lo que está construido, probado y listo. CotizaPro es un MVP de producción, no un prototipo. Cada línea de código tiene tests. Cada API tiene validación.</div>
+  </div>
+  <div class="success-box">
+    <h4>MVP Completamente Funcional — Febrero 2026</h4>
+    <p>338 tests E2E al 100% de tasa de éxito en Chromium, Firefox y WebKit. API REST completa con rate limiting, RLS, validaciones Zod. Seed de datos realistas de negocio HVAC. Deploy en Vercel listo para usuarios reales.</p>
+  </div>
+  <div class="two-col">
+    <div>
+      <h4 style="font-size:13px;margin-bottom:12px;color:var(--green);">Completado</h4>
+      <div class="metric-row"><span class="key">Autenticación (Supabase Auth)</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Módulo Clientes (CRUD)</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Módulo Servicios + catálogo</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Módulo Cotizaciones (full)</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Sistema de Recordatorios</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Dashboard Analytics</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">API REST + Rate Limiting</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Tests E2E (338 tests)</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">RLS en todas las tablas</span><span class="val green">✓ 100%</span></div>
+      <div class="metric-row"><span class="key">Seed datos HVAC realistas</span><span class="val green">✓ 100%</span></div>
+    </div>
+    <div>
+      <h4 style="font-size:13px;margin-bottom:12px;color:var(--blue);">Próximos Pasos</h4>
+      <div class="metric-row"><span class="key">WhatsApp Business API</span><span class="val blue">Sprint 3</span></div>
+      <div class="metric-row"><span class="key">Email con Resend</span><span class="val blue">Sprint 3</span></div>
+      <div class="metric-row"><span class="key">PDF personalizado + logo</span><span class="val blue">Sprint 3</span></div>
+      <div class="metric-row"><span class="key">Stripe suscripciones</span><span class="val blue">Sprint 4</span></div>
+      <div class="metric-row"><span class="key">Beta privada (50 técnicos)</span><span class="val blue">Mar 2026</span></div>
+      <div class="metric-row"><span class="key">Lanzamiento público</span><span class="val blue">Abr 2026</span></div>
+      <div class="metric-row"><span class="key">Facturación SAT (CFDI)</span><span class="val">Q2 2026</span></div>
+      <div class="metric-row"><span class="key">App móvil PWA avanzada</span><span class="val">Q3 2026</span></div>
+      <div class="metric-row"><span class="key">Pagos integrados cliente</span><span class="val">Q4 2026</span></div>
+      <div class="metric-row"><span class="key">Serie A fundraising</span><span class="val">Q1 2027</span></div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:20px;">
+    <h4>Contacto</h4>
+    <p>Para más información, demo del MVP, acceso al repositorio o conversación de inversión — comunicarse directamente con el equipo fundador de CotizaPro. El código fuente está disponible para due diligence técnico bajo NDA.</p>
+  </div>
+  <div style="margin-top:28px;text-align:center;border-top:1px solid var(--border);padding-top:20px;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--blue);">CotizaPro</div>
+    <div style="font-size:12px;color:var(--gray);margin-top:4px;">Tu cotizador profesional — "El Stripe para técnicos de mantenimiento"</div>
+    <div style="font-size:11px;color:var(--gray);margin-top:8px;">Plan Maestro 2026 · Versión 3.0 · Febrero 2026 · Confidencial</div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026</span>
+    <span>21 · Estado del Proyecto · Fin</span>
+  </div>
+</div>
+
+
+<!-- SECTION 22: OPORTUNIDADES ESTRATÉGICAS -->
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">Sección 22 · NUEVO v3.0</div>
+    <div class="section-title">Oportunidades <span>Estratégicas</span></div>
+    <div class="section-desc">Análisis competitivo contra ServiceTitan, Housecall Pro y Jobber — adaptado al contexto mexicano. Features de alto impacto a implementar por fases. Lo que NO replicamos (y por qué). El ciclo cerrado que ningún competidor en México ofrece por $499 MXN/mes.</div>
+  </div>
+  <!-- Ciclo cerrado -->
+  <div class="highlight-box" style="text-align:center;border-color:var(--blue);">
+    <h4 style="color:var(--blue);font-size:14px;">El Ciclo Cerrado — Ventaja Competitiva Irreplicable en MX</h4>
+    <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:12px;font-size:11px;font-weight:600;">
+      <div style="background:rgba(0,102,255,0.15);border:1px solid var(--blue);border-radius:8px;padding:8px 12px;color:var(--blue);">Cliente busca en Google</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,102,255,0.12);border:1px solid var(--blue);border-radius:8px;padding:8px 12px;color:var(--blue);">Mini Web Page del Técnico</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,102,255,0.12);border:1px solid var(--blue);border-radius:8px;padding:8px 12px;color:var(--blue);">Bot IA WhatsApp</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,200,83,0.12);border:1px solid var(--green);border-radius:8px;padding:8px 12px;color:var(--green);">Lead capturado</div>
+      <br style="flex-basis:100%;">
+      <div style="color:var(--gray);margin-top:6px;">→</div>
+      <div style="background:rgba(0,200,83,0.12);border:1px solid var(--green);border-radius:8px;padding:8px 12px;color:var(--green);">Cotización Good/Better/Best</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,200,83,0.12);border:1px solid var(--green);border-radius:8px;padding:8px 12px;color:var(--green);">Portal del Cliente</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,200,83,0.15);border:1px solid var(--green);border-radius:8px;padding:8px 12px;color:var(--green);">Acepta + Firma + Paga</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,102,255,0.12);border:1px solid var(--blue);border-radius:8px;padding:8px 12px;color:var(--blue);">Review Google</div>
+      <div style="color:var(--gray);">→</div>
+      <div style="background:rgba(0,102,255,0.15);border:1px solid var(--blue);border-radius:8px;padding:8px 12px;color:var(--blue);">Referidos → Ciclo se repite</div>
+    </div>
+    <p style="margin-top:12px;font-size:11px;color:var(--gray);">Ningún competidor en México ofrece este ciclo completo por <strong style="color:var(--blue);">$499 MXN/mes</strong>.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>22 · Oportunidades Estratégicas</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">22.A · Siguiente Sprint</div>
+    <div class="section-title">Features <span>Inmediatos</span> — Alto ROI</div>
+    <div class="section-desc">5 features críticos derivados del análisis competitivo. Media implementación, muy alto impacto. Todos en Tier Pro ($499 MXN/mes).</div>
+  </div>
+  <div class="three-col">
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">📊</div>
+      <h4 style="color:var(--blue);">Cotizaciones Multi-Opción</h4>
+      <p><em>Inspirado en ServiceTitan</em>. El técnico presenta 3 opciones: <strong>Good</strong> (básico), <strong>Better</strong> (recomendado), <strong>Best</strong> (premium). El cliente elige desde su portal. Esfuerzo: Medio.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Impacto ticket promedio</span><span class="val green">+25–40%</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">✍️</div>
+      <h4 style="color:var(--blue);">Firma Digital</h4>
+      <p><em>Inspirado en Housecall Pro</em>. El cliente firma la cotización digitalmente desde su smartphone. Elimina el "lo pienso" — el compromiso es inmediato. Canvas API + Supabase Storage. Esfuerzo: Medio.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Impacto conversión</span><span class="val green">Alto</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">📷</div>
+      <h4 style="color:var(--blue);">Fotos Before/After</h4>
+      <p><em>Inspirado en Jobber</em>. El técnico documenta el trabajo con fotos antes y después desde la PWA. Genera confianza, reduce disputas y alimenta el portfolio de la Mini Web Page. Esfuerzo: Bajo (PWA).</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Impacto retención</span><span class="val green">Alto</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro</span></div>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:10px;">
+    <div class="feature-card" style="border-color:var(--green);">
+      <div class="icon">🌐</div>
+      <h4 style="color:var(--green);">Portal del Cliente</h4>
+      <p><em>Inspirado en Housecall Pro + Jobber</em>. URL única por cliente (<code>cotizapro.mx/cliente/ABC123</code>). El cliente ve su historial, acepta cotizaciones, firma digitalmente y paga con tarjeta — sin cuenta ni app. Esfuerzo: Medio.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Impacto experiencia cliente</span><span class="val green">Muy Alto</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--green);">
+      <div class="icon">🤝</div>
+      <h4 style="color:var(--green);">Programa de Referidos In-App</h4>
+      <p><em>Inspirado en Housecall Pro + Jobber</em>. Dos vías: técnico a técnico (comparte link, gana 1 mes gratis cuando el referido convierte a Pro) y cliente a técnico (descuento para ambos). CAC medible en dashboard. Esfuerzo: Bajo.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">CAC por referido</span><span class="val green">$0 medible</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>22.A · Features Inmediatos</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">22.B · Q2–Q3 2026</div>
+    <div class="section-title">Diferenciadores <span>IA + Presencia Digital</span></div>
+    <div class="section-desc">3 features de alto diferenciamiento que convierten CotizaPro en el ecosistema completo del técnico — no solo una app de cotizaciones. Primeros en LATAM en combinar los tres.</div>
+  </div>
+  <div class="three-col">
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">🤖</div>
+      <h4 style="color:var(--blue);">Bot IA Multi-Canal</h4>
+      <p><em>Diferenciador exclusivo LATAM</em>. Bot de respuesta automática 24/7 en <strong>WhatsApp</strong> (primario via Twilio), <strong>Messenger/Instagram</strong> y <strong>Web widget</strong> embebible. Usa catálogo de servicios de Supabase para cotizar automáticamente.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Esfuerzo</span><span class="val">Medio</span></div>
+      <div class="metric-row"><span class="key">Impacto leads</span><span class="val green">Muy Alto</span></div>
+      <div class="metric-row"><span class="key">Precio add-on</span><span class="val blue">+$99 MXN/mes</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">🌐</div>
+      <h4 style="color:var(--blue);">Mini Web Page del Técnico</h4>
+      <p><em>Diferenciador exclusivo LATAM</em>. Cada técnico Pro obtiene <code>cotizapro.mx/juanHVAC</code> — página dinámica con sus servicios, galería before/after, reseñas Google y widget del Bot IA. Ruta dinámica Next.js, pulls del catálogo Supabase. SEO automático.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Esfuerzo</span><span class="val">Medio</span></div>
+      <div class="metric-row"><span class="key">Impacto SEO + leads</span><span class="val green">Muy Alto</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro / Empresa</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">🎙️</div>
+      <h4 style="color:var(--blue);">Cotizaciones por Voz</h4>
+      <p><em>Único en LATAM</em>. El técnico dicta la cotización en campo — Web Speech API o Whisper transcriben, la IA estructura y genera la cotización formal. Resuelve el mayor pain: el técnico no quiere escribir. Muy alto diferenciador de producto.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Esfuerzo</span><span class="val">Alto</span></div>
+      <div class="metric-row"><span class="key">Diferenciador</span><span class="val green">Único LATAM</span></div>
+      <div class="metric-row"><span class="key">Tier</span><span class="val blue">Pro</span></div>
+    </div>
+  </div>
+  <div class="success-box" style="margin-top:16px;">
+    <h4>Por qué estos 3 juntos son defensibles</h4>
+    <p>La Mini Web Page genera SEO orgánico → leads llegan al Bot IA en WhatsApp → el Bot captura y convierte → la Cotización por Voz reduce fricción de creación. Es un embudo de adquisición y conversión completo dentro de CotizaPro. Ningún competidor en LATAM lo ofrece. Los americanos (Housecall Pro, Jobber) no tienen WhatsApp como canal primario ni Mini Web Pages localizadas.</p>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>22.B · Diferenciadores IA</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">22.C · Roadmap 2027</div>
+    <div class="section-title">Pipeline <span>2027</span> — Empresa Level</div>
+    <div class="section-desc">Features para el segmento Empresa y para consolidar la posición como plataforma completa de gestión del negocio del técnico en México.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="feature-card" style="border-color:var(--green);">
+        <div class="icon">🔄</div>
+        <h4 style="color:var(--green);">Planes de Mantenimiento Recurrente</h4>
+        <p><em>Inspirado en ServiceTitan</em>. El técnico puede ofrecer contratos de mantenimiento anual al cliente (ej. "Mantenimiento HVAC $2,400 MXN/año" = $200/mes). Cobro automático por Stripe. MRR del técnico crece, churn de CotizaPro baja. Esfuerzo: Alto. Impacto: Alto. Tier: Empresa.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;border-color:var(--green);">
+        <div class="icon">⭐</div>
+        <h4 style="color:var(--green);">Review Management / Solicitud Reseñas Google</h4>
+        <p><em>Inspirado en Housecall Pro + Jobber</em>. Post-servicio, el sistema envía WhatsApp automático pidiendo reseña de Google. La reseña aparece en la Mini Web Page. Esfuerzo: Medio. Impacto: Medio-Alto. Tier: Pro.</p>
+      </div>
+    </div>
+    <div>
+      <div class="feature-card" style="border-color:var(--green);">
+        <div class="icon">📋</div>
+        <h4 style="color:var(--green);">Pipeline Visual de Ventas Kanban</h4>
+        <p><em>Inspirado en Housecall Pro</em>. Vista Kanban de todas las cotizaciones por estado: Enviada, Vista, Negociando, Aprobada, Cerrada. Arrastra y suelta para cambiar estado. Vista de ventas profesional para el técnico con múltiples proyectos. Esfuerzo: Medio. Tier: Pro.</p>
+      </div>
+      <div class="feature-card" style="margin-top:10px;border-color:var(--green);">
+        <div class="icon">🏭</div>
+        <h4 style="color:var(--green);">Integración con Proveedores MX</h4>
+        <p><em>Diferenciador local</em>. Conexión con catálogos de precios de distribuidoras HVAC mexicanas (Carrier, Lennox, Daikin distribuidoras). El técnico puede ver precios actualizados de materiales al crear la cotización. Esfuerzo: Alto. Tier: Empresa.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>22.C · Roadmap 2027</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-header">
+    <div class="section-label">22.D · Decisiones</div>
+    <div class="section-title">Lo que <span>NO</span> Construimos — y Por Qué</div>
+    <div class="section-desc">El análisis de ServiceTitan, Housecall Pro y Jobber revela features que NO aplican para el mercado mexicano de técnicos independientes. Ser selectivos es una ventaja — no una limitación.</div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="danger-box">
+        <h4>No aplica al mercado MX (técnico independiente)</h4>
+        <ul>
+          <li><strong>Dispatch / Routing inteligente</strong> — ServiceTitan lo usa para flotas de 10+ técnicos. El técnico independiente se autoasigna.</li>
+          <li><strong>Inventory Management</strong> — Implica almacén propio. El técnico MX compra por proyecto en la distribuidora.</li>
+          <li><strong>Fleet Tracking GPS</strong> — No hay flota. El técnico usa su propio vehículo.</li>
+          <li><strong>IVR / Call Center IA</strong> — Nadie llama a un técnico independiente; se contacta por WhatsApp.</li>
+          <li><strong>QuickBooks / Contabilidad integrada</strong> — Complejidad vs valor bajo. CFDI/SAT ya cubre la necesidad fiscal MX.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="warning-box">
+        <h4>Pospuesto — Sin product-market fit en LATAM aún</h4>
+        <ul>
+          <li><strong>Direct Mail / Postcards</strong> — Jobber lo usa en USA. En México no es canal relevante para técnicos. Bajo ROI.</li>
+          <li><strong>ACH Bank Transfers</strong> — Feature americano. En México usamos SPEI/CoDi que ya está en roadmap.</li>
+          <li><strong>Reserve with Google</strong> — Requiere Google Business Profile avanzado. La Mini Web Page del Técnico resuelve esto de forma más controlada.</li>
+          <li><strong>Multi-idioma completo</strong> — El 100% del mercado target habla español. El tiempo de internacionalización no se justifica en 2026.</li>
+        </ul>
+      </div>
+      <div class="highlight-box" style="margin-top:10px;">
+        <h4>Principio de Diseño</h4>
+        <p>Cada feature eliminado es tiempo de desarrollo redirigido a los features del ciclo cerrado. YAGNI aplicado al product roadmap de LATAM.</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:20px;text-align:center;border-top:1px solid var(--border);padding-top:20px;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--blue);">CotizaPro</div>
+    <div style="font-size:12px;color:var(--gray);margin-top:4px;">"El Stripe para técnicos de mantenimiento"</div>
+    <div style="font-size:11px;color:var(--gray);margin-top:8px;">Plan Maestro 2026 · Versión 3.0 · Febrero 2026 · Confidencial</div>
+    <div style="font-size:11px;color:var(--blue);margin-top:4px;font-weight:600;">v3.0 — Análisis competitivo · Pricing $499 · 12 Features Validados por el Mercado</div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>22.D · Decisiones de No-Build</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-header">
+    <div class="section-label" style="background:rgba(255,171,0,0.15);color:#FFAB00;border-color:#FFAB00;">NUEVO v3.0 · 23</div>
+    <div class="section-title">Features <span>Futuros Validados</span> por el Mercado</div>
+    <div class="section-desc">12 ideas capturadas directamente del uso real del producto — sin prioridad asignada aún. Representan oportunidades de expansión horizontal hacia nuevos verticales (HVAC, vidrio, madera, licitaciones) y funcionalidad de plataforma (agenda, marketplace, CRM empresarial).</div>
+  </div>
+  <div class="three-col">
+    <div class="feature-card" style="border-color:#FFAB00;">
+      <div class="icon">⭐</div>
+      <h4 style="color:#FFAB00;">Referencias Competitivas</h4>
+      <p>El técnico puede adjuntar referencias a trabajos similares propios (fotos, cotizaciones anteriores) para darle contexto al cliente. "Hice este mismo trabajo en Col. Narvarte — resultado aquí". Aumenta la confianza y el precio percibido.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">Todos</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">Confianza + Ticket</span></div>
+    </div>
+    <div class="feature-card" style="border-color:#FFAB00;">
+      <div class="icon">📋</div>
+      <h4 style="color:#FFAB00;">Catálogos Personalizados</h4>
+      <p>Campos dinámicos por tipo de servicio — el técnico define los atributos de cada ítem del catálogo (potencia BTU, marca, modelo, tipo de gas). La cotización se adapta al producto, no viceversa.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">HVAC · Vidrio · Madera</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">Precisión cotización</span></div>
+    </div>
+    <div class="feature-card" style="border-color:#FFAB00;">
+      <div class="icon">🏪</div>
+      <h4 style="color:#FFAB00;">Requerimiento de Materiales</h4>
+      <p>Links rápidos a proveedores (Carrier, Lennox, Vitro, Duralum) desde cada ítem de la cotización — proveedor o cliente puede comprar directamente. Elimina el "dame el número del refaccionario".</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">HVAC · Vidrio</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">Eficiencia + Upsell</span></div>
+    </div>
+  </div>
+  <div class="three-col" style="margin-top:10px;">
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">📅</div>
+      <h4 style="color:var(--blue);">Agenda y Confirmación de Citas</h4>
+      <p>Calendario integrado con seguimiento — el técnico agenda la visita desde la cotización. El cliente confirma por WhatsApp. Recordatorios automáticos D-1 y H-2. El técnico ve su agenda del día desde la PWA.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">Todos</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">No-shows -60%</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">🔧</div>
+      <h4 style="color:var(--blue);">Servicios Extra / Post-Venta</h4>
+      <p>Catálogo de servicios complementarios que el técnico puede ofrecer al cerrar un trabajo (garantías extendidas, mantenimientos preventivos, revisión anual). Se activan como upsell en el Portal del Cliente.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">HVAC · Madera</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">LTV cliente +35%</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">🛒</div>
+      <h4 style="color:var(--blue);">Cotizador Online (Link Rápido)</h4>
+      <p>URL pública del técnico con cotizador tipo e-commerce — el cliente configura su pedido (tipo de clima, m², material) y obtiene un precio estimado sin llamar. Compatible con perfil de Facebook Marketplace y WhatsApp Business.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">HVAC · Vidrio · Madera</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">Leads 24/7</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>23 · Features Futuros (1/2)</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="section-header">
+    <div class="section-label" style="background:rgba(255,171,0,0.15);color:#FFAB00;border-color:#FFAB00;">NUEVO v3.0 · 23 (cont.)</div>
+    <div class="section-title">Expansión a <span>Nuevos Verticales</span> — Vidrio, Madera, Empresas</div>
+    <div class="section-desc">CotizaPro nació en HVAC, pero el modelo aplica a cualquier técnico que cotice trabajos a medida. Los siguientes 6 features abren la expansión a canceles, carpintería, licitaciones y CRM empresarial.</div>
+  </div>
+  <div class="three-col">
+    <div class="feature-card" style="border-color:var(--green);">
+      <div class="icon">❄️</div>
+      <h4 style="color:var(--green);">Ciclo de Mantenimiento HVAC</h4>
+      <p>Módulo especializado para técnicos de climatización: el sistema programa automáticamente revisiones bianuales o anuales por equipo instalado. El cliente recibe recordatorio y puede reagendar. Genera MRR recurrente para el técnico.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical objetivo</span><span class="val blue">HVAC (Tier Empresa)</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">Retención cliente +40%</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--green);">
+      <div class="icon">🚪</div>
+      <h4 style="color:var(--green);">Vertical: Puertas y Carpintería</h4>
+      <p>Plantillas de cotización para puertas de madera, escaleras, muebles a medida. Campos específicos: tipo de madera, acabado, herraje, dimensiones (largo × ancho × alto). Catálogo de precios por m² o por pieza. Diseñadores de interiores como nuevo canal.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Mercado MX</span><span class="val blue">~80K carpinteros</span></div>
+      <div class="metric-row"><span class="key">Modelo</span><span class="val green">Mismo Pro $499</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--green);">
+      <div class="icon">🪟</div>
+      <h4 style="color:var(--green);">Vertical: Vidrio Templado y Canceles</h4>
+      <p>Plantillas para cancelería de aluminio, vidrio templado, duchas. Calculadora de m² con precio por tipo de vidrio (claro, ahumado, laminado) y perfil (natural, blanco, champagne). Cotización en campo con la cámara midiendo automáticamente vía AR.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Mercado MX</span><span class="val blue">~45K instaladores</span></div>
+      <div class="metric-row"><span class="key">Modelo</span><span class="val green">Pro + AR add-on</span></div>
+    </div>
+  </div>
+  <div class="three-col" style="margin-top:10px;">
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">📐</div>
+      <h4 style="color:var(--blue);">Visita Previa para Tomar Medidas</h4>
+      <p>Flujo especial para proveedores que requieren visita antes de cotizar (cancelería, carpintería, instalaciones especiales). El sistema genera una "pre-cotización" con fecha de visita agendada, fotos y notas — que luego se convierte en cotización formal.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Vertical</span><span class="val blue">Vidrio · Madera · HVAC</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">Conversión pre-visita</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">📁</div>
+      <h4 style="color:var(--blue);">Gestión de Documentos (Licitaciones)</h4>
+      <p>Para empresas que participan en licitaciones públicas o privadas: adjunta manifiestos, cumplimientos, cédulas fiscales, certificaciones y garantías en un expediente digital por proyecto. Genera paquete de licitación descargable en PDF.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Tier objetivo</span><span class="val blue">Empresa $799</span></div>
+      <div class="metric-row"><span class="key">Mercado</span><span class="val green">Gobierno · Corporativo</span></div>
+    </div>
+    <div class="feature-card" style="border-color:var(--blue);">
+      <div class="icon">🏢</div>
+      <h4 style="color:var(--blue);">CRM Empresarial — Contactos B2B</h4>
+      <p>Gestión de contactos corporativos dentro del CRM: empresas con múltiples contactos (compras, operaciones, dirección), historial de proyectos por empresa, notas de seguimiento, y alertas cuando vence un contrato o mantenimiento. Pipeline B2B distinto al residencial.</p>
+      <div class="metric-row" style="margin-top:8px;"><span class="key">Tier objetivo</span><span class="val blue">Empresa $799</span></div>
+      <div class="metric-row"><span class="key">Impacto</span><span class="val green">ARPU empresarial +2x</span></div>
+    </div>
+  </div>
+  <div class="highlight-box" style="margin-top:16px;border-color:#FFAB00;">
+    <h4 style="color:#FFAB00;">Estrategia de Validación — Estos 12 Features</h4>
+    <p style="margin-bottom:8px;">Ninguno está en el sprint actual — son hipótesis capturadas del uso real. El proceso de validación: <strong>(1)</strong> Encuesta a usuarios Pro activos (¿cuánto pagarías por X?), <strong>(2)</strong> 3 entrevistas por vertical, <strong>(3)</strong> Landing + waitlist para medir interés. Solo pasan al backlog oficial con &gt;40% demanda + LTV claro.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;font-size:11px;">
+      <div style="background:rgba(255,171,0,0.1);border-radius:6px;padding:8px;text-align:center;"><strong style="color:#FFAB00;">6 features</strong><br>Expansión horizontal HVAC</div>
+      <div style="background:rgba(0,102,255,0.1);border-radius:6px;padding:8px;text-align:center;"><strong style="color:var(--blue);">3 features</strong><br>Nuevos verticales (vidrio/madera)</div>
+      <div style="background:rgba(0,200,83,0.1);border-radius:6px;padding:8px;text-align:center;"><strong style="color:var(--green);">2 features</strong><br>Segmento Empresa (B2B)</div>
+      <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:8px;text-align:center;"><strong style="color:var(--gray);">1 feature</strong><br>Cotizador marketplace</div>
+    </div>
+  </div>
+  <div style="margin-top:20px;text-align:center;border-top:1px solid var(--border);padding-top:20px;">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--blue);">CotizaPro</div>
+    <div style="font-size:12px;color:var(--gray);margin-top:4px;">"El Stripe para técnicos de mantenimiento"</div>
+    <div style="font-size:11px;color:var(--gray);margin-top:8px;">Plan Maestro 2026 · Versión 3.0 · Febrero 2026 · Confidencial</div>
+    <div style="font-size:11px;color:var(--blue);margin-top:4px;font-weight:600;">v3.0 — Análisis competitivo · Pricing $499 · 12 Features Validados por el Mercado</div>
+  </div>
+  <div class="page-footer">
+    <span>CotizaPro — Plan Maestro 2026 · v3.0</span>
+    <span>23 · Features Futuros (2/2) · Fin</span>
+  </div>
+</div>
+
+</body>
+</html>
+

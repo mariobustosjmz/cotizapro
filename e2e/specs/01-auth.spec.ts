@@ -88,7 +88,7 @@ test.describe('Authentication Flow', () => {
 
   test('User cannot access protected dashboard without login', async ({ page }) => {
     await logout(page)
-    await page.goto('/dashboard', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard', { waitUntil: 'load' })
 
     const url = page.url()
     expect(url).not.toContain('/dashboard')
@@ -164,7 +164,7 @@ test.describe('Authentication Flow', () => {
     const protectedRoutes = ['/dashboard', '/dashboard/clients', '/dashboard/quotes']
 
     for (const route of protectedRoutes) {
-      await page.goto(route, { waitUntil: 'networkidle' })
+      await page.goto(route, { waitUntil: 'load' })
       const url = page.url()
       expect(url).not.toContain(route)
     }

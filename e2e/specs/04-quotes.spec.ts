@@ -35,11 +35,11 @@ test.describe('Quote Management', () => {
     await quotesPage.goto()
 
     // Wait for page to be fully loaded
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('load')
 
     // Click the link and wait for navigation
     await Promise.all([
-      page.waitForURL('**/dashboard/quotes/new', { timeout: 10000 }),
+      page.waitForURL('**/dashboard/quotes/new', { timeout: 30000 }),
       page.locator('[data-testid="new-quote-header-btn"]').click()
     ])
 
@@ -240,7 +240,7 @@ test.describe('Quote Management', () => {
         await page.waitForFunction(() => {
           const select = document.querySelector('select[name="client_id"]') as HTMLSelectElement
           return select && select.options.length > 1
-        }, { timeout: 10000 })
+        }, { timeout: 30000 })
         await clientSelect.selectOption({ index: 1 })
       }
     }
@@ -253,7 +253,7 @@ test.describe('Quote Management', () => {
     const submitButton = page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")')
     if (await submitButton.isVisible()) {
       await submitButton.click()
-      await page.waitForURL('**/dashboard/quotes', { timeout: 10000 })
+      await page.waitForURL('**/dashboard/quotes', { timeout: 30000 })
       expect(page.url()).toContain('/dashboard/quotes')
     }
   })

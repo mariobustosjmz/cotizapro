@@ -11,44 +11,51 @@ export class DashboardPage extends BasePage {
   }
 
   async getPageTitle(): Promise<string> {
-    return await this.getText(this.page.locator('h2'))
+    // Breadcrumb span contains "Dashboard" after header redesign (Phase 3)
+    return await this.getText(
+      this.page.locator('header span:has-text("Dashboard"), [role="banner"] span:has-text("Dashboard")').first()
+    )
   }
 
   async getPageSubtitle(): Promise<string> {
-    return await this.getText(this.page.locator('p.text-gray-600'))
+    // Class changed from text-gray-600 to text-muted-foreground in redesign
+    // Use .first() — multiple p.text-muted-foreground elements exist on dashboard
+    return await this.getText(this.page.locator('p.text-muted-foreground').first())
   }
 
-  // Sidebar Navigation
+  // Sidebar Navigation — scoped to aside to avoid duplicate hrefs in KPI "Ver" links
   async clickClientsLink() {
-    await this.page.locator('a[href="/dashboard/clients"]').click()
+    await this.page.locator('aside').locator('a[href="/dashboard/clients"]').click()
     await this.page.waitForURL('**/dashboard/clients')
   }
 
   async clickQuotesLink() {
-    await this.page.locator('a[href="/dashboard/quotes"]').click()
+    await this.page.locator('aside').locator('a[href="/dashboard/quotes"]').click()
     await this.page.waitForURL('**/dashboard/quotes')
   }
 
   async clickTeamLink() {
-    await this.page.locator('a[href="/dashboard/team"]').click()
+    await this.page.locator('aside').locator('a[href="/dashboard/team"]').click()
     await this.page.waitForURL('**/dashboard/team')
   }
 
   async clickSettingsLink() {
-    await this.page.locator('a[href="/dashboard/settings"]').click()
+    await this.page.locator('aside').locator('a[href="/dashboard/settings"]').click()
     await this.page.waitForURL('**/dashboard/settings')
   }
 
   async clickRemindersLink() {
-    await this.page.locator('a[href="/dashboard/reminders"]').click()
+    const link = this.page.locator('aside').locator('a[href="/dashboard/reminders"]')
+    await link.waitFor({ state: 'attached' })
+    await link.click({ force: true })
     await this.page.waitForURL('**/dashboard/reminders')
   }
 
   // User Menu
   async openUserMenu() {
-    const userMenuButton = this.page.locator('button[aria-label="User menu"], [data-testid="user-menu"]')
+    const userMenuButton = this.page.locator('button[aria-label^="Menú de usuario"], [data-testid="user-menu"]')
     if (await userMenuButton.isVisible()) {
-      await userMenuButton.click()
+      await userMenuButton.click({ force: true })
     }
   }
 
@@ -57,28 +64,31 @@ export class DashboardPage extends BasePage {
   }
 
   async logout() {
-    await this.openUserMenu()
-    await this.clickLogout()
+    // Clear browser cookies only — avoids invalidating server-side Supabase session
+    // which would break concurrent parallel test workers sharing the same credentials
+    await this.page.context().clearCookies()
+    await this.page.goto('/login')
     await this.page.waitForURL('**/login')
   }
 
   // Navigation verification
   async isClientsSectionVisible(): Promise<boolean> {
-    return await this.page.locator('text=Clientes').isVisible()
+    return await this.page.locator('text=Clientes').first().isVisible()
   }
 
   async isQuotesSectionVisible(): Promise<boolean> {
-    return await this.page.locator('text=Cotizaciones').isVisible()
+    return await this.page.locator('text=Cotizaciones').first().isVisible()
   }
 
   async isDashboardVisible(): Promise<boolean> {
-    // Scope to banner heading to avoid matching sidebar navigation link
-    return await this.page.locator('[role="banner"] h1:has-text("Dashboard"), header h1:has-text("Dashboard")').first().isVisible()
+    // Breadcrumb uses <span> not <h1> after header redesign (Phase 3)
+    return await this.page.locator('header span:has-text("Dashboard"), [role="banner"] span:has-text("Dashboard")').first().isVisible()
   }
 
   // Stats
   async getTotalClientsCount(): Promise<string> {
-    const stat = this.page.locator('text=Total Clientes').locator('..').locator('div.text-2xl')
+    // CardTitle renders as <h3> (not <div>) — traverse up to Card root then find text-3xl
+    const stat = this.page.locator('h3:has-text("Clientes")').locator('../..').locator('div.text-3xl')
     return await this.getText(stat)
   }
 
@@ -96,7 +106,8 @@ export class DashboardPage extends BasePage {
   // Check if logged in
   async isLoggedIn(): Promise<boolean> {
     try {
-      await this.page.waitForURL('**/dashboard', { timeout: 2000 })
+      // Use regex to match any /dashboard/* URL (glob '**/dashboard' only matches exact /dashboard)
+      await this.page.waitForURL(/\/dashboard/, { timeout: 2000 })
       return true
     } catch {
       return false

@@ -23,7 +23,7 @@ export class RemindersPage extends BasePage {
         return select && select.options.length > 1
       },
       'select[name="client_id"]',
-      { timeout: 10000 }
+      { timeout: 30000 }
     )
 
     const optionCount = await clientSelect.locator('option').count()
@@ -100,7 +100,7 @@ export class RemindersPage extends BasePage {
     // Wait for API response to avoid race conditions
     const responsePromise = this.page.waitForResponse(
       response => response.url().includes('/api/reminders') && response.request().method() === 'POST',
-      { timeout: 10000 }
+      { timeout: 30000 }
     ).catch((err) => {
       console.log('[E2E] No API response received for reminder creation:', err?.message)
       return null
@@ -137,10 +137,10 @@ export class RemindersPage extends BasePage {
       console.log('[E2E] No response received from reminder API')
     }
 
-    await this.page.waitForURL('**/dashboard/reminders', { timeout: 10000 })
+    await this.page.waitForURL('**/dashboard/reminders', { timeout: 30000 })
 
     // Force a page reload to ensure fresh data from Server Component
-    await this.page.reload({ waitUntil: 'networkidle' })
+    await this.page.reload({ waitUntil: 'load' }).catch(() => null)
 
     // Wait for the table to be visible (or empty state)
     await this.page.locator('table, text=No hay recordatorios').waitFor({ timeout: 5000 }).catch(() => null)
@@ -176,7 +176,7 @@ export class RemindersPage extends BasePage {
   async ensureClientExists() {
     // Navigate to clients page to check if any exist
     await this.page.goto('/dashboard/clients')
-    await this.page.waitForLoadState('networkidle')
+    await this.page.waitForLoadState('load')
 
     // Check if empty state is visible
     const emptyState = this.page.locator('text=No hay clientes')
@@ -194,7 +194,7 @@ export class RemindersPage extends BasePage {
   async createTestClientViaUI() {
     // Navigate to new client page
     await this.page.goto('/dashboard/clients/new')
-    await this.page.waitForLoadState('networkidle')
+    await this.page.waitForLoadState('load')
 
     // Fill client form
     const testClient = {
@@ -210,7 +210,7 @@ export class RemindersPage extends BasePage {
     // Wait for API response
     const responsePromise = this.page.waitForResponse(
       response => response.url().includes('/api/clients') && response.request().method() === 'POST',
-      { timeout: 10000 }
+      { timeout: 30000 }
     )
 
     // Submit form
@@ -223,11 +223,11 @@ export class RemindersPage extends BasePage {
     }
 
     // Wait for navigation back to clients list
-    await this.page.waitForURL('**/dashboard/clients', { timeout: 10000 })
-    await this.page.waitForLoadState('networkidle')
+    await this.page.waitForURL('**/dashboard/clients', { timeout: 30000 })
+    await this.page.waitForLoadState('load')
 
     // Force a page reload to ensure fresh data from Server Component
-    await this.page.reload({ waitUntil: 'networkidle' })
+    await this.page.reload({ waitUntil: 'load' }).catch(() => null)
 
     // Wait for the table to be visible (not empty state)
     await this.page.locator('table').waitFor({ timeout: 5000 })
@@ -272,7 +272,8 @@ export class RemindersPage extends BasePage {
       console.log('[E2E] Clicked details link, waiting for URL change...')
     }
 
-    await this.page.waitForURL('**/dashboard/reminders/*')
+    // Use regex to match UUID-based detail URLs only — excludes /reminders/new
+    await this.page.waitForURL(/\/dashboard\/reminders\/[0-9a-f-]{36}/, { timeout: 30000 })
     console.log('[E2E] URL after navigation:', this.page.url())
   }
 

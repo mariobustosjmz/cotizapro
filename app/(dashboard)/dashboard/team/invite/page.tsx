@@ -80,6 +80,7 @@ export default function InvitePage() {
               <Label htmlFor="email">Email del Miembro</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="ejemplo@correo.com"
                 value={formData.email}
@@ -95,6 +96,7 @@ export default function InvitePage() {
               <Label htmlFor="role">Rol</Label>
               <select
                 id="role"
+                name="role"
                 className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}

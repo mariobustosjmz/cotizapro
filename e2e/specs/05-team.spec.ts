@@ -22,7 +22,7 @@ test.describe('Team Management', () => {
     const teamPage = new TeamPage(page)
     await teamPage.goto()
 
-    const inviteButton = page.locator('a[href="/dashboard/team/invite"], button:has-text("Invitar")')
+    const inviteButton = page.locator('a[href="/dashboard/team/invite"], button:has-text("Invitar")').first()
     expect(await inviteButton.isVisible()).toBeTruthy()
   })
 
@@ -113,7 +113,7 @@ test.describe('Team Management', () => {
     const teamPage = new TeamPage(page)
     await teamPage.goToInvite()
 
-    const submitButton = page.locator('button[type="submit"]:has-text("Invitar"), button[type="submit"]:has-text("Send")')
+    const submitButton = page.locator('button[type="submit"]:has-text("Enviar Invitación"), button[type="submit"]:has-text("Invitar"), button[type="submit"]:has-text("Send")')
     expect(await submitButton.isVisible()).toBeTruthy()
   })
 
@@ -175,7 +175,7 @@ test.describe('Team Management', () => {
     const teamPage = new TeamPage(page)
     await teamPage.goToInvite()
 
-    const cancelButton = page.locator('a:has-text("Cancelar"), a:has-text("Cancel"), button:has-text("Cancelar")')
+    const cancelButton = page.locator('a:has-text("Cancelar"), a:has-text("Cancel"), button:has-text("Cancelar")').first()
     if (await cancelButton.isVisible()) {
       await cancelButton.click()
     }

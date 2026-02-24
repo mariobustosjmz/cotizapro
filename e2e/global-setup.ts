@@ -25,7 +25,7 @@ async function globalSetup(config: FullConfig) {
   try {
     // Wait for the app to be ready
     const baseURL = 'http://localhost:3000'
-    await page.goto(baseURL, { waitUntil: 'networkidle', timeout: 30000 })
+    await page.goto(baseURL, { waitUntil: 'load', timeout: 30000 })
     console.log('✅ Application is ready')
   } catch (error) {
     console.warn('⚠️  App startup check failed (may be expected):', error)

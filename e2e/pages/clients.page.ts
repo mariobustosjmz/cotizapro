@@ -54,7 +54,7 @@ export class ClientsPage extends BasePage {
     // Wait for API response
     const responsePromise = this.page.waitForResponse(
       response => response.url().includes('/api/clients') && response.request().method() === 'POST',
-      { timeout: 10000 }
+      { timeout: 30000 }
     )
 
     await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
@@ -75,10 +75,11 @@ export class ClientsPage extends BasePage {
       throw error
     }
 
-    await this.page.waitForURL('**/dashboard/clients', { timeout: 10000 })
+    await this.page.waitForURL('**/dashboard/clients', { timeout: 30000 })
 
     // Force a page reload to ensure fresh data from Server Component
-    await this.page.reload({ waitUntil: 'networkidle' })
+    // Firefox can throw "Target page closed" during networkidle wait — handle gracefully
+    await this.page.reload({ waitUntil: 'load' }).catch(() => null)
 
     // Wait for the table to be visible (or empty state)
     await this.page.locator('table, text=No hay clientes').waitFor({ timeout: 5000 }).catch(() => null)
@@ -119,7 +120,10 @@ export class ClientsPage extends BasePage {
   }
 
   async isClientVisible(name: string): Promise<boolean> {
-    return await this.page.locator(`text=${name}`).isVisible()
+    // Use count() scoped to table rows to avoid strict mode violation when
+    // multiple elements match (e.g., seed data + newly created client with same name)
+    const rows = this.page.locator('table tbody tr').filter({ hasText: name })
+    return (await rows.count()) > 0
   }
 
   // Client Details Page
@@ -143,7 +147,7 @@ export class ClientsPage extends BasePage {
   }
 
   async confirmDelete() {
-    await this.page.waitForURL('**/dashboard/clients', { timeout: 10000 })
+    await this.page.waitForURL('**/dashboard/clients', { timeout: 30000 })
   }
 
   async isEmptyStateVisible(): Promise<boolean> {

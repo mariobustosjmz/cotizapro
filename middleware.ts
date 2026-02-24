@@ -37,14 +37,52 @@ function checkRequestSize(request: NextRequest): NextResponse | null {
   return null
 }
 
+const ALLOWED_ORIGINS = [
+  'http://localhost:4200',
+  'http://localhost:3000',
+]
+
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false
+  if (ALLOWED_ORIGINS.includes(origin)) return true
+  // Allow any localhost / 127.0.0.1 port (Flutter web dev server uses ephemeral ports)
+  if (/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) return true
+  return false
+}
+
+function corsHeaders(origin: string | null) {
+  const allowed = isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0]
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+    'Access-Control-Allow-Credentials': 'true',
+  }
+}
+
 export async function middleware(request: NextRequest) {
+  const origin = request.headers.get('origin')
+
+  // Handle CORS preflight before auth check
+  if (request.method === 'OPTIONS' && request.nextUrl.pathname.startsWith('/api/')) {
+    return new NextResponse(null, { status: 204, headers: corsHeaders(origin) })
+  }
+
   // Check request size for POST, PUT, PATCH requests
   if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
     const sizeError = checkRequestSize(request)
     if (sizeError) return sizeError
   }
 
-  return await updateSession(request)
+  const response = await updateSession(request)
+
+  // Attach CORS headers to all API responses
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const headers = corsHeaders(origin)
+    Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v))
+  }
+
+  return response
 }
 
 export const config = {

@@ -85,7 +85,7 @@ test.describe('Dashboard Navigation', () => {
     const dashboardPage = new DashboardPage(page)
     await dashboardPage.goto()
 
-    const sidebar = page.locator('aside, nav, [role="navigation"]')
+    const sidebar = page.locator('aside, nav, [role="navigation"]').first()
     expect(await sidebar.isVisible()).toBeTruthy()
   })
 
@@ -102,7 +102,7 @@ test.describe('Dashboard Navigation', () => {
     await dashboardPage.goto()
 
     const userEmail = page.locator(`text=${testUsers.owner.email}`)
-    const userButton = page.locator('button[aria-label="User menu"], [data-testid="user-menu"]')
+    const userButton = page.locator('button[aria-label^="Menú de usuario"], [data-testid="user-menu"]')
 
     const hasUserInfo = await userEmail.isVisible() || await userButton.isVisible()
     expect(hasUserInfo).toBeTruthy()
@@ -112,9 +112,9 @@ test.describe('Dashboard Navigation', () => {
     const dashboardPage = new DashboardPage(page)
     await dashboardPage.goto()
 
-    const clientsLink = page.locator('a[href="/dashboard/clients"]')
-    const quotesLink = page.locator('a[href="/dashboard/quotes"]')
-    const teamLink = page.locator('a[href="/dashboard/team"]')
+    const clientsLink = page.locator('a[href="/dashboard/clients"]').first()
+    const quotesLink = page.locator('a[href="/dashboard/quotes"]').first()
+    const teamLink = page.locator('a[href="/dashboard/team"]').first()
 
     expect(await clientsLink.isVisible()).toBeTruthy()
     expect(await quotesLink.isVisible()).toBeTruthy()
@@ -138,7 +138,7 @@ test.describe('Dashboard Navigation', () => {
     const dashboardPage = new DashboardPage(page)
     await dashboardPage.goto()
 
-    const sidebar = page.locator('aside, nav')
+    const sidebar = page.locator('aside, nav').first()
     expect(await sidebar.isVisible()).toBeTruthy()
   })
 })

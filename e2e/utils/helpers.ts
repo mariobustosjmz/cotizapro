@@ -198,7 +198,7 @@ export class TestHelpers {
    * Navigate to page and wait for load
    */
   static async navigateAndWait(page: Page, url: string): Promise<void> {
-    await page.goto(url, { waitUntil: 'networkidle' })
+    await page.goto(url, { waitUntil: 'load' })
     await page.waitForLoadState('domcontentloaded')
   }
 

@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
+import type { CustomFieldValues } from '@/types/custom-fields'
 
 interface QuoteItem {
   description: string
@@ -30,7 +32,7 @@ interface Service {
   id: string
   name: string
   description: string | null
-  default_price: number
+  unit_price: number
   unit_type: string
 }
 
@@ -43,6 +45,7 @@ export default function NewQuotePage() {
   const [items, setItems] = useState<QuoteItem[]>([
     { description: '', quantity: 1, unit_price: 0, unit_type: 'per_unit', service_id: null }
   ])
+  const [customFields, setCustomFields] = useState<CustomFieldValues>({})
 
   useEffect(() => {
     async function fetchData() {
@@ -93,7 +96,7 @@ export default function NewQuotePage() {
         ...newItems[index],
         service_id: serviceId,
         description: service.name,
-        unit_price: service.default_price,
+        unit_price: service.unit_price,
         unit_type: service.unit_type as 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
       }
       setItems(newItems)
@@ -139,6 +142,7 @@ export default function NewQuotePage() {
       terms_and_conditions: formData.get('terms') || null,
       valid_until: validUntilDate.toISOString(),
       discount_rate: discountRate,
+      custom_fields: customFields,
     }
 
     if (data.items.length === 0) {
@@ -198,13 +202,12 @@ export default function NewQuotePage() {
             <CardTitle>Cliente</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="client_id">Selecciona un Cliente *</Label>
+            <FormField label="Selecciona un Cliente" htmlFor="client_id" required>
               <select
                 id="client_id"
                 name="client_id"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="">Selecciona un cliente...</option>
                 {clients.map(client => (
@@ -213,12 +216,12 @@ export default function NewQuotePage() {
                   </option>
                 ))}
               </select>
-              {clients.length === 0 && (
-                <p className="text-sm text-gray-500">
-                  No hay clientes. <Link href="/dashboard/clients/new" className="text-blue-600 hover:underline">Crear cliente</Link>
-                </p>
-              )}
-            </div>
+            </FormField>
+            {clients.length === 0 && (
+              <p className="mt-2 text-sm text-gray-500">
+                No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 hover:underline">Crear cliente</Link>
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -252,25 +255,23 @@ export default function NewQuotePage() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   {/* Service Selection */}
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>Servicio (Opcional)</Label>
+                  <FormField label="Servicio (Opcional)" className="md:col-span-2">
                     <select
                       value={item.service_id || ''}
                       onChange={(e) => selectService(index, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     >
                       <option value="">Selecciona un servicio...</option>
                       {services.map(service => (
                         <option key={service.id} value={service.id}>
-                          {service.name} - ${service.default_price.toLocaleString('es-MX')}
+                          {service.name} - ${service.unit_price.toLocaleString('es-MX')}
                         </option>
                       ))}
                     </select>
-                  </div>
+                  </FormField>
 
                   {/* Description */}
-                  <div className="space-y-2 md:col-span-2">
-                    <Label>Descripción *</Label>
+                  <FormField label="Descripción" required className="md:col-span-2">
                     <Input
                       value={item.description}
                       onChange={(e) => updateItem(index, 'description', e.target.value)}
@@ -278,11 +279,10 @@ export default function NewQuotePage() {
                       placeholder="Instalación de minisplit 12000 BTU"
                       data-testid={`item-description-${index}`}
                     />
-                  </div>
+                  </FormField>
 
                   {/* Quantity */}
-                  <div className="space-y-2">
-                    <Label>Cantidad *</Label>
+                  <FormField label="Cantidad" required>
                     <Input
                       type="number"
                       min="0.01"
@@ -292,11 +292,10 @@ export default function NewQuotePage() {
                       required
                       data-testid={`item-quantity-${index}`}
                     />
-                  </div>
+                  </FormField>
 
                   {/* Unit Price */}
-                  <div className="space-y-2">
-                    <Label>Precio Unitario *</Label>
+                  <FormField label="Precio Unitario" required>
                     <Input
                       type="number"
                       min="0"
@@ -306,7 +305,7 @@ export default function NewQuotePage() {
                       required
                       data-testid={`item-unit-price-${index}`}
                     />
-                  </div>
+                  </FormField>
                 </div>
 
                 {/* Item Total */}
@@ -335,7 +334,7 @@ export default function NewQuotePage() {
             </div>
             <div className="flex justify-between pt-2 border-t">
               <span className="text-lg font-bold">Total:</span>
-              <span className="text-lg font-bold text-blue-600" data-testid="quote-total">${total.toLocaleString('es-MX')}</span>
+              <span className="text-lg font-bold text-orange-600" data-testid="quote-total">${total.toLocaleString('es-MX')}</span>
             </div>
           </CardContent>
         </Card>
@@ -346,9 +345,7 @@ export default function NewQuotePage() {
             <CardTitle>Información Adicional</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Valid Until */}
-            <div className="space-y-2">
-              <Label htmlFor="valid_until_days">Válida por (días)</Label>
+            <FormField label="Válida por (días)" htmlFor="valid_until_days">
               <Input
                 id="valid_until_days"
                 name="valid_until_days"
@@ -356,22 +353,18 @@ export default function NewQuotePage() {
                 min="1"
                 defaultValue="30"
               />
-            </div>
+            </FormField>
 
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notas</Label>
+            <FormField label="Notas" htmlFor="notes">
               <Textarea
                 id="notes"
                 name="notes"
                 rows={3}
                 placeholder="Información adicional para el cliente..."
               />
-            </div>
+            </FormField>
 
-            {/* Terms */}
-            <div className="space-y-2">
-              <Label htmlFor="terms">Términos y Condiciones</Label>
+            <FormField label="Términos y Condiciones" htmlFor="terms">
               <Textarea
                 id="terms"
                 name="terms"
@@ -379,9 +372,16 @@ export default function NewQuotePage() {
                 placeholder="50% anticipo, 50% al terminar. Garantía de 1 año..."
                 defaultValue="50% de anticipo al aceptar la cotización. 50% restante al completar el trabajo. Garantía de 1 año en mano de obra."
               />
-            </div>
+            </FormField>
           </CardContent>
         </Card>
+
+        {/* Custom Fields */}
+        <DynamicFieldsSection
+          entityType="quote"
+          values={customFields}
+          onChange={setCustomFields}
+        />
 
         {/* Actions */}
         <div className="flex justify-end space-x-4">

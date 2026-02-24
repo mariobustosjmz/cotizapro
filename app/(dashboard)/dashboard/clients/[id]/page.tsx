@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
+import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
+import type { CustomFieldValues } from '@/types/custom-fields'
 
 interface Client {
   id: string
@@ -20,23 +22,29 @@ interface Client {
   notes: string | null
   tags: string[] | null
   created_at: string
+  custom_fields?: CustomFieldValues
 }
 
-export default function ClientDetailPage({ params }: { params: { id: string } }) {
+export default function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const resolvedParams = use(params)
+  const clientId = resolvedParams.id
+
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [client, setClient] = useState<Client | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [customFields, setCustomFields] = useState<CustomFieldValues>({})
 
   useEffect(() => {
     async function fetchClient() {
       try {
-        const response = await fetch(`/api/clients/${params.id}`)
+        const response = await fetch(`/api/clients/${clientId}`)
         if (response.ok) {
           const data = await response.json()
-          setClient(data.data)
+          setClient(data.client)
+          setCustomFields((data.client.custom_fields as CustomFieldValues) ?? {})
         } else {
           setError('Cliente no encontrado')
         }
@@ -46,7 +54,7 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
     }
 
     fetchClient()
-  }, [params.id])
+  }, [clientId])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -64,10 +72,11 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
       address: formData.get('address'),
       notes: formData.get('notes'),
       tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      custom_fields: customFields,
     }
 
     try {
-      const response = await fetch(`/api/clients/${params.id}`, {
+      const response = await fetch(`/api/clients/${clientId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -79,8 +88,10 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
       }
 
       const updated = await response.json()
-      setClient(updated.data)
+      setClient(updated.client)
       setIsEditing(false)
+      router.push('/dashboard/clients')
+      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al actualizar cliente')
     } finally {
@@ -97,7 +108,7 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
     setError('')
 
     try {
-      const response = await fetch(`/api/clients/${params.id}`, {
+      const response = await fetch(`/api/clients/${clientId}`, {
         method: 'DELETE',
       })
 
@@ -112,6 +123,17 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
       setError(err instanceof Error ? err.message : 'Error al eliminar cliente')
       setDeleting(false)
     }
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 font-semibold">Error</p>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    )
   }
 
   if (!client) {
@@ -217,12 +239,11 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
 
                 {/* Phone */}
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Teléfono *</Label>
+                  <Label htmlFor="phone">Teléfono</Label>
                   <Input
                     id="phone"
                     name="phone"
                     type="tel"
-                    required
                     defaultValue={client.phone || ''}
                   />
                 </div>
@@ -263,6 +284,12 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
                   defaultValue={client.notes || ''}
                 />
               </div>
+
+              <DynamicFieldsSection
+                entityType="client"
+                values={customFields}
+                onChange={setCustomFields}
+              />
 
               {/* Actions */}
               <div className="flex justify-end">
@@ -334,6 +361,13 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
                   })}
                 </p>
               </div>
+
+              <DynamicFieldsSection
+                entityType="client"
+                values={customFields}
+                onChange={() => {}}
+                disabled
+              />
             </div>
           )}
         </CardContent>

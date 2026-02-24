@@ -42,7 +42,8 @@ test.describe('Critical User Journey: Complete Workflow', () => {
     expect(page.url()).toContain('/dashboard/quotes')
 
     // Step 5: Create a new quote
-    await page.locator('a[href="/dashboard/quotes/new"]').click()
+    await page.locator('[data-testid="new-quote-header-btn"]').click({ force: true })
+    await page.waitForURL('**/dashboard/quotes/new', { timeout: 30000 })
     expect(page.url()).toContain('/dashboard/quotes/new')
 
     // Step 6: Return to Dashboard
@@ -136,7 +137,7 @@ test.describe('Critical User Journey: Complete Workflow', () => {
 
   test('User cannot access protected routes without authentication', async ({ page }) => {
     // Try to access dashboard without logging in
-    await page.goto('/dashboard', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard', { waitUntil: 'load' })
 
     // Should be redirected away from dashboard
     const url = page.url()
@@ -190,7 +191,7 @@ test.describe('Critical User Journey: Complete Workflow', () => {
 
     // Check if user email or name is displayed
     const userEmail = page.locator(`text=${testUsers.owner.email}`)
-    const userButton = page.locator('button[aria-label="User menu"], [data-testid="user-menu"]')
+    const userButton = page.locator('button[aria-label^="Menú de usuario"], [data-testid="user-menu"]')
 
     const hasUserInfo = await userEmail.isVisible() || await userButton.isVisible()
     expect(hasUserInfo).toBeTruthy()
