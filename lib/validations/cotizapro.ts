@@ -309,3 +309,36 @@ export const reminderQuerySchema = paginationSchema.extend({
 export type CreateReminderInput = z.infer<typeof createReminderSchema>
 export type UpdateReminderInput = z.infer<typeof updateReminderSchema>
 export type ReminderQueryParams = z.infer<typeof reminderQuerySchema>
+
+// ========================================
+// Quote Payment Schemas
+// ========================================
+
+export const paymentTypeSchema = z.enum(['anticipo', 'parcial', 'liquidacion'])
+export const paymentMethodSchema = z.enum(['efectivo', 'transferencia', 'cheque', 'otro'])
+
+export const createQuotePaymentSchema = z.object({
+  amount: z.number().positive('El monto debe ser mayor a 0'),
+  payment_type: paymentTypeSchema,
+  payment_method: paymentMethodSchema,
+  payment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida (YYYY-MM-DD)'),
+  notes: z.string().max(500).optional(),
+  received_by: z.string().uuid().optional(),
+})
+
+export type PaymentType = z.infer<typeof paymentTypeSchema>
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>
+export type CreateQuotePaymentInput = z.infer<typeof createQuotePaymentSchema>
+
+export interface QuotePayment {
+  id: string
+  organization_id: string
+  quote_id: string
+  amount: string  // Supabase returns NUMERIC as string
+  payment_type: PaymentType
+  payment_method: PaymentMethod
+  payment_date: string
+  notes: string | null
+  received_by: string | null
+  created_at: string
+}
