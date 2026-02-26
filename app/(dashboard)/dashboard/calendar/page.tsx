@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { CalendarWeekView } from '@/components/dashboard/calendar-week-view'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Calendar } from 'lucide-react'
 
 interface CalendarEvent {
   id: string
@@ -75,13 +75,22 @@ export default async function CalendarPage() {
   }))
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Agenda</h1>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
+            <Calendar className="w-4 h-4 text-orange-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Agenda</h2>
+            <span className="text-sm text-gray-500">{typedEvents.length} eventos esta semana</span>
+          </div>
+        </div>
         <Link href="/dashboard/calendar/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nuevo Evento
+          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+            <Plus className="w-4 h-4 mr-1" />
+            Nuevo
           </Button>
         </Link>
       </div>

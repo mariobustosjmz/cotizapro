@@ -19,6 +19,7 @@ interface WorkEventFormProps {
   defaultDate?: string
   defaultHour?: number
   defaultClientId?: string
+  quoteId?: string
 }
 
 function padZero(num: number): string {
@@ -30,6 +31,7 @@ export function WorkEventForm({
   defaultDate,
   defaultHour,
   defaultClientId,
+  quoteId,
 }: WorkEventFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -59,7 +61,7 @@ export function WorkEventForm({
       // Keep datetime strings as-is (local ISO format)
       // PostgreSQL accepts timestamptz with local ISO strings
       // Server handles timezone conversion correctly
-      const payload = {
+      const payload: Record<string, string | null> = {
         title,
         client_id: clientId,
         event_type: eventType,
@@ -67,6 +69,10 @@ export function WorkEventForm({
         scheduled_end: scheduledEnd,
         address,
         notes,
+      }
+
+      if (quoteId) {
+        payload.quote_id = quoteId
       }
 
       const response = await fetch('/api/calendar/events', {

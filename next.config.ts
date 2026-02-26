@@ -52,10 +52,10 @@ const nextConfig: NextConfig = {
               },
             ]
             : []),
-          // Disable client-side caching for sensitive pages
+          // Prevent caching of dynamic pages
           {
             key: "Cache-Control",
-            value: "public, max-age=3600",
+            value: "no-store, max-age=0",
           },
         ],
       },

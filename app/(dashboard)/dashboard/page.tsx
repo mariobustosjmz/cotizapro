@@ -1,5 +1,4 @@
 import { createServerClient } from '@/lib/supabase/server'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import {
   Users,
@@ -49,6 +48,9 @@ const STATUS_LABELS: Record<string, string> = {
   accepted: 'Aceptada',
   rejected: 'Rechazada',
   expired: 'Expirada',
+  en_instalacion: 'En Instalación',
+  completado: 'Completado',
+  cobrado: 'Cobrado',
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -58,6 +60,9 @@ const STATUS_COLORS: Record<string, string> = {
   accepted: 'border-l-emerald-500',
   rejected: 'border-l-red-500',
   expired: 'border-l-slate-300',
+  en_instalacion: 'border-l-blue-500',
+  completado: 'border-l-teal-500',
+  cobrado: 'border-l-green-600',
 }
 
 const STATUS_BADGE_COLORS: Record<string, string> = {
@@ -67,6 +72,9 @@ const STATUS_BADGE_COLORS: Record<string, string> = {
   accepted: 'bg-emerald-100 text-emerald-700',
   rejected: 'bg-red-100 text-red-700',
   expired: 'bg-slate-100 text-slate-500',
+  en_instalacion: 'bg-blue-100 text-blue-700',
+  completado: 'bg-teal-100 text-teal-700',
+  cobrado: 'bg-green-100 text-green-700',
 }
 
 export default async function DashboardPage() {
@@ -163,18 +171,18 @@ export default async function DashboardPage() {
   const firstName = profile.full_name?.split(' ')[0] || user.email?.split('@')[0] || 'Usuario'
 
   return (
-    <div className="space-y-6">
-      {/* Urgent Reminders Banner — Phase 6.4 */}
+    <div className="space-y-4">
+      {/* Urgent Reminders Banner */}
       {overdueReminders.length > 0 && (
         <Link href="/dashboard/reminders">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/15 transition-colors cursor-pointer">
-            <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0" />
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-50 border border-orange-200 hover:bg-orange-100/60 transition-colors cursor-pointer">
+            <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
             <div className="flex-1 min-w-0">
-              <span className="text-sm font-semibold text-orange-400">
+              <span className="text-sm font-semibold text-orange-700">
                 {overdueReminders.length} recordatorio{overdueReminders.length > 1 ? 's' : ''} vencido{overdueReminders.length > 1 ? 's' : ''}
               </span>
-              <span className="text-sm text-orange-400/70 ml-2">
-                — requieren atención inmediata
+              <span className="text-sm text-orange-600/70 ml-2">
+                — requieren atencion inmediata
               </span>
             </div>
             <ChevronRight className="w-4 h-4 text-orange-500 shrink-0" />
@@ -184,102 +192,90 @@ export default async function DashboardPage() {
 
       {/* Welcome Header */}
       <div>
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-xl font-bold text-gray-900">
           Bienvenido, {firstName}
         </h2>
-        <p className="text-muted-foreground mt-0.5">
+        <p className="text-xs text-gray-500 mt-0.5">
           {orgName} — resumen del negocio
         </p>
       </div>
 
-      {/* KPI Cards — Phase 6.1 */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        {/* Clients */}
-        <Card className="group hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Clientes</CardTitle>
-            <div className="p-2 rounded-lg bg-orange-500/10">
-              <Users className="h-4 w-4 text-orange-500" />
+      {/* KPI Cards */}
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-500">Clientes</span>
+            <div className="p-1.5 rounded-lg bg-orange-100">
+              <Users className="h-3.5 w-3.5 text-orange-500" />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold tracking-tight">{totalClients ?? 0}</div>
-            <div className="mt-1.5 flex items-center justify-between">
-              <TrendBadge value={clientTrend} />
-              <Link href="/dashboard/clients" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
-                Ver <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-xl font-bold text-gray-900">{totalClients ?? 0}</div>
+          <div className="mt-1 flex items-center justify-between">
+            <TrendBadge value={clientTrend} />
+            <Link href="/dashboard/clients" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
+              Ver <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
 
-        {/* Quotes */}
-        <Card className="group hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Cotizaciones</CardTitle>
-            <div className="p-2 rounded-lg bg-purple-500/10">
-              <FileText className="h-4 w-4 text-purple-500" />
+        <div className="bg-white rounded-xl border border-gray-200 p-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-500">Cotizaciones</span>
+            <div className="p-1.5 rounded-lg bg-purple-100">
+              <FileText className="h-3.5 w-3.5 text-purple-500" />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold tracking-tight">{quotes?.length ?? 0}</div>
-            <div className="mt-1.5 flex items-center justify-between">
-              <TrendBadge value={quoteTrend} />
-              <Link href="/dashboard/quotes" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
-                Ver <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-xl font-bold text-gray-900">{quotes?.length ?? 0}</div>
+          <div className="mt-1 flex items-center justify-between">
+            <TrendBadge value={quoteTrend} />
+            <Link href="/dashboard/quotes" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
+              Ver <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
 
-        {/* Revenue */}
-        <Card className="group hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ingresos Aceptados</CardTitle>
-            <div className="p-2 rounded-lg bg-emerald-500/10">
-              <DollarSign className="h-4 w-4 text-emerald-500" />
+        <div className="bg-white rounded-xl border border-gray-200 p-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-500">Ingresos Aceptados</span>
+            <div className="p-1.5 rounded-lg bg-emerald-100">
+              <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold tracking-tight">
-              ${totalRevenue.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
-            </div>
-            <div className="mt-1.5">
-              <span className="text-xs text-muted-foreground">
-                {acceptanceRate.toFixed(0)}% tasa de aceptación
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-xl font-bold text-green-600">
+            ${totalRevenue.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
+          </div>
+          <div className="mt-1">
+            <span className="text-xs text-gray-500">
+              {acceptanceRate.toFixed(0)}% tasa de aceptacion
+            </span>
+          </div>
+        </div>
 
-        {/* Reminders */}
-        <Card className={`group hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200 ${
-          overdueReminders.length > 0 ? 'border-orange-500/40' : ''
+        <div className={`bg-white rounded-xl border p-3 ${
+          overdueReminders.length > 0 ? 'border-orange-300' : 'border-gray-200'
         }`}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Recordatorios</CardTitle>
-            <div className={`p-2 rounded-lg ${overdueReminders.length > 0 ? 'bg-orange-500/10' : 'bg-yellow-500/10'}`}>
-              <Bell className={`h-4 w-4 ${overdueReminders.length > 0 ? 'text-orange-500' : 'text-yellow-500'}`} />
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-medium text-gray-500">Recordatorios</span>
+            <div className={`p-1.5 rounded-lg ${overdueReminders.length > 0 ? 'bg-orange-100' : 'bg-yellow-100'}`}>
+              <Bell className={`h-3.5 w-3.5 ${overdueReminders.length > 0 ? 'text-orange-500' : 'text-yellow-500'}`} />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-3xl font-bold tracking-tight ${overdueReminders.length > 0 ? 'text-orange-500' : ''}`}>
-              {pendingReminders}
-            </div>
-            <div className="mt-1.5 flex items-center justify-between">
-              {overdueReminders.length > 0 ? (
-                <span className="text-xs text-orange-500 font-medium">
-                  {overdueReminders.length} vencido{overdueReminders.length > 1 ? 's' : ''}
-                </span>
-              ) : (
-                <span className="text-xs text-muted-foreground">pendientes</span>
-              )}
-              <Link href="/dashboard/reminders" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
-                Ver <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className={`text-xl font-bold ${overdueReminders.length > 0 ? 'text-orange-500' : 'text-gray-900'}`}>
+            {pendingReminders}
+          </div>
+          <div className="mt-1 flex items-center justify-between">
+            {overdueReminders.length > 0 ? (
+              <span className="text-xs text-orange-500 font-medium">
+                {overdueReminders.length} vencido{overdueReminders.length > 1 ? 's' : ''}
+              </span>
+            ) : (
+              <span className="text-xs text-gray-500">pendientes</span>
+            )}
+            <Link href="/dashboard/reminders" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
+              Ver <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Quote Status Row */}
@@ -290,166 +286,140 @@ export default async function DashboardPage() {
           { label: 'Aceptadas', count: quoteCounts.accepted, color: 'border-l-emerald-500', text: 'text-emerald-600' },
           { label: 'Rechazadas', count: quoteCounts.rejected, color: 'border-l-red-500', text: 'text-red-600' },
         ].map((item) => (
-          <Card key={item.label} className={`border-l-4 ${item.color} hover:-translate-y-0.5 hover:shadow-md transition-all duration-200`}>
-            <CardContent className="pt-4 pb-4">
-              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{item.label}</div>
-              <div className={`text-2xl font-bold mt-1 ${item.text}`}>{item.count}</div>
-            </CardContent>
-          </Card>
+          <div key={item.label} className={`bg-white rounded-xl border border-gray-200 border-l-4 ${item.color} p-3`}>
+            <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">{item.label}</div>
+            <div className={`text-xl font-bold mt-0.5 ${item.text}`}>{item.count}</div>
+          </div>
         ))}
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
 
-        {/* Recent Quotes — Phase 6.2 */}
+        {/* Recent Quotes */}
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-base font-semibold">Cotizaciones Recientes</CardTitle>
+          <div className="bg-white rounded-xl border border-gray-200">
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-900">Cotizaciones Recientes</span>
               <Link href="/dashboard/quotes">
-                <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1">
+                <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1 h-7">
                   Ver todas <ChevronRight className="w-3 h-3" />
                 </Button>
               </Link>
-            </CardHeader>
-            <CardContent className="px-0 pb-0">
-              {recentQuotes.length === 0 ? (
-                <div className="px-6 py-8 text-center">
-                  <FileText className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No hay cotizaciones aún.</p>
-                  <Link href="/dashboard/quotes/new" className="mt-3 inline-block">
-                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
-                      <Plus className="w-3.5 h-3.5 mr-1.5" />
-                      Nueva Cotización
-                    </Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {recentQuotes.map((quote) => {
-                    const client = quote.clients as { name?: string; company_name?: string } | null
-                    const clientName = client?.company_name || client?.name || 'Sin cliente'
-                    const dateStr = new Date(quote.created_at).toLocaleDateString('es-MX', {
-                      day: 'numeric',
-                      month: 'short',
-                    })
-                    const status = quote.status as string
-                    return (
-                      <Link
-                        key={quote.id}
-                        href={`/dashboard/quotes/${quote.id}`}
-                        className={`flex items-center justify-between px-6 py-3.5 border-l-[3px] ${STATUS_COLORS[status] ?? 'border-l-slate-300'} hover:bg-muted/40 transition-colors`}
-                      >
-                        <div className="flex items-start gap-3 min-w-0">
-                          <div className="min-w-0">
-                            <div className="text-sm font-medium truncate">{quote.quote_number}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
-                              <span className="truncate max-w-[160px]">{clientName}</span>
-                              <span className="text-muted-foreground/40">·</span>
-                              <span className="flex items-center gap-0.5 shrink-0">
-                                <Clock className="w-3 h-3" />
-                                {dateStr}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 shrink-0 ml-3">
-                          <div className="text-sm font-semibold">
-                            ${Number(quote.total ?? 0).toLocaleString('es-MX', { maximumFractionDigits: 0 })}
-                          </div>
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE_COLORS[status] ?? 'bg-slate-100 text-slate-700'}`}>
-                            {STATUS_LABELS[status] ?? status}
+            </div>
+            {recentQuotes.length === 0 ? (
+              <div className="px-4 py-8 text-center">
+                <FileText className="w-7 h-7 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">No hay cotizaciones aun.</p>
+                <Link href="/dashboard/quotes/new" className="mt-3 inline-block">
+                  <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+                    <Plus className="w-3.5 h-3.5 mr-1.5" />
+                    Nueva Cotizacion
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {recentQuotes.map((quote) => {
+                  const client = quote.clients as { name?: string; company_name?: string } | null
+                  const clientName = client?.company_name || client?.name || 'Sin cliente'
+                  const dateStr = new Date(quote.created_at).toLocaleDateString('es-MX', {
+                    day: 'numeric',
+                    month: 'short',
+                  })
+                  const status = quote.status as string
+                  return (
+                    <Link
+                      key={quote.id}
+                      href={`/dashboard/quotes/${quote.id}`}
+                      className={`flex items-center justify-between px-4 py-2.5 border-l-[3px] ${STATUS_COLORS[status] ?? 'border-l-slate-300'} hover:bg-orange-50/40 transition-colors`}
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium truncate">{quote.quote_number}</div>
+                        <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-2">
+                          <span className="truncate max-w-[160px]">{clientName}</span>
+                          <span className="text-gray-300">·</span>
+                          <span className="flex items-center gap-0.5 shrink-0">
+                            <Clock className="w-3 h-3" />
+                            {dateStr}
                           </span>
                         </div>
-                      </Link>
-                    )
-                  })}
-                  <div className="px-6 py-3 flex justify-center border-t-0">
-                    <Link href="/dashboard/quotes" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-1">
-                      Ver todas las cotizaciones <ChevronRight className="w-3 h-3" />
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 ml-3">
+                        <div className="text-sm font-semibold text-gray-900">
+                          ${Number(quote.total ?? 0).toLocaleString('es-MX', { maximumFractionDigits: 0 })}
+                        </div>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_BADGE_COLORS[status] ?? 'bg-slate-100 text-slate-700'}`}>
+                          {STATUS_LABELS[status] ?? status}
+                        </span>
+                      </div>
                     </Link>
-                  </div>
+                  )
+                })}
+                <div className="px-4 py-2.5 flex justify-center">
+                  <Link href="/dashboard/quotes" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-1">
+                    Ver todas las cotizaciones <ChevronRight className="w-3 h-3" />
+                  </Link>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Quick Actions + Pending Reminders */}
         <div className="space-y-4">
-          {/* Quick Actions — Phase 6.3 */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold">Acciones Rápidas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2.5">
+          {/* Quick Actions */}
+          <div className="bg-white rounded-xl border border-gray-200">
+            <div className="px-4 py-3 border-b border-gray-100">
+              <span className="text-sm font-semibold text-gray-900">Acciones Rapidas</span>
+            </div>
+            <div className="p-3 space-y-2">
               <Link href="/dashboard/quotes/new" className="block">
-                <div className="group flex items-center gap-4 p-3.5 rounded-xl bg-orange-500/10 border border-orange-500/20 hover:bg-orange-500/15 hover:border-orange-500/30 transition-all duration-150 cursor-pointer">
-                  <div className="p-2.5 rounded-lg bg-orange-500/20 group-hover:bg-orange-500/30 transition-colors">
-                    <FileText className="w-5 h-5 text-orange-500" />
+                <div className="group flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200 hover:bg-orange-100/60 transition-all duration-150 cursor-pointer">
+                  <div className="p-2 rounded-lg bg-orange-200/60">
+                    <FileText className="w-4 h-4 text-orange-600" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-orange-400">Nueva Cotización</div>
-                    <div className="text-xs text-muted-foreground">Crea y envía al cliente</div>
+                    <div className="text-sm font-semibold text-orange-700">Nueva Cotizacion</div>
+                    <div className="text-xs text-orange-600/70">Crea y envia al cliente</div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-orange-500/50 ml-auto group-hover:text-orange-500 transition-colors" />
+                  <ChevronRight className="w-4 h-4 text-orange-400 ml-auto" />
                 </div>
               </Link>
 
-              <Link href="/dashboard/clients/new" className="block">
-                <div className="group flex items-center gap-4 p-3.5 rounded-xl border border-border hover:bg-muted/50 hover:border-border/80 transition-all duration-150 cursor-pointer">
-                  <div className="p-2.5 rounded-lg bg-muted group-hover:bg-muted/80 transition-colors">
-                    <Users className="w-5 h-5 text-muted-foreground" />
+              {[
+                { href: '/dashboard/clients/new', icon: Users, label: 'Nuevo Cliente', desc: 'Agrega a tu cartera' },
+                { href: '/dashboard/reminders/new', icon: Bell, label: 'Nuevo Recordatorio', desc: 'Seguimiento puntual' },
+                { href: '/dashboard/analytics', icon: TrendingUp, label: 'Ver Analytics', desc: 'Metricas del negocio' },
+              ].map((action) => (
+                <Link key={action.href} href={action.href} className="block">
+                  <div className="group flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-all duration-150 cursor-pointer">
+                    <div className="p-2 rounded-lg bg-gray-100">
+                      <action.icon className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-gray-900">{action.label}</div>
+                      <div className="text-xs text-gray-500">{action.desc}</div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-gray-500 transition-colors" />
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold">Nuevo Cliente</div>
-                    <div className="text-xs text-muted-foreground">Agrega a tu cartera</div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/40 ml-auto group-hover:text-muted-foreground transition-colors" />
-                </div>
-              </Link>
-
-              <Link href="/dashboard/reminders/new" className="block">
-                <div className="group flex items-center gap-4 p-3.5 rounded-xl border border-border hover:bg-muted/50 hover:border-border/80 transition-all duration-150 cursor-pointer">
-                  <div className="p-2.5 rounded-lg bg-muted group-hover:bg-muted/80 transition-colors">
-                    <Bell className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold">Nuevo Recordatorio</div>
-                    <div className="text-xs text-muted-foreground">Seguimiento puntual</div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/40 ml-auto group-hover:text-muted-foreground transition-colors" />
-                </div>
-              </Link>
-
-              <Link href="/dashboard/analytics" className="block">
-                <div className="group flex items-center gap-4 p-3.5 rounded-xl border border-border hover:bg-muted/50 hover:border-border/80 transition-all duration-150 cursor-pointer">
-                  <div className="p-2.5 rounded-lg bg-muted group-hover:bg-muted/80 transition-colors">
-                    <TrendingUp className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold">Ver Analytics</div>
-                    <div className="text-xs text-muted-foreground">Métricas del negocio</div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/40 ml-auto group-hover:text-muted-foreground transition-colors" />
-                </div>
-              </Link>
-            </CardContent>
-          </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
 
           {/* Upcoming Reminders mini-list */}
           {reminders && reminders.length > 0 && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-base font-semibold">Próximos Recordatorios</CardTitle>
+            <div className="bg-white rounded-xl border border-gray-200">
+              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-900">Proximos Recordatorios</span>
                 <Link href="/dashboard/reminders">
-                  <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1 -mr-2">
+                  <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1 h-7 -mr-2">
                     Ver todos <ChevronRight className="w-3 h-3" />
                   </Button>
                 </Link>
-              </CardHeader>
-              <CardContent className="space-y-2 pb-4">
+              </div>
+              <div className="p-3 space-y-1.5">
                 {reminders.slice(0, 4).map((reminder) => {
                   const isOverdue = reminder.scheduled_date < today
                   const date = new Date(reminder.scheduled_date).toLocaleDateString('es-MX', {
@@ -458,15 +428,15 @@ export default async function DashboardPage() {
                   })
                   return (
                     <Link key={reminder.id} href={`/dashboard/reminders/${reminder.id}`} className="block">
-                      <div className={`flex items-start gap-2.5 p-2.5 rounded-lg hover:bg-muted/40 transition-colors ${
-                        isOverdue ? 'bg-orange-500/5 border border-orange-500/20' : ''
+                      <div className={`flex items-start gap-2.5 p-2 rounded-lg hover:bg-gray-50 transition-colors ${
+                        isOverdue ? 'bg-orange-50/50 border border-orange-200' : ''
                       }`}>
-                        <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${
-                          isOverdue ? 'bg-orange-500' : 'bg-muted-foreground/40'
+                        <div className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${
+                          isOverdue ? 'bg-orange-500' : 'bg-gray-300'
                         }`} />
                         <div className="min-w-0 flex-1">
-                          <div className="text-xs font-medium truncate">{reminder.title}</div>
-                          <div className={`text-xs mt-0.5 ${isOverdue ? 'text-orange-500 font-medium' : 'text-muted-foreground'}`}>
+                          <div className="text-xs font-medium text-gray-900 truncate">{reminder.title}</div>
+                          <div className={`text-xs mt-0.5 ${isOverdue ? 'text-orange-500 font-medium' : 'text-gray-500'}`}>
                             {isOverdue ? 'Vencido · ' : ''}{date}
                           </div>
                         </div>
@@ -474,8 +444,8 @@ export default async function DashboardPage() {
                     </Link>
                   )
                 })}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -7,6 +7,7 @@ import {
   formatUsageLimit,
 } from '@/lib/stripe/helpers'
 import { BillingClient } from './BillingClient'
+import { CreditCard } from 'lucide-react'
 
 export const metadata = {
   title: 'Billing',
@@ -33,7 +34,7 @@ export default async function BillingPage() {
 
   const { data: organization, error: orgError } = await supabase
     .from('organizations')
-    .select('*')
+    .select('id, name, plan, subscription_status, stripe_customer_id, trial_ends_at')
     .eq('id', profile.organization_id)
     .single()
 
@@ -49,67 +50,60 @@ export default async function BillingPage() {
     : null
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Billing & Subscription</h1>
-        <p className="text-gray-600 mt-2">
-          Manage your subscription, payment methods, and billing history
-        </p>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
+          <CreditCard className="w-4 h-4 text-orange-600" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Facturacion</h2>
+          <p className="text-xs text-gray-500">Gestiona tu suscripcion y pagos</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg border p-6">
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">
-            Current Plan
-          </h3>
-          <div className="text-2xl font-bold mb-4">{planDetails.name}</div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Plan Actual</p>
+          <p className="text-xl font-bold text-gray-900">{planDetails.name}</p>
           {planDetails.price !== null && (
-            <div className="text-sm text-gray-600">
-              {planDetails.price === 0 ? 'Free' : `$${planDetails.price}/month`}
-            </div>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {planDetails.price === 0 ? 'Gratis' : `$${planDetails.price}/mes`}
+            </p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg border p-6">
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">
-            Status
-          </h3>
-          <div className="text-2xl font-bold mb-4">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Estado</p>
+          <div className="mt-1">
             <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                 subscriptionStatus === 'active'
-                  ? 'bg-green-50 text-green-700'
+                  ? 'bg-green-100 text-green-700'
                   : subscriptionStatus === 'trialing'
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'bg-red-50 text-red-700'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-red-100 text-red-700'
               }`}
             >
               {getSubscriptionStatusLabel(subscriptionStatus)}
             </span>
           </div>
           {trialDaysRemaining !== null && subscriptionStatus === 'trialing' && (
-            <div className="text-sm text-gray-600">
-              {trialDaysRemaining} days remaining
-            </div>
+            <p className="text-sm text-gray-500 mt-1">{trialDaysRemaining} dias restantes</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg border p-6">
-          <h3 className="text-sm font-semibold text-gray-600 mb-2">
-            Usage Limits
-          </h3>
-          <div className="space-y-2 text-sm">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Limites</p>
+          <div className="space-y-1 text-sm mt-1">
             <div className="flex justify-between">
-              <span className="text-gray-600">Projects:</span>
-              <span className="font-medium">
-                {formatUsageLimit(planDetails.limits.projects)}
-              </span>
+              <span className="text-gray-500">Proyectos:</span>
+              <span className="font-medium text-gray-900">{formatUsageLimit(planDetails.limits.projects)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">API Calls/day:</span>
-              <span className="font-medium">
-                {formatUsageLimit(planDetails.limits.apiCalls)}
-              </span>
+              <span className="text-gray-500">API/dia:</span>
+              <span className="font-medium text-gray-900">{formatUsageLimit(planDetails.limits.apiCalls)}</span>
             </div>
           </div>
         </div>

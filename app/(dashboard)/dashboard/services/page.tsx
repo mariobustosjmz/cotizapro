@@ -1,8 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus } from 'lucide-react'
+import { Plus, Wrench, CheckCircle, Layers } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { ServiceFilters } from './filters'
@@ -87,136 +86,106 @@ export default async function ServicesPage({
   }
 
   const activeServices = services?.filter(s => s.is_active) || []
-  const inactiveServices = services?.filter(s => !s.is_active) || []
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-4">
+      {/* Header + inline stats */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Servicios · {services?.length || 0}</h2>
-          <p className="text-gray-600">Gestiona tu catálogo de servicios</p>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
+            <Wrench className="w-4 h-4 text-orange-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Servicios</h2>
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span>{services?.length || 0} total</span>
+              <span className="text-green-600">{activeServices.length} activos</span>
+              <span>{Object.keys(servicesByCategory).length} categorías</span>
+            </div>
+          </div>
         </div>
         <Link href="/dashboard/services/new">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Servicio
+          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+            <Plus className="w-4 h-4 mr-1" />
+            Nuevo
           </Button>
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total de Servicios
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-gray-900">{services?.length || 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Servicios Activos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-green-600">{activeServices.length}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Categorías
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-orange-600">{Object.keys(servicesByCategory).length}</p>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-4">
-          <ServiceFilters activeUnitType={unit_type} activeFilter={active} defaultSearch={q} />
-        </CardContent>
-      </Card>
+      <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+        <ServiceFilters activeUnitType={unit_type} activeFilter={active} defaultSearch={q} />
+      </div>
 
       {/* Services by Category */}
       {Object.keys(servicesByCategory).length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-3">
           {(Object.entries(servicesByCategory) as [string, Service[]][]).map(([category, categoryServices]) => (
-            <Card key={category}>
-              <CardHeader>
-                <CardTitle>{categoryLabels[category] || 'Otros'}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2 px-4">Servicio</th>
-                        <th className="text-left py-2 px-4">Descripción</th>
-                        <th className="text-right py-2 px-4">Precio Base</th>
-                        <th className="text-center py-2 px-4">Unidad</th>
-                        <th className="text-center py-2 px-4">Estado</th>
-                        <th className="text-right py-2 px-4">Acciones</th>
+            <div key={category} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50/60 border-b border-gray-100">
+                <span className="text-sm font-semibold text-gray-700">{categoryLabels[category] || 'Otros'}</span>
+                <span className="ml-2 text-xs text-gray-400">{categoryServices.length}</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-50">
+                      <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Servicio</th>
+                      <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Descripción</th>
+                      <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Precio</th>
+                      <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Unidad</th>
+                      <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 uppercase">Estado</th>
+                      <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categoryServices.map((service) => (
+                      <tr key={service.id} className="border-b border-gray-50 last:border-0 hover:bg-orange-50/40 cursor-pointer">
+                        <td className="py-2 px-4 text-sm font-medium text-gray-900">{service.name}</td>
+                        <td className="py-2 px-4 text-xs text-gray-500 max-w-xs truncate hidden md:table-cell">
+                          {service.description || '-'}
+                        </td>
+                        <td className="text-right py-2 px-4 text-sm font-medium text-gray-900">
+                          ${Number(service.unit_price).toLocaleString('es-MX')}
+                        </td>
+                        <td className="text-center py-2 px-4 text-xs text-gray-500 hidden sm:table-cell">
+                          {unitTypeLabels[service.unit_type] || service.unit_type}
+                        </td>
+                        <td className="text-center py-2 px-4">
+                          <Badge variant={service.is_active ? 'active' : 'inactive'} className="text-[10px]">
+                            {service.is_active ? 'Activo' : 'Inactivo'}
+                          </Badge>
+                        </td>
+                        <td className="text-right py-2 px-4">
+                          <Link href={`/dashboard/services/${service.id}`}>
+                            <Button variant="outline" size="sm" className="h-7 text-xs px-2">
+                              Ver
+                            </Button>
+                          </Link>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {categoryServices.map((service) => (
-                        <tr key={service.id} className="border-b hover:bg-gray-50">
-                          <td className="py-3 px-4 font-medium">{service.name}</td>
-                          <td className="py-3 px-4 text-gray-600 max-w-md truncate">
-                            {service.description || '-'}
-                          </td>
-                          <td className="text-right py-3 px-4">
-                            ${Number(service.unit_price).toLocaleString('es-MX')}
-                          </td>
-                          <td className="text-center py-3 px-4 text-gray-600">
-                            {unitTypeLabels[service.unit_type] || service.unit_type}
-                          </td>
-                          <td className="text-center py-3 px-4">
-                            <Badge variant={service.is_active ? 'active' : 'inactive'}>
-                              {service.is_active ? 'Activo' : 'Inactivo'}
-                            </Badge>
-                          </td>
-                          <td className="text-right py-3 px-4">
-                            <Link href={`/dashboard/services/${service.id}`}>
-                              <Button variant="outline" size="sm">
-                                Ver
-                              </Button>
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="py-12">
-            <div className="text-center">
-              <p className="text-gray-500 mb-4">No tienes servicios registrados</p>
+        <div className="bg-white rounded-xl border border-gray-200 py-10">
+          <div className="text-center">
+            <Wrench className="mx-auto h-10 w-10 text-gray-300" />
+            <p className="mt-2 text-sm text-gray-500">No tienes servicios registrados</p>
+            <div className="mt-4">
               <Link href="/dashboard/services/new">
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+                  <Plus className="w-4 h-4 mr-1" />
                   Crear Primer Servicio
                 </Button>
               </Link>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   )

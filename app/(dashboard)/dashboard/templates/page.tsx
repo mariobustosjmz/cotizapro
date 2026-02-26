@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Trash2, Edit2 } from 'lucide-react'
+import { FormField } from '@/components/ui/form-field'
+import { Plus, Trash2, Edit2, FileStack } from 'lucide-react'
 import type { QuoteTemplate } from '@/lib/validations/cotizapro'
 
 export default function TemplatesPage() {
@@ -110,15 +109,6 @@ export default function TemplatesPage() {
 
       await fetchTemplates()
       setShowModal(false)
-      setFormData({
-        name: '',
-        description: '',
-        default_terms: '',
-        default_discount_rate: '',
-        is_active: true,
-        promotional_label: '',
-        promotional_valid_until: '',
-      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar template')
     } finally {
@@ -127,17 +117,13 @@ export default function TemplatesPage() {
   }
 
   async function handleDeleteTemplate(templateId: string) {
-    if (!confirm('¿Estás seguro de eliminar este template?')) {
-      return
-    }
+    if (!confirm('Eliminar este template?')) return
 
     setDeleting(templateId)
     setError('')
 
     try {
-      const response = await fetch(`/api/templates/${templateId}`, {
-        method: 'DELETE',
-      })
+      const response = await fetch(`/api/templates/${templateId}`, { method: 'DELETE' })
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -152,172 +138,163 @@ export default function TemplatesPage() {
     }
   }
 
+  const activeCount = templates.filter((t) => t.is_active).length
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Templates · {templates.length}</h2>
-          <p className="text-gray-600">Gestiona tus templates de cotizaciones</p>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
+            <FileStack className="w-4 h-4 text-orange-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Templates</h2>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-gray-500">{templates.length} templates</span>
+              <span className="text-green-600">{activeCount} activos</span>
+            </div>
+          </div>
         </div>
-        <Button onClick={openCreateModal} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nuevo Template
+        <Button onClick={openCreateModal} size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+          <Plus className="w-4 h-4 mr-1" />
+          Nuevo
         </Button>
       </div>
 
-      {/* Error Alert */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-6">
-            <p className="text-sm text-red-700">{error}</p>
-          </CardContent>
-        </Card>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
       )}
 
-      {/* Loading State */}
-      {loading && (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-gray-600">Cargando templates...</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Templates List */}
-      {!loading && templates.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-gray-600 mb-4">No hay templates aún</p>
-            <Button onClick={openCreateModal} variant="outline">
-              Crear primer template
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {!loading && templates.length > 0 && (
-        <div className="grid gap-4">
-          {templates.map((template) => (
-            <Card key={template.id}>
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
-                <div className="flex-1">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    {template.name}
-                    {template.is_active ? (
-                      <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                        Activo
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
-                        Inactivo
-                      </span>
-                    )}
-                  </CardTitle>
-                  {template.description && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {template.description.length > 100
-                        ? `${template.description.slice(0, 100)}...`
-                        : template.description}
-                    </p>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openEditModal(template)}
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteTemplate(template.id)}
-                    disabled={deleting === template.id}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {template.promotional_label && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Etiqueta Promocional:</span>
-                    <span className="font-semibold text-sm">{template.promotional_label}</span>
-                  </div>
-                )}
-                {template.promotional_valid_until && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Válido hasta:</span>
-                    <span className="text-sm">{template.promotional_valid_until}</span>
-                  </div>
-                )}
-                {template.default_discount_rate && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Descuento por defecto:</span>
-                    <span className="font-semibold text-sm">{template.default_discount_rate}%</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+      {loading ? (
+        <div className="py-10 text-center text-sm text-gray-400">Cargando...</div>
+      ) : templates.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 text-center py-10">
+          <FileStack className="mx-auto h-10 w-10 text-gray-300" />
+          <p className="mt-2 text-sm text-gray-500">No hay templates aun</p>
+          <button onClick={openCreateModal} className="mt-2 text-xs font-medium text-orange-600 hover:text-orange-700">
+            Crear el primero
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-50">
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Descripcion</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Descuento</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Promo</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Estado</th>
+                  <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {templates.map((template) => (
+                  <tr key={template.id} className="hover:bg-orange-50/40">
+                    <td className="py-2.5 px-4">
+                      <span className="font-medium text-gray-900">{template.name}</span>
+                    </td>
+                    <td className="py-2.5 px-4 text-gray-500 hidden md:table-cell">
+                      {template.description
+                        ? template.description.length > 60
+                          ? `${template.description.slice(0, 60)}...`
+                          : template.description
+                        : '\u2014'}
+                    </td>
+                    <td className="py-2.5 px-4 text-gray-700 hidden lg:table-cell">
+                      {template.default_discount_rate ? `${template.default_discount_rate}%` : '\u2014'}
+                    </td>
+                    <td className="py-2.5 px-4 hidden lg:table-cell">
+                      {template.promotional_label ? (
+                        <span className="px-2 py-0.5 rounded-full bg-orange-100 text-[10px] font-medium text-orange-700">
+                          {template.promotional_label}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">\u2014</span>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-4">
+                      {template.is_active ? (
+                        <span className="px-2 py-0.5 rounded-full bg-green-100 text-[10px] font-medium text-green-700">
+                          Activo
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-medium text-gray-500">
+                          Inactivo
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => openEditModal(template)}
+                          className="p-1 text-gray-400 hover:text-orange-600 rounded"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTemplate(template.id)}
+                          disabled={deleting === template.id}
+                          className="p-1 text-gray-400 hover:text-red-600 rounded disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <CardTitle>
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl border border-gray-200">
+            <div className="px-4 py-3 border-b border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-900">
                 {editingId ? 'Editar Template' : 'Nuevo Template'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre *</Label>
+              </h3>
+            </div>
+            <form onSubmit={handleSubmit} className="p-4 space-y-4">
+              <FormField label="Nombre" htmlFor="modal_name" required>
+                <Input
+                  id="modal_name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ej: Template HVAC Residencial"
+                  required
+                />
+              </FormField>
+
+              <FormField label="Descripcion" htmlFor="modal_description">
+                <Textarea
+                  id="modal_description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Descripcion del template"
+                  rows={2}
+                />
+              </FormField>
+
+              <FormField label="Terminos y Condiciones" htmlFor="modal_terms">
+                <Textarea
+                  id="modal_terms"
+                  value={formData.default_terms}
+                  onChange={(e) => setFormData({ ...formData, default_terms: e.target.value })}
+                  placeholder="Terminos por defecto en cotizaciones"
+                  rows={2}
+                />
+              </FormField>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField label="Descuento (%)" htmlFor="modal_discount">
                   <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Ej: Template HVAC Residencial"
-                    required
-                  />
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2">
-                  <Label htmlFor="description">Descripción</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Descripción del template"
-                    rows={3}
-                  />
-                </div>
-
-                {/* Default Terms */}
-                <div className="space-y-2">
-                  <Label htmlFor="default_terms">Términos y Condiciones por defecto</Label>
-                  <Textarea
-                    id="default_terms"
-                    value={formData.default_terms}
-                    onChange={(e) => setFormData({ ...formData, default_terms: e.target.value })}
-                    placeholder="Términos que aparecerán por defecto en las cotizaciones"
-                    rows={4}
-                  />
-                </div>
-
-                {/* Default Discount Rate */}
-                <div className="space-y-2">
-                  <Label htmlFor="default_discount_rate">Descuento por defecto (%)</Label>
-                  <Input
-                    id="default_discount_rate"
+                    id="modal_discount"
                     type="number"
                     min="0"
                     max="100"
@@ -326,65 +303,52 @@ export default function TemplatesPage() {
                     onChange={(e) => setFormData({ ...formData, default_discount_rate: e.target.value })}
                     placeholder="0"
                   />
-                </div>
+                </FormField>
 
-                {/* Promotional Label */}
-                <div className="space-y-2">
-                  <Label htmlFor="promotional_label">Etiqueta Promocional</Label>
+                <FormField label="Etiqueta Promo" htmlFor="modal_promo">
                   <Input
-                    id="promotional_label"
+                    id="modal_promo"
                     value={formData.promotional_label}
                     onChange={(e) => setFormData({ ...formData, promotional_label: e.target.value })}
                     placeholder="Ej: Oferta de Primavera"
                   />
-                </div>
+                </FormField>
+              </div>
 
-                {/* Promotional Valid Until */}
-                {formData.promotional_label && (
-                  <div className="space-y-2">
-                    <Label htmlFor="promotional_valid_until">Válido hasta</Label>
-                    <Input
-                      id="promotional_valid_until"
-                      type="date"
-                      value={formData.promotional_valid_until}
-                      onChange={(e) => setFormData({ ...formData, promotional_valid_until: e.target.value })}
-                    />
-                  </div>
-                )}
-
-                {/* Is Active */}
-                <div className="flex items-center gap-2">
-                  <input
-                    id="is_active"
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    className="w-4 h-4 rounded border-gray-300"
+              {formData.promotional_label && (
+                <FormField label="Promo valida hasta" htmlFor="modal_promo_date">
+                  <Input
+                    id="modal_promo_date"
+                    type="date"
+                    value={formData.promotional_valid_until}
+                    onChange={(e) => setFormData({ ...formData, promotional_valid_until: e.target.value })}
                   />
-                  <Label htmlFor="is_active" className="cursor-pointer">
-                    Template activo
-                  </Label>
-                </div>
+                </FormField>
+              )}
 
-                {/* Form Actions */}
-                <div className="flex gap-3 pt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={submitting || !formData.name}
-                  >
-                    {submitting ? 'Guardando...' : (editingId ? 'Actualizar' : 'Crear')}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+              <div className="flex items-center gap-2">
+                <input
+                  id="modal_is_active"
+                  type="checkbox"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
+                />
+                <label htmlFor="modal_is_active" className="text-sm text-gray-700 cursor-pointer">
+                  Template activo
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+                <Button type="button" variant="outline" size="sm" onClick={() => setShowModal(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" size="sm" disabled={submitting || !formData.name} className="bg-orange-500 hover:bg-orange-600 text-white">
+                  {submitting ? 'Guardando...' : (editingId ? 'Actualizar' : 'Crear')}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

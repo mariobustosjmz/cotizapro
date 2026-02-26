@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FormField } from '@/components/ui/form-field'
@@ -57,140 +56,106 @@ export default function NewServicePage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
+    <div className="space-y-4">
+      {/* Compact header */}
+      <div className="flex items-center gap-3">
         <Link href="/dashboard/services">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver
+          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+            <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Nuevo Servicio</h2>
-          <p className="text-gray-600">Agrega un servicio a tu catálogo</p>
+          <h2 className="text-xl font-bold text-gray-900">Nuevo Servicio</h2>
+          <p className="text-xs text-gray-500">Agrega un servicio a tu catálogo</p>
         </div>
       </div>
 
       {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Información del Servicio</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                {error}
-              </div>
-            )}
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <FormField label="Nombre del Servicio" htmlFor="name" required className="md:col-span-2">
-                <Input
-                  id="name"
-                  name="name"
-                  required
-                  placeholder="Instalación de minisplit 12000 BTU"
-                />
-              </FormField>
-
-              <FormField label="Categoría" htmlFor="category" required>
-                <select
-                  id="category"
-                  name="category"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Selecciona una categoría...</option>
-                  <option value="hvac">HVAC</option>
-                  <option value="painting">Pintura</option>
-                  <option value="plumbing">Plomería</option>
-                  <option value="electrical">Eléctrico</option>
-                  <option value="other">Otros</option>
-                </select>
-              </FormField>
-
-              <FormField label="Unidad de Medida" htmlFor="unit_type" required>
-                <select
-                  id="unit_type"
-                  name="unit_type"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Selecciona una unidad...</option>
-                  <option value="fixed">Precio Fijo</option>
-                  <option value="per_hour">Por Hora</option>
-                  <option value="per_sqm">Por Metro Cuadrado (m²)</option>
-                  <option value="per_unit">Por Unidad</option>
-                </select>
-              </FormField>
-
-              <FormField
-                label="Precio Base"
-                htmlFor="unit_price"
-                required
-                hint="Precio predeterminado para este servicio"
-              >
-                <Input
-                  id="unit_price"
-                  name="unit_price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  required
-                  placeholder="0.00"
-                />
-              </FormField>
-
-              <FormField
-                label="Estado"
-                htmlFor="is_active"
-                required
-                hint="Los servicios inactivos no aparecen en las cotizaciones"
-              >
-                <select
-                  id="is_active"
-                  name="is_active"
-                  required
-                  defaultValue="true"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="true">Activo</option>
-                  <option value="false">Inactivo</option>
-                </select>
-              </FormField>
+      <div className="bg-white rounded-xl border border-gray-200">
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+              {error}
             </div>
+          )}
 
-            <FormField label="Descripción" htmlFor="description">
-              <Textarea
-                id="description"
-                name="description"
-                rows={4}
-                placeholder="Detalles del servicio, incluye materiales, garantía, etc."
-              />
+          <FormField label="Nombre del Servicio" htmlFor="name" required>
+            <Input id="name" name="name" required placeholder="Instalación de minisplit 12000 BTU" />
+          </FormField>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <FormField label="Categoría" htmlFor="category" required>
+              <select
+                id="category"
+                name="category"
+                required
+                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">Selecciona...</option>
+                <option value="hvac">HVAC</option>
+                <option value="painting">Pintura</option>
+                <option value="plumbing">Plomería</option>
+                <option value="electrical">Eléctrico</option>
+                <option value="other">Otros</option>
+              </select>
             </FormField>
 
-            <DynamicFieldsSection
-              entityType="service"
-              values={customFields}
-              onChange={setCustomFields}
-            />
+            <FormField label="Unidad de Medida" htmlFor="unit_type" required>
+              <select
+                id="unit_type"
+                name="unit_type"
+                required
+                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="">Selecciona...</option>
+                <option value="fixed">Precio Fijo</option>
+                <option value="per_hour">Por Hora</option>
+                <option value="per_sqm">Por m²</option>
+                <option value="per_unit">Por Unidad</option>
+              </select>
+            </FormField>
 
-            {/* Actions */}
-            <div className="flex justify-end space-x-4">
-              <Link href="/dashboard/services">
-                <Button type="button" variant="outline" disabled={loading}>
-                  Cancelar
-                </Button>
-              </Link>
-              <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
-                {loading ? 'Creando...' : 'Crear Servicio'}
+            <FormField label="Precio Base" htmlFor="unit_price" required hint="Precio predeterminado">
+              <Input id="unit_price" name="unit_price" type="number" min="0" step="0.01" required placeholder="0.00" />
+            </FormField>
+
+            <FormField label="Estado" htmlFor="is_active" required hint="Inactivos no aparecen en cotizaciones">
+              <select
+                id="is_active"
+                name="is_active"
+                required
+                defaultValue="true"
+                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              >
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </FormField>
+          </div>
+
+          <FormField label="Descripción" htmlFor="description">
+            <Textarea id="description" name="description" rows={2} placeholder="Detalles del servicio, materiales, garantía, etc." />
+          </FormField>
+
+          <DynamicFieldsSection
+            entityType="service"
+            values={customFields}
+            onChange={setCustomFields}
+          />
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+            <Link href="/dashboard/services">
+              <Button type="button" variant="outline" size="sm" disabled={loading}>
+                Cancelar
               </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </Link>
+            <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
+              {loading ? 'Creando...' : 'Crear Servicio'}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

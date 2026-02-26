@@ -5,6 +5,8 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/templates - List quote templates
 export async function GET(request: NextRequest) {
   try {

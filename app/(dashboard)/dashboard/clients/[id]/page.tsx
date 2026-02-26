@@ -3,10 +3,9 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
@@ -48,7 +47,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
         } else {
           setError('Cliente no encontrado')
         }
-      } catch (err) {
+      } catch {
         setError('Error al cargar cliente')
       }
     }
@@ -83,8 +82,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al actualizar cliente')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al actualizar cliente')
       }
 
       const updated = await response.json()
@@ -100,7 +99,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   }
 
   async function handleDelete() {
-    if (!confirm('¿Estás seguro de eliminar este cliente? Esta acción no se puede deshacer.')) {
+    if (!confirm('Estas seguro de eliminar este cliente? Esta accion no se puede deshacer.')) {
       return
     }
 
@@ -113,8 +112,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al eliminar cliente')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al eliminar cliente')
       }
 
       router.push('/dashboard/clients')
@@ -125,12 +124,12 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
     }
   }
 
-  if (error) {
+  if (error && !client) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-red-600 font-semibold">Error</p>
-          <p className="text-gray-600">{error}</p>
+          <p className="text-red-600 font-semibold text-sm">Error</p>
+          <p className="text-gray-500 text-xs mt-1">{error}</p>
         </div>
       </div>
     )
@@ -139,151 +138,92 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   if (!client) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Cargando...</p>
+        <p className="text-gray-500 text-sm">Cargando...</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-3">
           <Link href="/dashboard/clients">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver
+            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{client.name}</h2>
-            <p className="text-gray-600">{client.company_name || 'Sin empresa'}</p>
+            <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
+            <p className="text-xs text-gray-500">{client.company_name || 'Sin empresa'}</p>
           </div>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           {!isEditing ? (
             <>
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="outline"
-              >
+              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                 Editar
               </Button>
-              <Button
-                onClick={handleDelete}
-                variant="destructive"
-                disabled={deleting}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
+              <Button onClick={handleDelete} variant="destructive" size="sm" disabled={deleting}>
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </Button>
             </>
           ) : (
-            <Button
-              onClick={() => setIsEditing(false)}
-              variant="outline"
-            >
+            <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
               Cancelar
             </Button>
           )}
         </div>
       </div>
 
-      {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Información del Cliente</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+      )}
+
+      {/* Content */}
+      <div className="bg-white rounded-xl border border-gray-200">
+        <div className="px-4 py-3 border-b border-gray-100">
+          <span className="text-sm font-semibold text-gray-900">Informacion del Cliente</span>
+        </div>
+        <div className="p-4">
           {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField label="Nombre Completo" htmlFor="name" required>
+                  <Input id="name" name="name" required defaultValue={client.name} />
+                </FormField>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre Completo *</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    required
-                    defaultValue={client.name}
-                  />
-                </div>
+                <FormField label="Empresa" htmlFor="company_name">
+                  <Input id="company_name" name="company_name" defaultValue={client.company_name || ''} />
+                </FormField>
 
-                {/* Company Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="company_name">Empresa (Opcional)</Label>
-                  <Input
-                    id="company_name"
-                    name="company_name"
-                    defaultValue={client.company_name || ''}
-                  />
-                </div>
+                <FormField label="Email" htmlFor="email">
+                  <Input id="email" name="email" type="email" defaultValue={client.email || ''} />
+                </FormField>
 
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    defaultValue={client.email || ''}
-                  />
-                </div>
-
-                {/* Phone */}
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    defaultValue={client.phone || ''}
-                  />
-                </div>
+                <FormField label="Telefono" htmlFor="phone">
+                  <Input id="phone" name="phone" type="tel" defaultValue={client.phone || ''} />
+                </FormField>
               </div>
 
-              {/* Address */}
-              <div className="space-y-2">
-                <Label htmlFor="address">Dirección</Label>
-                <Textarea
-                  id="address"
-                  name="address"
-                  rows={3}
-                  defaultValue={client.address || ''}
-                />
-              </div>
+              <FormField label="Direccion" htmlFor="address">
+                <Textarea id="address" name="address" rows={2} defaultValue={client.address || ''} />
+              </FormField>
 
-              {/* Tags */}
-              <div className="space-y-2">
-                <Label htmlFor="tags">Etiquetas</Label>
+              <FormField label="Etiquetas" htmlFor="tags" hint="Separa las etiquetas con comas">
                 <Input
                   id="tags"
                   name="tags"
-                  placeholder="HVAC, Mantenimiento, VIP (separadas por comas)"
+                  placeholder="HVAC, Mantenimiento, VIP"
                   defaultValue={client.tags?.join(', ') || ''}
                 />
-                <p className="text-sm text-gray-500">
-                  Separa las etiquetas con comas
-                </p>
-              </div>
+              </FormField>
 
-              {/* Notes */}
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notas</Label>
-                <Textarea
-                  id="notes"
-                  name="notes"
-                  rows={4}
-                  defaultValue={client.notes || ''}
-                />
-              </div>
+              <FormField label="Notas" htmlFor="notes">
+                <Textarea id="notes" name="notes" rows={2} defaultValue={client.notes || ''} />
+              </FormField>
 
               <DynamicFieldsSection
                 entityType="client"
@@ -291,51 +231,47 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                 onChange={setCustomFields}
               />
 
-              {/* Actions */}
-              <div className="flex justify-end">
-                <Button type="submit" disabled={loading}>
-                  <Save className="w-4 h-4 mr-2" />
-                  {loading ? 'Guardando...' : 'Guardar Cambios'}
+              <div className="flex justify-end pt-2 border-t border-gray-100">
+                <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
+                  <Save className="w-3.5 h-3.5 mr-1" />
+                  {loading ? 'Guardando...' : 'Guardar'}
                 </Button>
               </div>
             </form>
           ) : (
-            <div className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <Label className="text-sm text-gray-500">Nombre</Label>
-                  <p className="text-gray-900 font-medium">{client.name}</p>
+                  <p className="text-xs text-gray-500">Nombre</p>
+                  <p className="text-sm font-medium text-gray-900">{client.name}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Empresa</Label>
-                  <p className="text-gray-900">{client.company_name || '-'}</p>
+                  <p className="text-xs text-gray-500">Empresa</p>
+                  <p className="text-sm text-gray-900">{client.company_name || '-'}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Email</Label>
-                  <p className="text-gray-900">{client.email || '-'}</p>
+                  <p className="text-xs text-gray-500">Email</p>
+                  <p className="text-sm text-gray-900">{client.email || '-'}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Teléfono</Label>
-                  <p className="text-gray-900">{client.phone || '-'}</p>
+                  <p className="text-xs text-gray-500">Telefono</p>
+                  <p className="text-sm text-gray-900">{client.phone || '-'}</p>
                 </div>
               </div>
 
               <div>
-                <Label className="text-sm text-gray-500">Dirección</Label>
-                <p className="text-gray-900">{client.address || '-'}</p>
+                <p className="text-xs text-gray-500">Direccion</p>
+                <p className="text-sm text-gray-900">{client.address || '-'}</p>
               </div>
 
               {client.tags && client.tags.length > 0 && (
                 <div>
-                  <Label className="text-sm text-gray-500">Etiquetas</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <p className="text-xs text-gray-500 mb-1">Etiquetas</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {client.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                        className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-[10px] font-medium"
                       >
                         {tag}
                       </span>
@@ -346,14 +282,14 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
 
               {client.notes && (
                 <div>
-                  <Label className="text-sm text-gray-500">Notas</Label>
-                  <p className="text-gray-900 whitespace-pre-wrap">{client.notes}</p>
+                  <p className="text-xs text-gray-500">Notas</p>
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{client.notes}</p>
                 </div>
               )}
 
-              <div>
-                <Label className="text-sm text-gray-500">Fecha de Creación</Label>
-                <p className="text-gray-900">
+              <div className="pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500">Creado</p>
+                <p className="text-sm text-gray-900">
                   {new Date(client.created_at).toLocaleDateString('es-MX', {
                     year: 'numeric',
                     month: 'long',
@@ -370,8 +306,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
               />
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

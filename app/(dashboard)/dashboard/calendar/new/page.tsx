@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { WorkEventForm } from '@/components/dashboard/work-event-form'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 interface Client {
   id: string
@@ -14,7 +17,7 @@ export const metadata = {
 }
 
 export default async function NewEventPage(props: {
-  searchParams: Promise<{ date?: string; hour?: string; client_id?: string }>
+  searchParams: Promise<{ date?: string; hour?: string; client_id?: string; quote_id?: string }>
 }) {
   const searchParams = await props.searchParams
 
@@ -52,18 +55,29 @@ export default async function NewEventPage(props: {
     company_name: c.company_name,
   }))
 
-  // Validate hour parameter: ensure it's a finite number within 0-23, default to 9
   const rawHour = Number(searchParams.hour)
   const validatedHour = Number.isFinite(rawHour) && rawHour >= 0 && rawHour <= 23 ? rawHour : 9
 
   return (
-    <div className="p-6 max-w-xl">
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">Nuevo Evento</h1>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Link href="/dashboard/calendar">
+          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+        </Link>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Nuevo Evento</h2>
+          <p className="text-xs text-gray-500">Crea un evento de trabajo</p>
+        </div>
+      </div>
       <WorkEventForm
         clients={typedClients}
         defaultDate={searchParams.date}
         defaultHour={validatedHour}
         defaultClientId={searchParams.client_id}
+        quoteId={searchParams.quote_id}
       />
     </div>
   )

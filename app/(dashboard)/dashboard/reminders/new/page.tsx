@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -87,185 +86,150 @@ export default function NewReminderPage() {
     }
   }
 
+  const selectClass = "w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
+    <div className="space-y-4">
+      {/* Compact header */}
+      <div className="flex items-center gap-3">
         <Link href="/dashboard/reminders">
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver
+          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+            <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Nuevo Recordatorio</h2>
-          <p className="text-gray-600">Programa un recordatorio de seguimiento</p>
+          <h2 className="text-xl font-bold text-gray-900">Nuevo Recordatorio</h2>
+          <p className="text-xs text-gray-500">Programa un recordatorio de seguimiento</p>
         </div>
       </div>
 
       {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Información del Recordatorio</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                {error}
-              </div>
-            )}
+      <div className="bg-white rounded-xl border border-gray-200">
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+              {error}
+            </div>
+          )}
 
-            {/* Client Selection */}
-            <FormField label="Cliente" htmlFor="client_id" required>
-              <select
-                id="client_id"
-                name="client_id"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              >
-                <option value="">Selecciona un cliente...</option>
-                {clients.map(client => (
-                  <option key={client.id} value={client.id}>
-                    {client.name} {client.company_name ? `(${client.company_name})` : ''}
-                  </option>
-                ))}
+          {/* Client Selection */}
+          <FormField label="Cliente" htmlFor="client_id" required>
+            <select id="client_id" name="client_id" required className={selectClass}>
+              <option value="">Selecciona un cliente...</option>
+              {clients.map(client => (
+                <option key={client.id} value={client.id}>
+                  {client.name} {client.company_name ? `(${client.company_name})` : ''}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          {clients.length === 0 && (
+            <p className="text-xs text-gray-500">
+              No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 hover:underline">Crear cliente</Link>
+            </p>
+          )}
+
+          <FormField label="Título" htmlFor="title" required>
+            <Input id="title" name="title" required placeholder="Mantenimiento anual de minisplit" />
+          </FormField>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <FormField label="Tipo" htmlFor="reminder_type" required>
+              <select id="reminder_type" name="reminder_type" required className={selectClass}>
+                <option value="follow_up">Seguimiento</option>
+                <option value="maintenance">Mantenimiento</option>
+                <option value="renewal">Renovación</option>
+                <option value="custom">Personalizado</option>
               </select>
             </FormField>
-            {clients.length === 0 && (
-              <p className="text-sm text-gray-500">
-                No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 hover:underline">Crear cliente</Link>
-              </p>
-            )}
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <FormField label="Título" htmlFor="title" required className="md:col-span-2">
-                <Input
-                  id="title"
-                  name="title"
-                  required
-                  placeholder="Mantenimiento anual de minisplit"
-                />
-              </FormField>
+            <FormField label="Prioridad" htmlFor="priority" required>
+              <select id="priority" name="priority" required className={selectClass}>
+                <option value="normal">Normal</option>
+                <option value="low">Baja</option>
+                <option value="high">Alta</option>
+                <option value="urgent">Urgente</option>
+              </select>
+            </FormField>
 
-              <FormField label="Tipo de Recordatorio" htmlFor="reminder_type" required>
-                <select
-                  id="reminder_type"
-                  name="reminder_type"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="follow_up">Seguimiento</option>
-                  <option value="maintenance">Mantenimiento</option>
-                  <option value="renewal">Renovación</option>
-                  <option value="custom">Personalizado</option>
-                </select>
-              </FormField>
-
-              <FormField label="Prioridad" htmlFor="priority" required>
-                <select
-                  id="priority"
-                  name="priority"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="normal">Normal</option>
-                  <option value="low">Baja</option>
-                  <option value="high">Alta</option>
-                  <option value="urgent">Urgente</option>
-                </select>
-              </FormField>
-
-              <FormField label="Fecha Programada" htmlFor="scheduled_date" required>
-                <Input
-                  id="scheduled_date"
-                  name="scheduled_date"
-                  type="date"
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </FormField>
-
-              <FormField label="Categoría de Servicio" htmlFor="related_service_category">
-                <select
-                  id="related_service_category"
-                  name="related_service_category"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Ninguna</option>
-                  <option value="hvac">HVAC</option>
-                  <option value="painting">Pintura</option>
-                  <option value="plumbing">Plomería</option>
-                  <option value="electrical">Eléctrico</option>
-                  <option value="other">Otro</option>
-                </select>
-              </FormField>
-            </div>
-
-            <FormField
-              label="Mensaje"
-              htmlFor="description"
-              hint="Este mensaje se enviará al cliente en la fecha programada"
-            >
-              <Textarea
-                id="description"
-                name="description"
-                rows={4}
-                placeholder="Hola {cliente}, es momento de programar el mantenimiento anual de tu minisplit..."
+            <FormField label="Fecha Programada" htmlFor="scheduled_date" required>
+              <Input
+                id="scheduled_date"
+                name="scheduled_date"
+                type="date"
+                required
+                min={new Date().toISOString().split('T')[0]}
               />
             </FormField>
 
-            {/* Recurring */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="is_recurring"
-                  checked={isRecurring}
-                  onChange={(e) => setIsRecurring(e.target.checked)}
-                  className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded"
-                />
-                <Label htmlFor="is_recurring" className="cursor-pointer">
-                  Recordatorio recurrente
+            <FormField label="Categoría de Servicio" htmlFor="related_service_category">
+              <select id="related_service_category" name="related_service_category" className={selectClass}>
+                <option value="">Ninguna</option>
+                <option value="hvac">HVAC</option>
+                <option value="painting">Pintura</option>
+                <option value="plumbing">Plomería</option>
+                <option value="electrical">Eléctrico</option>
+                <option value="other">Otro</option>
+              </select>
+            </FormField>
+          </div>
+
+          <FormField label="Mensaje" htmlFor="description" hint="Se enviará al cliente en la fecha programada">
+            <Textarea
+              id="description"
+              name="description"
+              rows={2}
+              placeholder="Hola, es momento de programar el mantenimiento anual..."
+            />
+          </FormField>
+
+          {/* Recurring */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="is_recurring"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
+              />
+              <Label htmlFor="is_recurring" className="text-sm cursor-pointer">
+                Recurrente
+              </Label>
+            </div>
+            {isRecurring && (
+              <div className="flex items-center gap-2">
+                <Label htmlFor="recurrence_interval_months" className="text-sm text-gray-600 whitespace-nowrap">
+                  Cada
                 </Label>
+                <Input
+                  id="recurrence_interval_months"
+                  name="recurrence_interval_months"
+                  type="number"
+                  min="1"
+                  max="36"
+                  defaultValue="12"
+                  required={isRecurring}
+                  className="w-20"
+                />
+                <span className="text-sm text-gray-500">meses</span>
               </div>
+            )}
+          </div>
 
-              {isRecurring && (
-                <div className="pl-6">
-                  <FormField
-                    label="Repetir cada (meses)"
-                    htmlFor="recurrence_interval_months"
-                    required={isRecurring}
-                    hint="El recordatorio se creará automáticamente cada vez que se complete"
-                  >
-                    <Input
-                      id="recurrence_interval_months"
-                      name="recurrence_interval_months"
-                      type="number"
-                      min="1"
-                      max="36"
-                      defaultValue="12"
-                      required={isRecurring}
-                    />
-                  </FormField>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-end space-x-4">
-              <Link href="/dashboard/reminders">
-                <Button type="button" variant="outline" disabled={loading}>
-                  Cancelar
-                </Button>
-              </Link>
-              <Button type="submit" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
-                {loading ? 'Creando...' : 'Crear Recordatorio'}
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+            <Link href="/dashboard/reminders">
+              <Button type="button" variant="outline" size="sm" disabled={loading}>
+                Cancelar
               </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </Link>
+            <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
+              {loading ? 'Creando...' : 'Crear Recordatorio'}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

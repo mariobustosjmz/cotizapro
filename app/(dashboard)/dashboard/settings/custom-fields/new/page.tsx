@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { FormField } from '@/components/ui/form-field'
+import { ArrowLeft } from 'lucide-react'
 import type { EntityType, FieldType } from '@/types/custom-fields'
 
 const ENTITY_OPTIONS: { label: string; value: EntityType }[] = [
@@ -14,12 +18,12 @@ const ENTITY_OPTIONS: { label: string; value: EntityType }[] = [
 const FIELD_TYPE_OPTIONS: { label: string; value: FieldType }[] = [
   { label: 'Texto corto', value: 'text' },
   { label: 'Texto largo', value: 'textarea' },
-  { label: 'Número', value: 'number' },
+  { label: 'Numero', value: 'number' },
   { label: 'Fecha', value: 'date' },
   { label: 'Lista de opciones', value: 'select' },
   { label: 'Checkbox', value: 'checkbox' },
   { label: 'URL', value: 'url' },
-  { label: 'Teléfono', value: 'phone' },
+  { label: 'Telefono', value: 'phone' },
   { label: 'Email', value: 'email' },
 ]
 
@@ -116,201 +120,181 @@ export default function NewCustomFieldPage() {
 
       router.push(`/dashboard/settings/custom-fields?entity_type=${entityType}`)
     } catch {
-      setError('Error de conexión. Por favor intenta de nuevo.')
+      setError('Error de conexion. Por favor intenta de nuevo.')
     } finally {
       setSubmitting(false)
     }
   }
 
-  const inputClass =
-    'block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
-  const labelClass = 'block text-sm font-medium text-gray-700 mb-1'
+  const selectClass = "w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-6">
-        <Link
-          href="/dashboard/settings/custom-fields"
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
-          &larr; Campos Personalizados
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Link href="/dashboard/settings/custom-fields">
+          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">Nuevo Campo</h1>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Nuevo Campo</h2>
+          <p className="text-xs text-gray-500">Define un campo personalizado</p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-lg border border-gray-200 bg-white p-6">
-        {error && (
-          <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
-        )}
+      {/* Form */}
+      <div className="bg-white rounded-xl border border-gray-200">
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+          )}
 
-        {/* Entity type */}
-        <div>
-          <label className={labelClass}>Entidad</label>
-          <select
-            className={inputClass}
-            value={entityType}
-            onChange={(e) => setEntityType(e.target.value as EntityType)}
-          >
-            {ENTITY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <FormField label="Entidad" htmlFor="entity_type" required>
+              <select
+                id="entity_type"
+                className={selectClass}
+                value={entityType}
+                onChange={(e) => setEntityType(e.target.value as EntityType)}
+              >
+                {ENTITY_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </FormField>
 
-        {/* Field label */}
-        <div>
-          <label className={labelClass}>
-            Etiqueta <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className={inputClass}
-            value={fieldLabel}
-            onChange={(e) => handleLabelChange(e.target.value)}
-            placeholder="Ej: Número de Licencia"
-            required
-          />
-        </div>
+            <FormField label="Tipo" htmlFor="field_type" required>
+              <select
+                id="field_type"
+                className={selectClass}
+                value={fieldType}
+                onChange={(e) => setFieldType(e.target.value as FieldType)}
+              >
+                {FIELD_TYPE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </FormField>
+          </div>
 
-        {/* Field key */}
-        <div>
-          <label className={labelClass}>
-            Identificador <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className={inputClass}
-            value={fieldKey}
-            onChange={(e) => {
-              setFieldKeyManual(true)
-              setFieldKey(e.target.value)
-            }}
-            placeholder="numero_licencia"
-            pattern="^[a-z0-9_]+$"
-            title="Solo letras minúsculas, números y guiones bajos"
-            required
-          />
-          <p className="mt-1 text-xs text-gray-400">
-            Solo letras minúsculas, números y guiones bajos. No se puede cambiar después.
-          </p>
-        </div>
+          <FormField label="Etiqueta" htmlFor="field_label" required>
+            <Input
+              id="field_label"
+              value={fieldLabel}
+              onChange={(e) => handleLabelChange(e.target.value)}
+              placeholder="Ej: Numero de Licencia"
+              required
+            />
+          </FormField>
 
-        {/* Field type */}
-        <div>
-          <label className={labelClass}>
-            Tipo <span className="text-red-500">*</span>
-          </label>
-          <select
-            className={inputClass}
-            value={fieldType}
-            onChange={(e) => setFieldType(e.target.value as FieldType)}
-          >
-            {FIELD_TYPE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+          <FormField label="Identificador" htmlFor="field_key" required hint="Solo letras minusculas, numeros y guiones bajos. No se puede cambiar despues.">
+            <Input
+              id="field_key"
+              value={fieldKey}
+              onChange={(e) => {
+                setFieldKeyManual(true)
+                setFieldKey(e.target.value)
+              }}
+              placeholder="numero_licencia"
+              pattern="^[a-z0-9_]+$"
+              title="Solo letras minusculas, numeros y guiones bajos"
+              required
+            />
+          </FormField>
 
-        {/* Select options */}
-        {fieldType === 'select' && (
-          <div>
-            <label className={labelClass}>Opciones</label>
+          {/* Select options */}
+          {fieldType === 'select' && (
             <div className="space-y-2">
-              {options.map((opt, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    className={`${inputClass} flex-1`}
-                    value={opt.value}
-                    onChange={(e) => handleOptionChange(i, 'value', e.target.value)}
-                    placeholder="valor"
-                  />
-                  <input
-                    type="text"
-                    className={`${inputClass} flex-1`}
-                    value={opt.label}
-                    onChange={(e) => handleOptionChange(i, 'label', e.target.value)}
-                    placeholder="etiqueta"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveOption(i)}
-                    className="shrink-0 text-gray-400 hover:text-red-500"
-                    disabled={options.length === 1}
-                  >
-                    &times;
-                  </button>
-                </div>
-              ))}
+              <span className="text-sm font-medium text-gray-700">Opciones</span>
+              <div className="space-y-2">
+                {options.map((opt, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={opt.value}
+                      onChange={(e) => handleOptionChange(i, 'value', e.target.value)}
+                      placeholder="valor"
+                      className="flex-1"
+                    />
+                    <Input
+                      value={opt.label}
+                      onChange={(e) => handleOptionChange(i, 'label', e.target.value)}
+                      placeholder="etiqueta"
+                      className="flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveOption(i)}
+                      className="shrink-0 text-gray-400 hover:text-red-500 text-lg"
+                      disabled={options.length === 1}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={handleAddOption}
+                className="text-xs font-medium text-orange-600 hover:text-orange-700"
+              >
+                + Agregar opcion
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleAddOption}
-              className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-500"
-            >
-              + Agregar opción
-            </button>
+          )}
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {/* Placeholder */}
+            {fieldType !== 'checkbox' && (
+              <FormField label="Placeholder" htmlFor="placeholder" hint="Opcional">
+                <Input
+                  id="placeholder"
+                  value={placeholder}
+                  onChange={(e) => setPlaceholder(e.target.value)}
+                  placeholder="Texto de ayuda"
+                />
+              </FormField>
+            )}
+
+            {/* Default value */}
+            {fieldType !== 'checkbox' && fieldType !== 'select' && (
+              <FormField label="Valor por defecto" htmlFor="default_value" hint="Opcional">
+                <Input
+                  id="default_value"
+                  value={defaultValue}
+                  onChange={(e) => setDefaultValue(e.target.value)}
+                />
+              </FormField>
+            )}
           </div>
-        )}
 
-        {/* Required */}
-        <div className="flex items-center gap-2">
-          <input
-            id="is_required"
-            type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-blue-600"
-            checked={isRequired}
-            onChange={(e) => setIsRequired(e.target.checked)}
-          />
-          <label htmlFor="is_required" className="text-sm text-gray-700">
-            Campo requerido
-          </label>
-        </div>
-
-        {/* Placeholder */}
-        {fieldType !== 'checkbox' && (
-          <div>
-            <label className={labelClass}>Placeholder (opcional)</label>
+          {/* Required */}
+          <div className="flex items-center gap-2">
             <input
-              type="text"
-              className={inputClass}
-              value={placeholder}
-              onChange={(e) => setPlaceholder(e.target.value)}
-              placeholder="Texto de ayuda en el campo"
+              id="is_required"
+              type="checkbox"
+              className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
+              checked={isRequired}
+              onChange={(e) => setIsRequired(e.target.checked)}
             />
+            <label htmlFor="is_required" className="text-sm text-gray-700 cursor-pointer">
+              Campo requerido
+            </label>
           </div>
-        )}
 
-        {/* Default value */}
-        {fieldType !== 'checkbox' && fieldType !== 'select' && (
-          <div>
-            <label className={labelClass}>Valor por defecto (opcional)</label>
-            <input
-              type="text"
-              className={inputClass}
-              value={defaultValue}
-              onChange={(e) => setDefaultValue(e.target.value)}
-            />
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+            <Link href="/dashboard/settings/custom-fields">
+              <Button type="button" variant="outline" size="sm" disabled={submitting}>
+                Cancelar
+              </Button>
+            </Link>
+            <Button type="submit" size="sm" disabled={submitting} className="bg-orange-500 hover:bg-orange-600 text-white">
+              {submitting ? 'Guardando...' : 'Crear Campo'}
+            </Button>
           </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
-          <Link
-            href="/dashboard/settings/custom-fields"
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Cancelar
-          </Link>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            {submitting ? 'Guardando...' : 'Crear Campo'}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   )
 }

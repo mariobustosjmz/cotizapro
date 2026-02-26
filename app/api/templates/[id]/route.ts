@@ -5,6 +5,8 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 
+export const dynamic = 'force-dynamic'
+
 // PATCH /api/templates/[id] - Update template
 export async function PATCH(
   request: NextRequest,
@@ -56,6 +58,30 @@ export async function PATCH(
     }
 
     const body = await request.json()
+
+    // Handle usage_count increment (best-effort, no validation needed)
+    if (body.usage_count_increment === true) {
+      const { error: rpcError } = await supabase.rpc('increment_template_usage', { template_id: id })
+      if (rpcError) {
+        // Fallback: read current count and increment manually
+        const { data: current } = await supabase
+          .from('quote_templates')
+          .select('usage_count')
+          .eq('id', id)
+          .eq('organization_id', profile.organization_id)
+          .single()
+
+        if (current) {
+          await supabase
+            .from('quote_templates')
+            .update({ usage_count: (Number(current.usage_count) || 0) + 1 })
+            .eq('id', id)
+            .eq('organization_id', profile.organization_id)
+        }
+      }
+      return NextResponse.json({ success: true })
+    }
+
     const validation = updateQuoteTemplateSchema.safeParse(body)
 
     if (!validation.success) {
@@ -65,18 +91,26 @@ export async function PATCH(
       }, { status: 400 })
     }
 
+    // Map default_terms to actual DB column name default_terms_and_conditions
+    const { default_terms, ...restData } = validation.data
+    const updatePayload = {
+      ...restData,
+      ...(default_terms !== undefined ? { default_terms_and_conditions: default_terms } : {}),
+    }
+
     logger.database('UPDATE', 'quote_templates', { templateId: id })
+
     const { data: updated, error: updateError } = await supabase
       .from('quote_templates')
-      .update(validation.data)
+      .update(updatePayload)
       .eq('id', id)
       .eq('organization_id', profile.organization_id)
       .select(
-        'id, organization_id, name, description, default_items, default_terms, default_discount_rate, is_active, promotional_label, promotional_valid_until, created_at'
+        'id, organization_id, name, description, default_items, default_terms_and_conditions, default_discount_rate, is_active, promotional_label, promotional_valid_until, created_at'
       )
       .single()
 
-    if (updateError) {
+    if (updateError || !updated) {
       logger.error('Error updating template', updateError, { templateId: id })
       return handleApiError(
         ApiErrors.INTERNAL_ERROR('Failed to update template'),
@@ -84,6 +118,7 @@ export async function PATCH(
       )
     }
 
+    logger.info('Template updated successfully', { templateId: id, name: updated.name })
     return NextResponse.json({ data: updated })
   } catch (error) {
     logger.error('Unexpected error in PATCH /api/templates/[id]', error)

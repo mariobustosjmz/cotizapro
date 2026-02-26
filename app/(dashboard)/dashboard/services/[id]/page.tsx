@@ -3,10 +3,9 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
@@ -45,7 +44,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         } else {
           setError('Servicio no encontrado')
         }
-      } catch (err) {
+      } catch {
         setError('Error al cargar servicio')
       }
     }
@@ -78,8 +77,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al actualizar servicio')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al actualizar servicio')
       }
 
       const updated = await response.json()
@@ -93,7 +92,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   }
 
   async function handleDelete() {
-    if (!confirm('¿Estás seguro de eliminar este servicio? Esta acción no se puede deshacer.')) {
+    if (!confirm('Estas seguro de eliminar este servicio? Esta accion no se puede deshacer.')) {
       return
     }
 
@@ -106,8 +105,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al eliminar servicio')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al eliminar servicio')
       }
 
       router.push('/dashboard/services')
@@ -121,7 +120,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   if (!service) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Cargando...</p>
+        <p className="text-gray-500 text-sm">Cargando...</p>
       </div>
     )
   }
@@ -129,170 +128,113 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   const categoryLabels: Record<string, string> = {
     hvac: 'HVAC',
     painting: 'Pintura',
-    plumbing: 'Plomería',
-    electrical: 'Eléctrico',
+    plumbing: 'Plomeria',
+    electrical: 'Electrico',
     other: 'Otros'
   }
 
+  const unitTypeLabels: Record<string, string> = {
+    fixed: 'Fijo',
+    per_hour: 'Por Hora',
+    per_sqm: 'Por m\u00B2',
+    per_unit: 'Por Unidad',
+  }
+
+  const selectClass = 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500'
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-3">
           <Link href="/dashboard/services">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver
+            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
           <div>
-            <div className="flex items-center space-x-3">
-              <h2 className="text-2xl font-bold text-gray-900">{service.name}</h2>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                service.is_active
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-700'
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900">{service.name}</h2>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                service.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
               }`}>
                 {service.is_active ? 'Activo' : 'Inactivo'}
               </span>
             </div>
-            <p className="text-gray-600">{categoryLabels[service.category]}</p>
+            <p className="text-xs text-gray-500">{categoryLabels[service.category]}</p>
           </div>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           {!isEditing ? (
             <>
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="outline"
-              >
+              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                 Editar
               </Button>
-              <Button
-                onClick={handleDelete}
-                variant="destructive"
-                disabled={deleting}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
+              <Button onClick={handleDelete} variant="destructive" size="sm" disabled={deleting}>
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </Button>
             </>
           ) : (
-            <Button
-              onClick={() => setIsEditing(false)}
-              variant="outline"
-            >
+            <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
               Cancelar
             </Button>
           )}
         </div>
       </div>
 
-      {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Información del Servicio</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+      )}
+
+      {/* Content */}
+      <div className="bg-white rounded-xl border border-gray-200">
+        <div className="px-4 py-3 border-b border-gray-100">
+          <span className="text-sm font-semibold text-gray-900">Informacion del Servicio</span>
+        </div>
+        <div className="p-4">
           {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <FormField label="Nombre del Servicio" htmlFor="name" required>
+                <Input id="name" name="name" required defaultValue={service.name} />
+              </FormField>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Name */}
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="name">Nombre del Servicio *</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    required
-                    defaultValue={service.name}
-                  />
-                </div>
-
-                {/* Category */}
-                <div className="space-y-2">
-                  <Label htmlFor="category">Categoría *</Label>
-                  <select
-                    id="category"
-                    name="category"
-                    required
-                    defaultValue={service.category}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField label="Categoria" htmlFor="category" required>
+                  <select id="category" name="category" required defaultValue={service.category} className={selectClass}>
                     <option value="hvac">HVAC</option>
                     <option value="painting">Pintura</option>
-                    <option value="plumbing">Plomería</option>
-                    <option value="electrical">Eléctrico</option>
+                    <option value="plumbing">Plomeria</option>
+                    <option value="electrical">Electrico</option>
                     <option value="other">Otros</option>
                   </select>
-                </div>
+                </FormField>
 
-                {/* Unit Type */}
-                <div className="space-y-2">
-                  <Label htmlFor="unit_type">Unidad de Medida *</Label>
-                  <select
-                    id="unit_type"
-                    name="unit_type"
-                    required
-                    defaultValue={service.unit_type}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+                <FormField label="Unidad de Medida" htmlFor="unit_type" required>
+                  <select id="unit_type" name="unit_type" required defaultValue={service.unit_type} className={selectClass}>
                     <option value="fixed">Precio Fijo</option>
                     <option value="per_hour">Por Hora</option>
-                    <option value="per_sqm">Por Metro Cuadrado (m²)</option>
+                    <option value="per_sqm">Por Metro Cuadrado (m&#178;)</option>
                     <option value="per_unit">Por Unidad</option>
                   </select>
-                </div>
+                </FormField>
 
-                {/* Default Price */}
-                <div className="space-y-2">
-                  <Label htmlFor="unit_price">Precio Base *</Label>
-                  <Input
-                    id="unit_price"
-                    name="unit_price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    required
-                    defaultValue={service.unit_price}
-                  />
-                </div>
+                <FormField label="Precio Base" htmlFor="unit_price" required>
+                  <Input id="unit_price" name="unit_price" type="number" min="0" step="0.01" required defaultValue={service.unit_price} />
+                </FormField>
 
-                {/* Status */}
-                <div className="space-y-2">
-                  <Label htmlFor="is_active">Estado *</Label>
-                  <select
-                    id="is_active"
-                    name="is_active"
-                    required
-                    defaultValue={service.is_active ? 'true' : 'false'}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+                <FormField label="Estado" htmlFor="is_active" required hint="Los servicios inactivos no aparecen en las cotizaciones">
+                  <select id="is_active" name="is_active" required defaultValue={service.is_active ? 'true' : 'false'} className={selectClass}>
                     <option value="true">Activo</option>
                     <option value="false">Inactivo</option>
                   </select>
-                  <p className="text-sm text-gray-500">
-                    Los servicios inactivos no aparecen en las cotizaciones
-                  </p>
-                </div>
+                </FormField>
               </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  rows={4}
-                  defaultValue={service.description || ''}
-                />
-              </div>
+              <FormField label="Descripcion" htmlFor="description">
+                <Textarea id="description" name="description" rows={2} defaultValue={service.description || ''} />
+              </FormField>
 
               <DynamicFieldsSection
                 entityType="service"
@@ -300,49 +242,41 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 onChange={setCustomFields}
               />
 
-              {/* Actions */}
-              <div className="flex justify-end">
-                <Button type="submit" disabled={loading}>
-                  <Save className="w-4 h-4 mr-2" />
-                  {loading ? 'Guardando...' : 'Guardar Cambios'}
+              <div className="flex justify-end pt-2 border-t border-gray-100">
+                <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
+                  <Save className="w-3.5 h-3.5 mr-1" />
+                  {loading ? 'Guardando...' : 'Guardar'}
                 </Button>
               </div>
             </form>
           ) : (
-            <div className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <Label className="text-sm text-gray-500">Nombre</Label>
-                  <p className="text-gray-900 font-medium">{service.name}</p>
+                  <p className="text-xs text-gray-500">Nombre</p>
+                  <p className="text-sm font-medium text-gray-900">{service.name}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Categoría</Label>
-                  <p className="text-gray-900">{categoryLabels[service.category]}</p>
+                  <p className="text-xs text-gray-500">Categoria</p>
+                  <p className="text-sm text-gray-900">{categoryLabels[service.category]}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Precio Base</Label>
-                  <p className="text-gray-900 text-xl font-bold">
+                  <p className="text-xs text-gray-500">Precio Base</p>
+                  <p className="text-lg font-bold text-green-600">
                     ${Number(service.unit_price).toLocaleString('es-MX')}
                   </p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Unidad de Medida</Label>
-                  <p className="text-gray-900">{service.unit_type}</p>
+                  <p className="text-xs text-gray-500">Unidad de Medida</p>
+                  <p className="text-sm text-gray-900">{unitTypeLabels[service.unit_type] || service.unit_type}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Estado</Label>
-                  <p className="text-gray-900">
-                    {service.is_active ? 'Activo' : 'Inactivo'}
-                  </p>
+                  <p className="text-xs text-gray-500">Estado</p>
+                  <p className="text-sm text-gray-900">{service.is_active ? 'Activo' : 'Inactivo'}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Fecha de Creación</Label>
-                  <p className="text-gray-900">
+                  <p className="text-xs text-gray-500">Creado</p>
+                  <p className="text-sm text-gray-900">
                     {new Date(service.created_at).toLocaleDateString('es-MX', {
                       year: 'numeric',
                       month: 'long',
@@ -354,8 +288,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
               {service.description && (
                 <div>
-                  <Label className="text-sm text-gray-500">Descripción</Label>
-                  <p className="text-gray-900 whitespace-pre-wrap">{service.description}</p>
+                  <p className="text-xs text-gray-500">Descripcion</p>
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{service.description}</p>
                 </div>
               )}
 
@@ -367,8 +301,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               />
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

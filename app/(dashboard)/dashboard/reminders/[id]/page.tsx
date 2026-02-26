@@ -3,10 +3,9 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft, Trash2, Save, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -42,32 +41,21 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
   const [reminder, setReminder] = useState<Reminder | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
-  console.log('[ReminderDetails] Component mounted, resolvedParams:', resolvedParams, 'id:', id)
-
   useEffect(() => {
     async function fetchReminder() {
-      console.log('[ReminderDetails] useEffect triggered, id:', id, 'type:', typeof id)
       if (!id || id === 'undefined') {
-        console.error('[ReminderDetails] No valid ID provided!')
-        setError('ID de recordatorio inválido')
+        setError('ID de recordatorio invalido')
         return
       }
       try {
-        console.log('[ReminderDetails] Fetching reminder:', id)
         const response = await fetch(`/api/reminders/${id}`)
-        console.log('[ReminderDetails] Response status:', response.status, response.statusText)
-
         if (response.ok) {
           const data = await response.json()
-          console.log('[ReminderDetails] Response data:', data)
           setReminder(data.data)
         } else {
-          const errorText = await response.text()
-          console.error('[ReminderDetails] Error response:', response.status, errorText)
           setError('Recordatorio no encontrado')
         }
-      } catch (err) {
-        console.error('[ReminderDetails] Fetch error:', err)
+      } catch {
         setError('Error al cargar recordatorio')
       }
     }
@@ -99,8 +87,8 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al actualizar recordatorio')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al actualizar recordatorio')
       }
 
       const updated = await response.json()
@@ -114,7 +102,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
   }
 
   async function handleDelete() {
-    if (!confirm('¿Estás seguro de eliminar este recordatorio? Esta acción no se puede deshacer.')) {
+    if (!confirm('Estas seguro de eliminar este recordatorio? Esta accion no se puede deshacer.')) {
       return
     }
 
@@ -127,8 +115,8 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al eliminar recordatorio')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al eliminar recordatorio')
       }
 
       router.push('/dashboard/reminders')
@@ -151,8 +139,8 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al actualizar estado')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Error al actualizar estado')
       }
 
       const updated = await response.json()
@@ -167,7 +155,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
   if (!reminder) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Cargando...</p>
+        <p className="text-gray-500 text-sm">{error || 'Cargando...'}</p>
       </div>
     )
   }
@@ -175,246 +163,180 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
   const today = new Date().toISOString().split('T')[0]
   const isOverdue = reminder.status === 'pending' && reminder.scheduled_date < today
 
-  const priorityColors = {
+  const priorityColors: Record<string, string> = {
     low: 'bg-gray-100 text-gray-700',
     normal: 'bg-blue-100 text-blue-700',
     high: 'bg-orange-100 text-orange-700',
     urgent: 'bg-red-100 text-red-700',
   }
 
-  const statusColors = {
+  const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700',
     completed: 'bg-green-100 text-green-700',
     cancelled: 'bg-gray-100 text-gray-700',
   }
 
+  const priorityLabels: Record<string, string> = {
+    low: 'Baja', normal: 'Normal', high: 'Alta', urgent: 'Urgente',
+  }
+
+  const statusLabels: Record<string, string> = {
+    pending: 'Pendiente', completed: 'Completado', cancelled: 'Cancelado',
+  }
+
+  const typeLabels: Record<string, string> = {
+    follow_up: 'Seguimiento', maintenance: 'Mantenimiento', renewal: 'Renovacion', custom: 'Personalizado',
+  }
+
+  const categoryLabels: Record<string, string> = {
+    hvac: 'HVAC', painting: 'Pintura', plumbing: 'Plomeria', electrical: 'Electrico', other: 'Otro',
+  }
+
+  const selectClass = 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500'
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-3">
           <Link href="/dashboard/reminders">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver
+            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </Link>
           <div>
-            <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold text-gray-900">{reminder.title}</h1>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900">{reminder.title}</h2>
               {isOverdue && (
-                <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-1" />
+                <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[10px] font-medium flex items-center gap-0.5">
+                  <AlertCircle className="w-3 h-3" />
                   Atrasado
                 </span>
               )}
             </div>
-            <p className="text-gray-600">
-              {reminder.clients.name}
-            </p>
+            <p className="text-xs text-gray-500">{reminder.clients.name}</p>
           </div>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           {!isEditing ? (
             <>
               {reminder.status === 'pending' && (
                 <>
-                  <Button
-                    onClick={() => handleStatusChange('completed')}
-                    disabled={loading}
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                  <Button onClick={() => handleStatusChange('completed')} size="sm" disabled={loading} className="bg-green-600 hover:bg-green-700 text-white">
+                    <CheckCircle className="w-3.5 h-3.5 mr-1" />
                     Completar
                   </Button>
-                  <Button
-                    onClick={() => handleStatusChange('cancelled')}
-                    variant="outline"
-                    disabled={loading}
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
+                  <Button onClick={() => handleStatusChange('cancelled')} variant="outline" size="sm" disabled={loading}>
+                    <XCircle className="w-3.5 h-3.5 mr-1" />
                     Cancelar
                   </Button>
-                  <Button
-                    onClick={() => setIsEditing(true)}
-                    variant="outline"
-                  >
+                  <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
                     Editar
                   </Button>
                 </>
               )}
-              <Button
-                onClick={handleDelete}
-                variant="destructive"
-                disabled={deleting}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {deleting ? 'Eliminando...' : 'Eliminar'}
+              <Button onClick={handleDelete} variant="destructive" size="sm" disabled={deleting}>
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
+                {deleting ? '...' : 'Eliminar'}
               </Button>
             </>
           ) : (
-            <Button
-              onClick={() => setIsEditing(false)}
-              variant="outline"
-            >
-              Cancelar Edición
+            <Button onClick={() => setIsEditing(false)} variant="outline" size="sm">
+              Cancelar
             </Button>
           )}
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
       )}
 
-      {/* Main Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Información del Recordatorio</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {/* Content */}
+      <div className="bg-white rounded-xl border border-gray-200">
+        <div className="px-4 py-3 border-b border-gray-100">
+          <span className="text-sm font-semibold text-gray-900">Informacion del Recordatorio</span>
+        </div>
+        <div className="p-4">
           {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title */}
-              <div className="space-y-2">
-                <Label htmlFor="title">Título *</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  required
-                  defaultValue={reminder.title}
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <FormField label="Titulo" htmlFor="title" required>
+                <Input id="title" name="title" required defaultValue={reminder.title} />
+              </FormField>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Reminder Type */}
-                <div className="space-y-2">
-                  <Label htmlFor="reminder_type">Tipo de Recordatorio *</Label>
-                  <select
-                    id="reminder_type"
-                    name="reminder_type"
-                    required
-                    defaultValue={reminder.reminder_type}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField label="Tipo de Recordatorio" htmlFor="reminder_type" required>
+                  <select id="reminder_type" name="reminder_type" required defaultValue={reminder.reminder_type} className={selectClass}>
                     <option value="follow_up">Seguimiento</option>
                     <option value="maintenance">Mantenimiento</option>
-                    <option value="renewal">Renovación</option>
+                    <option value="renewal">Renovacion</option>
                     <option value="custom">Personalizado</option>
                   </select>
-                </div>
+                </FormField>
 
-                {/* Priority */}
-                <div className="space-y-2">
-                  <Label htmlFor="priority">Prioridad *</Label>
-                  <select
-                    id="priority"
-                    name="priority"
-                    required
-                    defaultValue={reminder.priority}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+                <FormField label="Prioridad" htmlFor="priority" required>
+                  <select id="priority" name="priority" required defaultValue={reminder.priority} className={selectClass}>
                     <option value="normal">Normal</option>
                     <option value="low">Baja</option>
                     <option value="high">Alta</option>
                     <option value="urgent">Urgente</option>
                   </select>
-                </div>
+                </FormField>
 
-                {/* Scheduled Date */}
-                <div className="space-y-2">
-                  <Label htmlFor="scheduled_date">Fecha Programada *</Label>
-                  <Input
-                    id="scheduled_date"
-                    name="scheduled_date"
-                    type="date"
-                    required
-                    defaultValue={reminder.scheduled_date}
-                  />
-                </div>
+                <FormField label="Fecha Programada" htmlFor="scheduled_date" required>
+                  <Input id="scheduled_date" name="scheduled_date" type="date" required defaultValue={reminder.scheduled_date} />
+                </FormField>
 
-                {/* Service Category */}
-                <div className="space-y-2">
-                  <Label htmlFor="related_service_category">Categoría de Servicio</Label>
-                  <select
-                    id="related_service_category"
-                    name="related_service_category"
-                    defaultValue={reminder.related_service_category || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+                <FormField label="Categoria de Servicio" htmlFor="related_service_category">
+                  <select id="related_service_category" name="related_service_category" defaultValue={reminder.related_service_category || ''} className={selectClass}>
                     <option value="">Ninguna</option>
                     <option value="hvac">HVAC</option>
                     <option value="painting">Pintura</option>
-                    <option value="plumbing">Plomería</option>
-                    <option value="electrical">Eléctrico</option>
+                    <option value="plumbing">Plomeria</option>
+                    <option value="electrical">Electrico</option>
                     <option value="other">Otro</option>
                   </select>
-                </div>
+                </FormField>
               </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  rows={4}
-                  defaultValue={reminder.description || ''}
-                />
-              </div>
+              <FormField label="Descripcion" htmlFor="description">
+                <Textarea id="description" name="description" rows={2} defaultValue={reminder.description || ''} />
+              </FormField>
 
-              {/* Actions */}
-              <div className="flex justify-end">
-                <Button type="submit" disabled={loading}>
-                  <Save className="w-4 h-4 mr-2" />
-                  {loading ? 'Guardando...' : 'Guardar Cambios'}
+              <div className="flex justify-end pt-2 border-t border-gray-100">
+                <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
+                  <Save className="w-3.5 h-3.5 mr-1" />
+                  {loading ? 'Guardando...' : 'Guardar'}
                 </Button>
               </div>
             </form>
           ) : (
-            <div className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <Label className="text-sm text-gray-500">Cliente</Label>
-                  <p className="text-gray-900 font-medium">
-                    {reminder.clients.name}
-                  </p>
+                  <p className="text-xs text-gray-500">Cliente</p>
+                  <p className="text-sm font-medium text-gray-900">{reminder.clients.name}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Tipo</Label>
-                  <p className="text-gray-900">
-                    {reminder.reminder_type === 'follow_up' && 'Seguimiento'}
-                    {reminder.reminder_type === 'maintenance' && 'Mantenimiento'}
-                    {reminder.reminder_type === 'renewal' && 'Renovación'}
-                    {reminder.reminder_type === 'custom' && 'Personalizado'}
-                  </p>
+                  <p className="text-xs text-gray-500">Tipo</p>
+                  <p className="text-sm text-gray-900">{typeLabels[reminder.reminder_type] || reminder.reminder_type}</p>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Prioridad</Label>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${priorityColors[reminder.priority as keyof typeof priorityColors]}`}>
-                    {reminder.priority === 'low' && 'Baja'}
-                    {reminder.priority === 'normal' && 'Normal'}
-                    {reminder.priority === 'high' && 'Alta'}
-                    {reminder.priority === 'urgent' && 'Urgente'}
+                  <p className="text-xs text-gray-500">Prioridad</p>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${priorityColors[reminder.priority]}`}>
+                    {priorityLabels[reminder.priority] || reminder.priority}
                   </span>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Estado</Label>
-                  <span data-testid="reminder-status" className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColors[reminder.status as keyof typeof statusColors]}`}>
-                    {reminder.status === 'pending' && 'Pendiente'}
-                    {reminder.status === 'completed' && 'Completado'}
-                    {reminder.status === 'cancelled' && 'Cancelado'}
+                  <p className="text-xs text-gray-500">Estado</p>
+                  <span data-testid="reminder-status" className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColors[reminder.status]}`}>
+                    {statusLabels[reminder.status] || reminder.status}
                   </span>
                 </div>
-
                 <div>
-                  <Label className="text-sm text-gray-500">Fecha Programada</Label>
-                  <p data-testid="due-date" className={`text-gray-900 ${isOverdue ? 'text-red-600 font-medium' : ''}`}>
+                  <p className="text-xs text-gray-500">Fecha Programada</p>
+                  <p data-testid="due-date" className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-900'}`}>
                     {new Date(reminder.scheduled_date).toLocaleDateString('es-MX', {
                       year: 'numeric',
                       month: 'long',
@@ -422,41 +344,34 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
                     })}
                   </p>
                 </div>
-
                 {reminder.related_service_category && (
                   <div>
-                    <Label className="text-sm text-gray-500">Categoría de Servicio</Label>
-                    <p className="text-gray-900">
-                      {reminder.related_service_category === 'hvac' && 'HVAC'}
-                      {reminder.related_service_category === 'painting' && 'Pintura'}
-                      {reminder.related_service_category === 'plumbing' && 'Plomería'}
-                      {reminder.related_service_category === 'electrical' && 'Eléctrico'}
-                      {reminder.related_service_category === 'other' && 'Otro'}
-                    </p>
+                    <p className="text-xs text-gray-500">Categoria de Servicio</p>
+                    <p className="text-sm text-gray-900">{categoryLabels[reminder.related_service_category] || reminder.related_service_category}</p>
                   </div>
                 )}
               </div>
 
               {reminder.description && (
                 <div>
-                  <Label className="text-sm text-gray-500">Descripción</Label>
-                  <p className="text-gray-900 whitespace-pre-wrap">{reminder.description}</p>
+                  <p className="text-xs text-gray-500">Descripcion</p>
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{reminder.description}</p>
                 </div>
               )}
 
               {reminder.is_recurring && (
-                <div className="bg-blue-50 border border-blue-200 rounded p-4">
-                  <Label className="text-sm text-blue-700 font-medium">Recordatorio Recurrente</Label>
-                  <p className="text-blue-600 mt-1">
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <p className="text-xs font-medium text-orange-700">Recordatorio Recurrente</p>
+                  <p className="text-xs text-orange-600 mt-0.5">
                     Se repite cada {reminder.recurrence_interval_months} {reminder.recurrence_interval_months === 1 ? 'mes' : 'meses'}
                   </p>
                 </div>
               )}
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2 pt-3 border-t border-gray-100">
                 <div>
-                  <Label className="text-sm text-gray-500">Fecha de Creación</Label>
-                  <p className="text-gray-900">
+                  <p className="text-xs text-gray-500">Creado</p>
+                  <p className="text-sm text-gray-900">
                     {new Date(reminder.created_at).toLocaleDateString('es-MX', {
                       year: 'numeric',
                       month: 'long',
@@ -464,11 +379,10 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
                     })}
                   </p>
                 </div>
-
                 {reminder.completed_at && (
                   <div>
-                    <Label className="text-sm text-gray-500">Fecha de Completado</Label>
-                    <p className="text-gray-900">
+                    <p className="text-xs text-gray-500">Completado</p>
+                    <p className="text-sm text-gray-900">
                       {new Date(reminder.completed_at).toLocaleDateString('es-MX', {
                         year: 'numeric',
                         month: 'long',
@@ -480,8 +394,8 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

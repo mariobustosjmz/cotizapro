@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
     const client_id = searchParams.get('client_id') || undefined
     const event_type = searchParams.get('event_type') || undefined
     const status = searchParams.get('status') || undefined
+    const quote_id = searchParams.get('quote_id') || undefined
 
     // Build query with explicit columns
     let query = supabase
@@ -72,6 +73,10 @@ export async function GET(request: NextRequest) {
 
     if (status) {
       query = query.eq('status', status)
+    }
+
+    if (quote_id) {
+      query = query.eq('quote_id', quote_id)
     }
 
     const { data: events, error, count } = await query
