@@ -95,17 +95,17 @@ export default async function RemindersPage({
       {/* Header + inline stats */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-            <Bell className="w-4 h-4 text-orange-600" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+            <Bell className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Recordatorios</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recordatorios</h2>
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-yellow-600">{statusCounts.pending} pendientes</span>
+              <span className="text-yellow-600 dark:text-yellow-400">{statusCounts.pending} pendientes</span>
               {statusCounts.overdue > 0 && (
-                <span className="text-red-600 font-medium">{statusCounts.overdue} vencidos</span>
+                <span className="text-red-600 dark:text-red-400 font-medium">{statusCounts.overdue} vencidos</span>
               )}
-              <span className="text-green-600">{statusCounts.completed} completados</span>
+              <span className="text-green-600 dark:text-green-400">{statusCounts.completed} completados</span>
             </div>
           </div>
         </div>
@@ -118,16 +118,16 @@ export default async function RemindersPage({
       </div>
 
       {/* Filters + Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
           <ReminderFilters activeStatus={activeStatus} defaultSearch={q} />
         </div>
 
         {!reminders || reminders.length === 0 ? (
           <div className="text-center py-10">
-            <Bell className="mx-auto h-10 w-10 text-gray-300" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay recordatorios</h3>
-            <p className="mt-1 text-xs text-gray-500">Crea tu primer recordatorio de seguimiento</p>
+            <Bell className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay recordatorios</h3>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Crea tu primer recordatorio de seguimiento</p>
             <div className="mt-4">
               <Link href="/dashboard/reminders/new">
                 <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
@@ -139,60 +139,60 @@ export default async function RemindersPage({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100">
-              <thead className="bg-gray-50/60">
+            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
+              <thead className="bg-gray-50/60 dark:bg-gray-800/50">
                 <tr>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Tipo</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Prioridad</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Título</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fecha</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Tipo</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Prioridad</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {reminders.map((reminder) => {
                   const isOverdue = reminder.status === 'pending' && reminder.scheduled_date < today
                   return (
-                    <tr key={reminder.id} className={`hover:bg-orange-50/40 cursor-pointer ${isOverdue ? 'bg-red-50/60' : ''}`}>
+                    <tr key={reminder.id} className={`hover:bg-orange-50/40 dark:hover:bg-gray-800 cursor-pointer ${isOverdue ? 'bg-red-50/60 dark:bg-red-900/20' : ''}`}>
                       <td className="px-4 py-2.5">
-                        <div className="text-sm text-gray-900">{reminder.clients?.name || 'Sin cliente'}</div>
+                        <div className="text-sm text-gray-900 dark:text-white">{reminder.clients?.name || 'Sin cliente'}</div>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="text-sm font-medium text-gray-900">{reminder.title}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">{reminder.title}</div>
                         {reminder.message && (
-                          <div className="text-xs text-gray-400 truncate max-w-[200px]">{reminder.message}</div>
+                          <div className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[100px] sm:max-w-[200px]">{reminder.message}</div>
                         )}
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap">
-                        <div className={`text-sm ${isOverdue ? 'text-red-600 font-semibold' : 'text-gray-700'}`}>
+                        <div className={`text-sm ${isOverdue ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-700 dark:text-gray-300'}`}>
                           {new Date(reminder.scheduled_date).toLocaleDateString('es-MX', {
                             month: 'short',
                             day: 'numeric'
                           })}
                         </div>
-                        {isOverdue && <div className="text-[10px] text-red-500">Vencido</div>}
+                        {isOverdue && <div className="text-[10px] text-red-500 dark:text-red-400">Vencido</div>}
                       </td>
                       <td className="px-4 py-2.5 hidden md:table-cell">
-                        <Badge variant={reminder.reminder_type as 'follow_up' | 'maintenance' | 'renewal' | 'custom'} className="text-[10px]">
+                        <Badge variant={reminder.reminder_type as 'follow_up' | 'maintenance' | 'renewal' | 'custom'} className="text-xs">
                           {REMINDER_TYPE_LABELS[reminder.reminder_type] ?? reminder.reminder_type}
                         </Badge>
                       </td>
                       <td className="px-4 py-2.5 hidden lg:table-cell">
-                        <Badge variant={reminder.priority as 'urgent' | 'high' | 'normal' | 'low'} className="text-[10px]">
+                        <Badge variant={reminder.priority as 'urgent' | 'high' | 'normal' | 'low'} className="text-xs">
                           {REMINDER_PRIORITY_LABELS[reminder.priority] ?? reminder.priority}
                         </Badge>
                       </td>
                       <td className="px-4 py-2.5">
-                        <Badge variant={reminder.status as 'pending' | 'sent' | 'completed' | 'snoozed' | 'cancelled'} className="text-[10px]">
+                        <Badge variant={reminder.status as 'pending' | 'sent' | 'completed' | 'snoozed' | 'cancelled'} className="text-xs">
                           {REMINDER_STATUS_LABELS[reminder.status] ?? reminder.status}
                         </Badge>
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <Link
                           href={`/dashboard/reminders/${reminder.id}`}
-                          className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                          className="inline-flex items-center justify-center px-2 py-1.5 text-xs text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium rounded"
                         >
                           Ver
                         </Link>

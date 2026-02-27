@@ -93,27 +93,27 @@ export default async function QuotesPage({
       {/* Header with inline stats */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-            <FileText className="w-4 h-4 text-orange-600" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+            <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Cotizaciones</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Cotizaciones</h2>
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-gray-500" data-testid="draft-quotes-count">{statusCounts.draft} borradores</span>
-              <span className="text-orange-600" data-testid="sent-quotes-count">{statusCounts.sent} enviadas</span>
-              <span className="text-green-600" data-testid="accepted-quotes-count">{statusCounts.accepted} aceptadas</span>
-              <span className="text-red-500" data-testid="rejected-quotes-count">{statusCounts.rejected} rechazadas</span>
+              <span className="text-gray-500 dark:text-gray-400" data-testid="draft-quotes-count">{statusCounts.draft} borradores</span>
+              <span className="text-orange-600 dark:text-orange-400" data-testid="sent-quotes-count">{statusCounts.sent} enviadas</span>
+              <span className="text-green-600 dark:text-green-400" data-testid="accepted-quotes-count">{statusCounts.accepted} aceptadas</span>
+              <span className="text-red-500 dark:text-red-400" data-testid="rejected-quotes-count">{statusCounts.rejected} rechazadas</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
             <Link
               href="/dashboard/quotes"
               className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
                 !isKanbanView
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               Lista
@@ -122,8 +122,8 @@ export default async function QuotesPage({
               href="/dashboard/quotes?view=kanban"
               className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
                 isKanbanView
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               Kanban
@@ -143,13 +143,13 @@ export default async function QuotesPage({
         <QuotesKanbanWrapper />
       ) : (
         /* List View */
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <QuoteSearchInput defaultValue={q} />
                 {activeStatus && (
-                  <Link href="/dashboard/quotes" className="text-xs text-orange-600 hover:underline">
+                  <Link href="/dashboard/quotes" className="text-xs text-orange-600 dark:text-orange-400 hover:underline">
                     Ver todas
                   </Link>
                 )}
@@ -158,10 +158,10 @@ export default async function QuotesPage({
             <div className="flex flex-wrap gap-1.5 mt-2">
               <Link
                 href="/dashboard/quotes"
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   !activeStatus
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 Todas
@@ -170,10 +170,10 @@ export default async function QuotesPage({
                 <Link
                   key={s}
                   href={`/dashboard/quotes?status=${s}`}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  className={`px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     activeStatus === s
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   {STATUS_LABELS[s]}
@@ -184,11 +184,11 @@ export default async function QuotesPage({
 
           {!quotes || quotes.length === 0 ? (
             <div className="text-center py-10">
-              <FileText className="mx-auto h-10 w-10 text-gray-300" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <FileText className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                 {activeStatus ? `No hay cotizaciones ${STATUS_LABELS[activeStatus].toLowerCase()}` : 'No hay cotizaciones'}
               </h3>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 {activeStatus ? 'Prueba con otro filtro' : 'Comienza creando tu primera cotizaci\u00f3n'}
               </p>
               {!activeStatus && (
@@ -204,33 +204,33 @@ export default async function QuotesPage({
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-gray-50/60">
+              <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
+                <thead className="bg-gray-50/60 dark:bg-gray-800/50">
                   <tr>
-                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">N\u00famero</th>
-                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Fecha</th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">N\u00famero</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Fecha</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Total</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                   {quotes.map((quote) => {
                     const client = quote.clients as unknown as { name: string | null; company_name: string | null } | null
                     return (
-                    <tr key={quote.id} className="hover:bg-orange-50/40 cursor-pointer">
+                    <tr key={quote.id} className="hover:bg-orange-50/40 dark:hover:bg-gray-800 cursor-pointer">
                       <td className="px-4 py-2.5 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{quote.quote_number}</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">{quote.quote_number}</span>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="text-sm text-gray-900">{client?.name || '\u2014'}</div>
+                        <div className="text-sm text-gray-900 dark:text-white">{client?.name || '\u2014'}</div>
                         {client?.company_name && (
-                          <div className="text-xs text-gray-400">{client.company_name}</div>
+                          <div className="text-xs text-gray-400 dark:text-gray-500">{client.company_name}</div>
                         )}
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap hidden md:table-cell">
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                           {new Date(quote.created_at).toLocaleDateString('es-MX', {
                             month: 'short',
                             day: 'numeric'
@@ -238,7 +238,7 @@ export default async function QuotesPage({
                         </span>
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap text-right">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
                           ${Number(quote.total).toLocaleString('es-MX')}
                         </span>
                       </td>
@@ -250,7 +250,7 @@ export default async function QuotesPage({
                       <td className="px-4 py-2.5 whitespace-nowrap text-right">
                         <Link
                           href={`/dashboard/quotes/${quote.id}`}
-                          className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                          className="inline-flex items-center justify-center px-2 py-1.5 text-xs text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium rounded"
                         >
                           Ver
                         </Link>

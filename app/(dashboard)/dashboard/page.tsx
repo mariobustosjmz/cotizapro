@@ -1,5 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { RealtimeRefresh } from '@/components/dashboard/realtime-refresh'
 import {
   Users,
   FileText,
@@ -172,16 +173,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
+      <RealtimeRefresh tables={['quotes', 'clients', 'follow_up_reminders']} />
+
       {/* Urgent Reminders Banner */}
       {overdueReminders.length > 0 && (
         <Link href="/dashboard/reminders">
-          <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-50 border border-orange-200 hover:bg-orange-100/60 transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 hover:bg-orange-100/60 dark:hover:bg-orange-900/30 transition-colors cursor-pointer">
             <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
             <div className="flex-1 min-w-0">
-              <span className="text-sm font-semibold text-orange-700">
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-400">
                 {overdueReminders.length} recordatorio{overdueReminders.length > 1 ? 's' : ''} vencido{overdueReminders.length > 1 ? 's' : ''}
               </span>
-              <span className="text-sm text-orange-600/70 ml-2">
+              <span className="text-sm text-orange-600/70 dark:text-orange-400/70 ml-2">
                 — requieren atencion inmediata
               </span>
             </div>
@@ -192,40 +195,40 @@ export default async function DashboardPage() {
 
       {/* Welcome Header */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           Bienvenido, {firstName}
         </h2>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
           {orgName} — resumen del negocio
         </p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Clientes</span>
-            <div className="p-1.5 rounded-lg bg-orange-100">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Clientes</span>
+            <div className="p-1.5 rounded-lg bg-orange-100 dark:bg-orange-900/20">
               <Users className="h-3.5 w-3.5 text-orange-500" />
             </div>
           </div>
-          <div className="text-xl font-bold text-gray-900">{totalClients ?? 0}</div>
+          <div className="text-xl font-bold text-gray-900 dark:text-white">{totalClients ?? 0}</div>
           <div className="mt-1 flex items-center justify-between">
             <TrendBadge value={clientTrend} />
-            <Link href="/dashboard/clients" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
+            <Link href="/dashboard/clients" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5 px-2 py-1 rounded hover:bg-orange-50 dark:hover:bg-orange-900/10">
               Ver <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Cotizaciones</span>
-            <div className="p-1.5 rounded-lg bg-purple-100">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Cotizaciones</span>
+            <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/20">
               <FileText className="h-3.5 w-3.5 text-purple-500" />
             </div>
           </div>
-          <div className="text-xl font-bold text-gray-900">{quotes?.length ?? 0}</div>
+          <div className="text-xl font-bold text-gray-900 dark:text-white">{quotes?.length ?? 0}</div>
           <div className="mt-1 flex items-center justify-between">
             <TrendBadge value={quoteTrend} />
             <Link href="/dashboard/quotes" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
@@ -234,33 +237,36 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Ingresos Aceptados</span>
-            <div className="p-1.5 rounded-lg bg-emerald-100">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Ingresos Aceptados</span>
+            <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/20">
               <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
             </div>
           </div>
-          <div className="text-xl font-bold text-green-600">
+          <div className="text-xl font-bold text-green-600 dark:text-green-400">
             ${totalRevenue.toLocaleString('es-MX', { maximumFractionDigits: 0 })}
           </div>
-          <div className="mt-1">
-            <span className="text-xs text-gray-500">
-              {acceptanceRate.toFixed(0)}% tasa de aceptacion
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {acceptanceRate.toFixed(0)}% tasa
             </span>
+            <Link href="/dashboard/analytics" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5 px-2 py-1 rounded hover:bg-orange-50 dark:hover:bg-orange-900/10">
+              Ver <ChevronRight className="w-3 h-3" />
+            </Link>
           </div>
         </div>
 
-        <div className={`bg-white rounded-xl border p-3 ${
-          overdueReminders.length > 0 ? 'border-orange-300' : 'border-gray-200'
+        <div className={`bg-white dark:bg-gray-900 rounded-xl border p-3 ${
+          overdueReminders.length > 0 ? 'border-orange-300 dark:border-orange-700' : 'border-gray-200 dark:border-gray-700'
         }`}>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Recordatorios</span>
-            <div className={`p-1.5 rounded-lg ${overdueReminders.length > 0 ? 'bg-orange-100' : 'bg-yellow-100'}`}>
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Recordatorios</span>
+            <div className={`p-1.5 rounded-lg ${overdueReminders.length > 0 ? 'bg-orange-100 dark:bg-orange-900/20' : 'bg-yellow-100 dark:bg-yellow-900/20'}`}>
               <Bell className={`h-3.5 w-3.5 ${overdueReminders.length > 0 ? 'text-orange-500' : 'text-yellow-500'}`} />
             </div>
           </div>
-          <div className={`text-xl font-bold ${overdueReminders.length > 0 ? 'text-orange-500' : 'text-gray-900'}`}>
+          <div className={`text-xl font-bold ${overdueReminders.length > 0 ? 'text-orange-500' : 'text-gray-900 dark:text-white'}`}>
             {pendingReminders}
           </div>
           <div className="mt-1 flex items-center justify-between">
@@ -269,9 +275,9 @@ export default async function DashboardPage() {
                 {overdueReminders.length} vencido{overdueReminders.length > 1 ? 's' : ''}
               </span>
             ) : (
-              <span className="text-xs text-gray-500">pendientes</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">pendientes</span>
             )}
-            <Link href="/dashboard/reminders" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5">
+            <Link href="/dashboard/reminders" className="text-xs text-orange-500 hover:text-orange-400 flex items-center gap-0.5 px-2 py-1 rounded hover:bg-orange-50 dark:hover:bg-orange-900/10">
               Ver <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -281,13 +287,13 @@ export default async function DashboardPage() {
       {/* Quote Status Row */}
       <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
         {[
-          { label: 'Borradores', count: quoteCounts.draft, color: 'border-l-slate-400', text: 'text-slate-500' },
-          { label: 'Enviadas', count: quoteCounts.sent, color: 'border-l-orange-500', text: 'text-orange-600' },
-          { label: 'Aceptadas', count: quoteCounts.accepted, color: 'border-l-emerald-500', text: 'text-emerald-600' },
-          { label: 'Rechazadas', count: quoteCounts.rejected, color: 'border-l-red-500', text: 'text-red-600' },
+          { label: 'Borradores', count: quoteCounts.draft, color: 'border-l-slate-400', text: 'text-slate-500 dark:text-slate-400' },
+          { label: 'Enviadas', count: quoteCounts.sent, color: 'border-l-orange-500', text: 'text-orange-600 dark:text-orange-400' },
+          { label: 'Aceptadas', count: quoteCounts.accepted, color: 'border-l-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
+          { label: 'Rechazadas', count: quoteCounts.rejected, color: 'border-l-red-500', text: 'text-red-600 dark:text-red-400' },
         ].map((item) => (
-          <div key={item.label} className={`bg-white rounded-xl border border-gray-200 border-l-4 ${item.color} p-3`}>
-            <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">{item.label}</div>
+          <div key={item.label} className={`bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 border-l-4 ${item.color} p-3`}>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">{item.label}</div>
             <div className={`text-xl font-bold mt-0.5 ${item.text}`}>{item.count}</div>
           </div>
         ))}
@@ -298,9 +304,9 @@ export default async function DashboardPage() {
 
         {/* Recent Quotes */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-gray-200">
-            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-900">Cotizaciones Recientes</span>
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">Cotizaciones Recientes</span>
               <Link href="/dashboard/quotes">
                 <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1 h-7">
                   Ver todas <ChevronRight className="w-3 h-3" />
@@ -309,8 +315,8 @@ export default async function DashboardPage() {
             </div>
             {recentQuotes.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <FileText className="w-7 h-7 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No hay cotizaciones aun.</p>
+                <FileText className="w-7 h-7 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">No hay cotizaciones aun.</p>
                 <Link href="/dashboard/quotes/new" className="mt-3 inline-block">
                   <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
                     <Plus className="w-3.5 h-3.5 mr-1.5" />
@@ -319,7 +325,7 @@ export default async function DashboardPage() {
                 </Link>
               </div>
             ) : (
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-gray-700">
                 {recentQuotes.map((quote) => {
                   const client = quote.clients as { name?: string; company_name?: string } | null
                   const clientName = client?.company_name || client?.name || 'Sin cliente'
@@ -332,13 +338,13 @@ export default async function DashboardPage() {
                     <Link
                       key={quote.id}
                       href={`/dashboard/quotes/${quote.id}`}
-                      className={`flex items-center justify-between px-4 py-2.5 border-l-[3px] ${STATUS_COLORS[status] ?? 'border-l-slate-300'} hover:bg-orange-50/40 transition-colors`}
+                      className={`flex items-center justify-between px-4 py-2.5 border-l-[3px] ${STATUS_COLORS[status] ?? 'border-l-slate-300'} hover:bg-orange-50/40 dark:hover:bg-gray-800 transition-colors`}
                     >
                       <div className="min-w-0">
-                        <div className="text-sm font-medium truncate">{quote.quote_number}</div>
-                        <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-2">
+                        <div className="text-sm font-medium truncate text-gray-900 dark:text-white">{quote.quote_number}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-2">
                           <span className="truncate max-w-[160px]">{clientName}</span>
-                          <span className="text-gray-300">·</span>
+                          <span className="text-gray-300 dark:text-gray-600">·</span>
                           <span className="flex items-center gap-0.5 shrink-0">
                             <Clock className="w-3 h-3" />
                             {dateStr}
@@ -346,7 +352,7 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
-                        <div className="text-sm font-semibold text-gray-900">
+                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
                           ${Number(quote.total ?? 0).toLocaleString('es-MX', { maximumFractionDigits: 0 })}
                         </div>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_BADGE_COLORS[status] ?? 'bg-slate-100 text-slate-700'}`}>
@@ -369,19 +375,19 @@ export default async function DashboardPage() {
         {/* Right Column: Quick Actions + Pending Reminders */}
         <div className="space-y-4">
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl border border-gray-200">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <span className="text-sm font-semibold text-gray-900">Acciones Rapidas</span>
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">Acciones Rapidas</span>
             </div>
             <div className="p-3 space-y-2">
               <Link href="/dashboard/quotes/new" className="block">
-                <div className="group flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200 hover:bg-orange-100/60 transition-all duration-150 cursor-pointer">
-                  <div className="p-2 rounded-lg bg-orange-200/60">
-                    <FileText className="w-4 h-4 text-orange-600" />
+                <div className="group flex items-center gap-3 p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 hover:bg-orange-100/60 dark:hover:bg-orange-900/30 transition-all duration-150 cursor-pointer">
+                  <div className="p-2 rounded-lg bg-orange-200/60 dark:bg-orange-900/40">
+                    <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-orange-700">Nueva Cotizacion</div>
-                    <div className="text-xs text-orange-600/70">Crea y envia al cliente</div>
+                    <div className="text-sm font-semibold text-orange-700 dark:text-orange-400">Nueva Cotizacion</div>
+                    <div className="text-xs text-orange-600/70 dark:text-orange-400/70">Crea y envia al cliente</div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-orange-400 ml-auto" />
                 </div>
@@ -393,15 +399,15 @@ export default async function DashboardPage() {
                 { href: '/dashboard/analytics', icon: TrendingUp, label: 'Ver Analytics', desc: 'Metricas del negocio' },
               ].map((action) => (
                 <Link key={action.href} href={action.href} className="block">
-                  <div className="group flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-all duration-150 cursor-pointer">
-                    <div className="p-2 rounded-lg bg-gray-100">
-                      <action.icon className="w-4 h-4 text-gray-500" />
+                  <div className="group flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-150 cursor-pointer">
+                    <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <action.icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-sm font-semibold text-gray-900">{action.label}</div>
-                      <div className="text-xs text-gray-500">{action.desc}</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{action.label}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{action.desc}</div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-gray-500 transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 ml-auto group-hover:text-gray-500 dark:group-hover:text-gray-500 transition-colors" />
                   </div>
                 </Link>
               ))}
@@ -410,9 +416,9 @@ export default async function DashboardPage() {
 
           {/* Upcoming Reminders mini-list */}
           {reminders && reminders.length > 0 && (
-            <div className="bg-white rounded-xl border border-gray-200">
-              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">Proximos Recordatorios</span>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">Proximos Recordatorios</span>
                 <Link href="/dashboard/reminders">
                   <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1 h-7 -mr-2">
                     Ver todos <ChevronRight className="w-3 h-3" />
@@ -428,15 +434,15 @@ export default async function DashboardPage() {
                   })
                   return (
                     <Link key={reminder.id} href={`/dashboard/reminders/${reminder.id}`} className="block">
-                      <div className={`flex items-start gap-2.5 p-2 rounded-lg hover:bg-gray-50 transition-colors ${
-                        isOverdue ? 'bg-orange-50/50 border border-orange-200' : ''
+                      <div className={`flex items-start gap-2.5 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
+                        isOverdue ? 'bg-orange-50/50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700' : ''
                       }`}>
                         <div className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${
-                          isOverdue ? 'bg-orange-500' : 'bg-gray-300'
+                          isOverdue ? 'bg-orange-500' : 'bg-gray-300 dark:bg-gray-600'
                         }`} />
                         <div className="min-w-0 flex-1">
-                          <div className="text-xs font-medium text-gray-900 truncate">{reminder.title}</div>
-                          <div className={`text-xs mt-0.5 ${isOverdue ? 'text-orange-500 font-medium' : 'text-gray-500'}`}>
+                          <div className="text-xs font-medium text-gray-900 dark:text-white truncate">{reminder.title}</div>
+                          <div className={`text-xs mt-0.5 ${isOverdue ? 'text-orange-500 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
                             {isOverdue ? 'Vencido · ' : ''}{date}
                           </div>
                         </div>
