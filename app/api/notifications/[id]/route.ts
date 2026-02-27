@@ -26,6 +26,15 @@ export async function PATCH(
       if (error) {
         return handleApiError(ApiErrors.INTERNAL_ERROR('Failed to update reminder'), 'PATCH /api/notifications/[id]')
       }
+    } else if (body.type === 'send') {
+      const { error } = await supabase
+        .from('quote_notifications')
+        .update({ status: 'read', read_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) {
+        return handleApiError(ApiErrors.INTERNAL_ERROR('Failed to update notification'), 'PATCH /api/notifications/[id]')
+      }
     }
 
     return NextResponse.json({ success: true })

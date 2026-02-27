@@ -34,6 +34,19 @@ export function NotificationBell() {
     }
   }, [])
 
+  const markAsRead = useCallback(async (notificationId: string, notificationType: string) => {
+    try {
+      await fetch(`/api/notifications/${notificationId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: notificationType }),
+      })
+      await fetchNotifications()
+    } catch {
+      // silent
+    }
+  }, [fetchNotifications])
+
   useEffect(() => {
     fetchNotifications()
     const interval = setInterval(fetchNotifications, 60_000)
@@ -100,7 +113,12 @@ export function NotificationBell() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false)
+                    if (!item.read) {
+                      markAsRead(item.id, item.type)
+                    }
+                  }}
                   className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
                     !item.read ? 'bg-orange-50/40 dark:bg-orange-900/20' : ''
                   }`}
