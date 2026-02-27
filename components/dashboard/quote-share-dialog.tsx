@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Mail, MessageCircle, Send, Loader2, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
+import { X, Mail, MessageCircle, Send, Loader2, CheckCircle2, AlertCircle, Clock, FileDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 
@@ -40,17 +40,40 @@ export function QuoteShareDialog({
   const [whatsappOverride, setWhatsappOverride] = useState('')
   const [sending, setSending] = useState(false)
   const [notifications, setNotifications] = useState<NotificationRecord[]>([])
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [loadingPdf, setLoadingPdf] = useState(false)
 
   useEffect(() => {
     if (!open) return
     setSendVia(new Set())
     setEmailOverride('')
     setWhatsappOverride('')
+    setPdfUrl(null)
+    setLoadingPdf(true)
 
+    // Fetch notifications
     fetch(`/api/quotes/${quoteId}/notifications`)
       .then(res => res.ok ? res.json() : { data: [] })
       .then(json => setNotifications(json.data ?? []))
       .catch(() => setNotifications([]))
+
+    // Fetch PDF preview
+    fetch(`/api/export/quote/${quoteId}`)
+      .then(res => {
+        if (res.ok) {
+          return res.blob()
+        }
+        throw new Error('Failed to load PDF')
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob)
+        setPdfUrl(url)
+      })
+      .catch(error => {
+        console.error('Error loading PDF preview:', error)
+        setPdfUrl(null)
+      })
+      .finally(() => setLoadingPdf(false))
   }, [open, quoteId])
 
   if (!open) return null
@@ -118,9 +141,9 @@ export function QuoteShareDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl w-full max-w-md mx-4">
+      <div className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
           <div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Enviar Cotizacion</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{quoteNumber} - {clientName}</p>
@@ -130,8 +153,35 @@ export function QuoteShareDialog({
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-5 space-y-4">
+        {/* Body - Scrollable */}
+        <div className="overflow-y-auto flex-1 p-5 space-y-4">
+          {/* PDF Preview */}
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800">
+            {loadingPdf ? (
+              <div className="h-64 flex items-center justify-center">
+                <div className="text-center">
+                  <Loader2 className="w-5 h-5 animate-spin text-orange-500 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Cargando vista previa...</p>
+                </div>
+              </div>
+            ) : pdfUrl ? (
+              <div className="h-64 relative">
+                <iframe
+                  src={pdfUrl}
+                  className="w-full h-full"
+                  title={`Preview de ${quoteNumber}`}
+                />
+              </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center">
+                <div className="text-center">
+                  <FileDown className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">No se pudo cargar la vista previa</p>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Method toggles */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Metodo de envio</p>
@@ -231,8 +281,8 @@ export function QuoteShareDialog({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-2">
+        {/* Footer - Fixed */}
+        <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-2 shrink-0 bg-white dark:bg-gray-900">
           <Button variant="outline" size="sm" onClick={onClose} disabled={sending}>
             Cancelar
           </Button>
