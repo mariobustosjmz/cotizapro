@@ -53,57 +53,57 @@ export default async function BillingPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-          <CreditCard className="w-4 h-4 text-orange-600" />
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+          <CreditCard className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Facturacion</h2>
-          <p className="text-xs text-gray-500">Gestiona tu suscripcion y pagos</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Facturacion</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Gestiona tu suscripcion y pagos</p>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Plan Actual</p>
-          <p className="text-xl font-bold text-gray-900">{planDetails.name}</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Plan Actual</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{planDetails.name}</p>
           {planDetails.price !== null && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {planDetails.price === 0 ? 'Gratis' : `$${planDetails.price}/mes`}
             </p>
           )}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Estado</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Estado</p>
           <div className="mt-1">
             <span
               className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                 subscriptionStatus === 'active'
-                  ? 'bg-green-100 text-green-700'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                   : subscriptionStatus === 'trialing'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-red-100 text-red-700'
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
               }`}
             >
               {getSubscriptionStatusLabel(subscriptionStatus)}
             </span>
           </div>
           {trialDaysRemaining !== null && subscriptionStatus === 'trialing' && (
-            <p className="text-sm text-gray-500 mt-1">{trialDaysRemaining} dias restantes</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{trialDaysRemaining} dias restantes</p>
           )}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs font-medium text-gray-500 uppercase mb-1">Limites</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Limites</p>
           <div className="space-y-1 text-sm mt-1">
             <div className="flex justify-between">
-              <span className="text-gray-500">Proyectos:</span>
-              <span className="font-medium text-gray-900">{formatUsageLimit(planDetails.limits.projects)}</span>
+              <span className="text-gray-500 dark:text-gray-400">Proyectos:</span>
+              <span className="font-medium text-gray-900 dark:text-white">{formatUsageLimit(planDetails.limits.projects)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">API/dia:</span>
-              <span className="font-medium text-gray-900">{formatUsageLimit(planDetails.limits.apiCalls)}</span>
+              <span className="text-gray-500 dark:text-gray-400">API/dia:</span>
+              <span className="font-medium text-gray-900 dark:text-white">{formatUsageLimit(planDetails.limits.apiCalls)}</span>
             </div>
           </div>
         </div>

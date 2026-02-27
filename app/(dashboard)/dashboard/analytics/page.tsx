@@ -96,59 +96,59 @@ export default async function AnalyticsPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-          <BarChart3 className="w-4 h-4 text-orange-600" />
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+          <BarChart3 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Analiticas</h2>
-          <p className="text-xs text-gray-500">Metricas y rendimiento del negocio</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Analiticas</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Metricas y rendimiento del negocio</p>
         </div>
       </div>
 
       {/* Summary KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Cotizaciones</span>
-            <FileText className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Cotizaciones</span>
+            <FileText className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
-          <p className="text-xl font-bold text-gray-900">{analytics.summary.total_quotes}</p>
-          <p className="text-xs text-gray-500">{analytics.quotes.conversion_rate.toFixed(1)}% conversion</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{analytics.summary.total_quotes}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.quotes.conversion_rate.toFixed(1)}% conversion</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Clientes</span>
-            <Users className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Clientes</span>
+            <Users className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
-          <p className="text-xl font-bold text-gray-900">{analytics.summary.total_clients}</p>
-          <p className="text-xs text-gray-500">{analytics.clients.new_this_month} nuevos este mes</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{analytics.summary.total_clients}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.clients.new_this_month} nuevos este mes</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Ingresos</span>
-            <DollarSign className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Ingresos</span>
+            <DollarSign className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
-          <p className="text-xl font-bold text-green-600">${analytics.summary.total_revenue.toLocaleString('es-MX')}</p>
-          <p className="text-xs text-gray-500">{analytics.revenue.accepted_quotes} aceptadas</p>
+          <p className="text-xl font-bold text-green-600 dark:text-green-400">${analytics.summary.total_revenue.toLocaleString('es-MX')}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.revenue.accepted_quotes} aceptadas</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-gray-500">Recordatorios</span>
-            <Bell className="w-3.5 h-3.5 text-gray-400" />
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Recordatorios</span>
+            <Bell className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
-          <p className="text-xl font-bold text-yellow-600">{analytics.summary.pending_reminders}</p>
-          <p className="text-xs text-gray-500">{analytics.reminders.overdue} atrasados</p>
+          <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{analytics.summary.pending_reminders}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.reminders.overdue} atrasados</p>
         </div>
       </div>
 
       {/* Quotes Analytics */}
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <span className="text-sm font-semibold text-gray-900">Cotizaciones por Estado</span>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Cotizaciones por Estado</span>
           </div>
           <div className="p-4 space-y-3">
             {analytics.quotes.by_status.map((item) => {
@@ -162,9 +162,9 @@ export default async function AnalyticsPage() {
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColors[item.status]}`}>
                       {statusLabels[item.status]}
                     </span>
-                    <span className="text-sm font-semibold text-gray-900">{item.count}</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{item.count}</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5">
                     <div
                       className="bg-orange-500 h-1.5 rounded-full"
                       style={{ width: `${percentage}%` }}
@@ -176,19 +176,19 @@ export default async function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <span className="text-sm font-semibold text-gray-900">Metricas de Cotizaciones</span>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Metricas de Cotizaciones</span>
           </div>
           <div className="p-4 space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-500">Tasa de Conversion</span>
-                <span className="text-lg font-bold text-green-600">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Tasa de Conversion</span>
+                <span className="text-lg font-bold text-green-600 dark:text-green-400">
                   {analytics.quotes.conversion_rate.toFixed(1)}%
                 </span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2">
+              <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
                 <div
                   className="bg-green-500 h-2 rounded-full"
                   style={{ width: `${analytics.quotes.conversion_rate}%` }}
@@ -196,19 +196,19 @@ export default async function AnalyticsPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-gray-100">
+            <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Valor Promedio</span>
-                <span className="text-lg font-bold text-gray-900">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Valor Promedio</span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
                   ${analytics.quotes.avg_quote_value.toLocaleString('es-MX')}
                 </span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-gray-100">
+            <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Valor Total</span>
-                <span className="text-lg font-bold text-orange-600">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Valor Total</span>
+                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
                   ${analytics.quotes.total_value.toLocaleString('es-MX')}
                 </span>
               </div>
@@ -219,36 +219,36 @@ export default async function AnalyticsPage() {
 
       {/* Clients and Reminders */}
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <span className="text-sm font-semibold text-gray-900">Analisis de Clientes</span>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Analisis de Clientes</span>
           </div>
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-xs text-gray-500">Total</p>
-                <p className="text-lg font-bold text-blue-600">{analytics.clients.total}</p>
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{analytics.clients.total}</p>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-xs text-gray-500">Nuevos (mes)</p>
-                <p className="text-lg font-bold text-green-600">{analytics.clients.new_this_month}</p>
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Nuevos (mes)</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">{analytics.clients.new_this_month}</p>
               </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <p className="text-xs text-gray-500">Con Cotizaciones</p>
-                <p className="text-lg font-bold text-purple-600">{analytics.clients.with_quotes}</p>
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Con Cotizaciones</p>
+                <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{analytics.clients.with_quotes}</p>
               </div>
-              <div className="p-3 bg-orange-50 rounded-lg">
-                <p className="text-xs text-gray-500">Sin Cotizaciones</p>
-                <p className="text-lg font-bold text-orange-600">{analytics.clients.without_quotes}</p>
+              <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Sin Cotizaciones</p>
+                <p className="text-lg font-bold text-orange-600 dark:text-orange-400">{analytics.clients.without_quotes}</p>
               </div>
             </div>
 
             {analytics.clients.total > 0 && (
-              <div className="pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 mb-1">
+              <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                   {((analytics.clients.with_quotes / analytics.clients.total) * 100).toFixed(1)}% con cotizaciones
                 </p>
-                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-1.5">
                   <div
                     className="bg-purple-500 h-1.5 rounded-full"
                     style={{ width: `${(analytics.clients.with_quotes / analytics.clients.total) * 100}%` }}
@@ -259,34 +259,34 @@ export default async function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <span className="text-sm font-semibold text-gray-900">Recordatorios</span>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Recordatorios</span>
           </div>
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-3 gap-2">
-              <div className="p-3 bg-yellow-50 rounded-lg">
-                <p className="text-xs text-gray-500">Pendientes</p>
-                <p className="text-lg font-bold text-yellow-600">{analytics.reminders.pending}</p>
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Pendientes</p>
+                <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{analytics.reminders.pending}</p>
               </div>
-              <div className="p-3 bg-red-50 rounded-lg">
-                <p className="text-xs text-gray-500">Atrasados</p>
-                <p className="text-lg font-bold text-red-600">{analytics.reminders.overdue}</p>
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Atrasados</p>
+                <p className="text-lg font-bold text-red-600 dark:text-red-400">{analytics.reminders.overdue}</p>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-xs text-gray-500">Completados</p>
-                <p className="text-lg font-bold text-green-600">{analytics.reminders.completed}</p>
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Completados</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">{analytics.reminders.completed}</p>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-gray-100">
+            <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-500">Tasa de Completado</span>
-                <span className="text-lg font-bold text-green-600">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Tasa de Completado</span>
+                <span className="text-lg font-bold text-green-600 dark:text-green-400">
                   {analytics.reminders.completion_rate.toFixed(1)}%
                 </span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2">
+              <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
                 <div
                   className="bg-green-500 h-2 rounded-full"
                   style={{ width: `${analytics.reminders.completion_rate}%` }}
@@ -298,37 +298,37 @@ export default async function AnalyticsPage() {
       </div>
 
       {/* Revenue */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <span className="text-sm font-semibold text-gray-900">Analisis de Ingresos</span>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Analisis de Ingresos</span>
         </div>
         <div className="p-4">
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Ingresos Totales</p>
-              <p className="text-xl font-bold text-green-700">
+            <div className="p-4 bg-gradient-to-br from-green-50 dark:from-green-900/20 to-green-100 dark:to-green-900/10 rounded-lg">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Ingresos Totales</p>
+              <p className="text-xl font-bold text-green-700 dark:text-green-400">
                 ${analytics.revenue.total.toLocaleString('es-MX')}
               </p>
-              <div className="flex items-center mt-1 text-green-600">
+              <div className="flex items-center mt-1 text-green-600 dark:text-green-400">
                 <TrendingUp className="w-3.5 h-3.5 mr-1" />
                 <span className="text-xs">De {analytics.revenue.accepted_quotes} cotizaciones</span>
               </div>
             </div>
 
-            <div className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Ticket Promedio</p>
-              <p className="text-xl font-bold text-orange-700">
+            <div className="p-4 bg-gradient-to-br from-orange-50 dark:from-orange-900/20 to-orange-100 dark:to-orange-900/10 rounded-lg">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Ticket Promedio</p>
+              <p className="text-xl font-bold text-orange-700 dark:text-orange-400">
                 ${analytics.revenue.avg_deal_size.toLocaleString('es-MX')}
               </p>
-              <p className="text-xs text-orange-600 mt-1">Por cotizacion aceptada</p>
+              <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Por cotizacion aceptada</p>
             </div>
 
-            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Valor Pipeline</p>
-              <p className="text-xl font-bold text-purple-700">
+            <div className="p-4 bg-gradient-to-br from-purple-50 dark:from-purple-900/20 to-purple-100 dark:to-purple-900/10 rounded-lg">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Valor Pipeline</p>
+              <p className="text-xl font-bold text-purple-700 dark:text-purple-400">
                 ${analytics.quotes.total_value.toLocaleString('es-MX')}
               </p>
-              <p className="text-xs text-purple-600 mt-1">Todas las cotizaciones</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Todas las cotizaciones</p>
             </div>
           </div>
         </div>

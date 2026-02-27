@@ -154,8 +154,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             </Button>
           </Link>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">{client.name}</h2>
-            <p className="text-xs text-gray-500">{client.company_name || 'Sin empresa'}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{client.name}</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{client.company_name || 'Sin empresa'}</p>
           </div>
         </div>
 
@@ -179,13 +179,13 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">{error}</div>
       )}
 
       {/* Content */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <span className="text-sm font-semibold text-gray-900">Informacion del Cliente</span>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Informacion del Cliente</span>
         </div>
         <div className="p-4">
           {isEditing ? (
@@ -231,7 +231,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                 onChange={setCustomFields}
               />
 
-              <div className="flex justify-end pt-2 border-t border-gray-100">
+              <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-700">
                 <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
                   <Save className="w-3.5 h-3.5 mr-1" />
                   {loading ? 'Guardando...' : 'Guardar'}
@@ -242,36 +242,36 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             <div className="space-y-4">
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <p className="text-xs text-gray-500">Nombre</p>
-                  <p className="text-sm font-medium text-gray-900">{client.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Nombre</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{client.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Empresa</p>
-                  <p className="text-sm text-gray-900">{client.company_name || '-'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Empresa</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{client.company_name || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Email</p>
-                  <p className="text-sm text-gray-900">{client.email || '-'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{client.email || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Telefono</p>
-                  <p className="text-sm text-gray-900">{client.phone || '-'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Telefono</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{client.phone || '-'}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-gray-500">Direccion</p>
-                <p className="text-sm text-gray-900">{client.address || '-'}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Direccion</p>
+                <p className="text-sm text-gray-900 dark:text-white">{client.address || '-'}</p>
               </div>
 
               {client.tags && client.tags.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Etiquetas</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Etiquetas</p>
                   <div className="flex flex-wrap gap-1.5">
                     {client.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-[10px] font-medium"
+                        className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-[10px] font-medium"
                       >
                         {tag}
                       </span>
@@ -282,14 +282,14 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
 
               {client.notes && (
                 <div>
-                  <p className="text-xs text-gray-500">Notas</p>
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{client.notes}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Notas</p>
+                  <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{client.notes}</p>
                 </div>
               )}
 
-              <div className="pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500">Creado</p>
-                <p className="text-sm text-gray-900">
+              <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Creado</p>
+                <p className="text-sm text-gray-900 dark:text-white">
                   {new Date(client.created_at).toLocaleDateString('es-MX', {
                     year: 'numeric',
                     month: 'long',

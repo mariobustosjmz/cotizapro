@@ -151,12 +151,12 @@ export default function SettingsPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-          <Settings2 className="w-4 h-4 text-orange-600" />
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+          <Settings2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Configuracion</h2>
-          <p className="text-xs text-gray-500">Gestiona tu cuenta y preferencias</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Configuracion</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Gestiona tu cuenta y preferencias</p>
         </div>
       </div>
 
@@ -170,8 +170,8 @@ export default function SettingsPage() {
               onClick={() => { setActiveTab(tab.id); setError(''); setSuccess('') }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-gray-900 dark:bg-gray-700 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -183,22 +183,22 @@ export default function SettingsPage() {
 
       {/* Alerts */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">{error}</div>
       )}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded text-sm">{success}</div>
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/50 text-green-700 dark:text-green-400 px-3 py-2 rounded text-sm">{success}</div>
       )}
 
       {/* Profile Tab */}
       {activeTab === 'profile' && profile && (
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-900">Informacion Personal</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Informacion Personal</h3>
           </div>
           <form onSubmit={handleProfileSubmit} className="p-4 space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
               <FormField label="Email" htmlFor="email" hint="No se puede cambiar">
-                <Input id="email" value={profile.email} disabled className="bg-gray-50" />
+                <Input id="email" value={profile.email} disabled className="bg-gray-50 dark:bg-gray-800 dark:text-gray-100" />
               </FormField>
 
               <FormField label="Nombre Completo" htmlFor="full_name">
@@ -211,7 +211,7 @@ export default function SettingsPage() {
               </FormField>
 
               <FormField label="Rol" htmlFor="role">
-                <Input id="role" value={profile.role} disabled className="bg-gray-50 capitalize" />
+                <Input id="role" value={profile.role} disabled className="bg-gray-50 dark:bg-gray-800 dark:text-gray-100 capitalize" />
               </FormField>
 
               <FormField label="URL de Avatar" htmlFor="avatar_url">
@@ -225,7 +225,7 @@ export default function SettingsPage() {
               </FormField>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-gray-100">
+            <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-800">
               <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
                 <Save className="w-3.5 h-3.5 mr-1" />
                 {loading ? 'Guardando...' : 'Guardar'}
@@ -237,9 +237,9 @@ export default function SettingsPage() {
 
       {/* Organization Tab */}
       {activeTab === 'organization' && organization && (
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-900">Informacion de la Empresa</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Informacion de la Empresa</h3>
           </div>
           <form onSubmit={handleOrganizationSubmit} className="p-4 space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
@@ -248,7 +248,7 @@ export default function SettingsPage() {
               </FormField>
 
               <FormField label="Slug" htmlFor="slug" hint="No se puede cambiar">
-                <Input id="slug" value={organization.slug} disabled className="bg-gray-50" />
+                <Input id="slug" value={organization.slug} disabled className="bg-gray-50 dark:bg-gray-800 dark:text-gray-100" />
               </FormField>
 
               <FormField label="Email de Contacto" htmlFor="company_email">
@@ -317,7 +317,7 @@ export default function SettingsPage() {
               />
             </FormField>
 
-            <div className="flex justify-end pt-2 border-t border-gray-100">
+            <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-800">
               <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
                 <Save className="w-3.5 h-3.5 mr-1" />
                 {loading ? 'Guardando...' : 'Guardar'}
@@ -329,27 +329,27 @@ export default function SettingsPage() {
 
       {/* Notifications Tab */}
       {activeTab === 'notifications' && (
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-900">Preferencias de Notificaciones</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Preferencias de Notificaciones</h3>
           </div>
           <div className="p-4 space-y-3">
-            <p className="text-xs text-gray-500">Las notificaciones por email estaran disponibles proximamente.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Las notificaciones por email estaran disponibles proximamente.</p>
 
             {[
               { title: 'Nuevas Cotizaciones', desc: 'Email cuando se crea una cotizacion' },
               { title: 'Recordatorios Pendientes', desc: 'Email diario con recordatorios del dia' },
               { title: 'Cotizaciones Aceptadas', desc: 'Email cuando un cliente acepta' },
             ].map((item) => (
-              <div key={item.title} className="flex items-center justify-between p-3 rounded-lg border border-gray-100">
+              <div key={item.title} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{item.title}</p>
-                  <p className="text-xs text-gray-500">{item.desc}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{item.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{item.desc}</p>
                 </div>
                 <input
                   type="checkbox"
                   disabled
-                  className="h-4 w-4 accent-orange-500 border-gray-300 rounded"
+                  className="h-4 w-4 accent-orange-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-800"
                 />
               </div>
             ))}
@@ -359,14 +359,14 @@ export default function SettingsPage() {
 
       {/* Security Tab */}
       {activeTab === 'security' && (
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-900">Seguridad</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Seguridad</h3>
           </div>
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-900 mb-1">Cambiar Contrasena</p>
-              <p className="text-xs text-gray-500 mb-3">
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Cambiar Contrasena</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                 Usa la opcion &quot;Olvidaste tu contrasena?&quot; en la pagina de inicio de sesion.
               </p>
               <Button variant="outline" size="sm" asChild>
@@ -374,14 +374,14 @@ export default function SettingsPage() {
               </Button>
             </div>
 
-            <div className="pt-3 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-900 mb-2">Sesiones Activas</p>
-              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100">
+            <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Sesiones Activas</p>
+              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Esta sesion</p>
-                  <p className="text-xs text-gray-500">Ultima actividad: Ahora</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Esta sesion</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Ultima actividad: Ahora</p>
                 </div>
-                <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-medium">
+                <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-[10px] font-medium">
                   Actual
                 </span>
               </div>

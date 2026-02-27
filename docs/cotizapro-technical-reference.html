@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CotizaPro — Referencia Técnica del Sistema</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-light: #dbeafe;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --green: #059669;
+      --green-light: #d1fae5;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --teal: #0d9488;
+      --teal-light: #ccfbf1;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--slate-50);
+      color: var(--slate-800);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ── HEADER ── */
+    .doc-header {
+      background: linear-gradient(135deg, var(--slate-900) 0%, #1e3a5f 100%);
+      color: white;
+      padding: 60px 48px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .doc-header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(37,99,235,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .doc-header-inner { max-width: 900px; margin: 0 auto; position: relative; }
+    .doc-badge {
+      display: inline-block;
+      background: rgba(37,99,235,0.25);
+      border: 1px solid rgba(37,99,235,0.5);
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .doc-header h1 {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .doc-header h1 span { color: #60a5fa; }
+    .doc-header p.subtitle {
+      font-size: 17px;
+      color: #94a3b8;
+      max-width: 580px;
+      margin-bottom: 36px;
+    }
+    .doc-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .doc-meta-item { font-size: 13px; color: #64748b; }
+    .doc-meta-item strong { color: #cbd5e1; display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── TOC ── */
+    .toc-section {
+      background: white;
+      border-bottom: 1px solid var(--slate-200);
+      padding: 32px 48px;
+    }
+    .toc-inner { max-width: 900px; margin: 0 auto; }
+    .toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-400); margin-bottom: 16px; }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--slate-700);
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .toc-item:hover { background: var(--slate-100); }
+    .toc-item .toc-num { font-size: 11px; color: var(--slate-400); font-weight: 400; min-width: 18px; }
+
+    /* ── STACK OVERVIEW ── */
+    .stack-bar {
+      background: white;
+      border-bottom: 1px solid var(--slate-200);
+      padding: 24px 48px;
+    }
+    .stack-inner { max-width: 900px; margin: 0 auto; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .stack-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-400); margin-right: 8px; }
+    .stack-tag {
+      background: var(--slate-100);
+      color: var(--slate-700);
+      border: 1px solid var(--slate-200);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .stack-tag.primary { background: var(--blue-light); color: var(--blue-dark); border-color: #bfdbfe; }
+
+    /* ── MAIN CONTENT ── */
+    .content { padding: 48px 48px; }
+    .content-inner { max-width: 900px; margin: 0 auto; }
+
+    /* ── MODULE CARD ── */
+    .module {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .module-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 28px 32px 24px;
+      border-bottom: 1px solid var(--slate-100);
+    }
+    .module-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .module-icon.blue { background: var(--blue-light); }
+    .module-icon.green { background: var(--green-light); }
+    .module-icon.purple { background: var(--purple-light); }
+    .module-icon.amber { background: var(--amber-light); }
+    .module-icon.red { background: var(--red-light); }
+    .module-icon.teal { background: var(--teal-light); }
+    .module-icon.slate { background: var(--slate-100); }
+
+    .module-header-text { flex: 1; }
+    .module-num { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-400); margin-bottom: 4px; }
+    .module-title { font-size: 20px; font-weight: 700; color: var(--slate-900); margin-bottom: 6px; }
+    .module-desc { font-size: 14px; color: var(--slate-600); line-height: 1.5; }
+
+    .module-body { padding: 28px 32px; }
+
+    /* ── SUBSECTION ── */
+    .subsection { margin-bottom: 28px; }
+    .subsection:last-child { margin-bottom: 0; }
+    .subsection-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-400);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--slate-100);
+    }
+
+    /* ── ENDPOINT LIST ── */
+    .endpoint-list { display: flex; flex-direction: column; gap: 6px; }
+    .endpoint {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .method {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      min-width: 44px;
+      text-align: center;
+    }
+    .method.get { background: #d1fae5; color: #065f46; }
+    .method.post { background: #dbeafe; color: #1e40af; }
+    .method.patch { background: #fef3c7; color: #92400e; }
+    .method.delete { background: #fee2e2; color: #991b1b; }
+    .endpoint-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--slate-700);
+      flex: 1;
+    }
+    .endpoint-desc {
+      font-size: 12px;
+      color: var(--slate-500);
+    }
+
+    /* ── FEATURE LIST ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--slate-50);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--slate-700);
+      line-height: 1.4;
+    }
+    .feature-item::before {
+      content: '→';
+      color: var(--blue);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── SCHEMA BLOCK ── */
+    .schema-block {
+      background: var(--slate-900);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .schema-block .key { color: #93c5fd; }
+    .schema-block .type { color: #6ee7b7; }
+    .schema-block .comment { color: #64748b; }
+
+    /* ── TECH PILL ── */
+    .tech-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tech-pill {
+      background: var(--slate-100);
+      border: 1px solid var(--slate-200);
+      color: var(--slate-600);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ── STATUS BADGE ── */
+    .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+    .s-draft { background: #f1f5f9; color: #475569; }
+    .s-sent { background: #dbeafe; color: #1e40af; }
+    .s-viewed { background: #ede9fe; color: #5b21b6; }
+    .s-accepted { background: #d1fae5; color: #065f46; }
+    .s-install { background: #fef3c7; color: #92400e; }
+    .s-completed { background: #ccfbf1; color: #115e59; }
+    .s-charged { background: #1e293b; color: #e2e8f0; }
+    .s-rejected { background: #fee2e2; color: #991b1b; }
+    .s-expired { background: #fef9c3; color: #713f12; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--blue-light);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #1e40af;
+      margin-top: 12px;
+    }
+    .warn-box {
+      background: var(--amber-light);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #78350f;
+      margin-top: 12px;
+    }
+
+    /* ── ROLE TABLE ── */
+    .role-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .role-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--slate-500);
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--slate-200);
+    }
+    .role-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--slate-100);
+      vertical-align: top;
+      color: var(--slate-700);
+    }
+    .role-table tr:last-child td { border-bottom: none; }
+    .check { color: var(--green); font-weight: 700; }
+    .cross { color: var(--slate-300); }
+
+    /* ── TWO COLUMN ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── FOOTER ── */
+    .doc-footer {
+      background: var(--slate-900);
+      color: var(--slate-400);
+      padding: 32px 48px;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .doc-footer-inner { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 16px; }
+    .doc-footer a { color: #60a5fa; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ HEADER ══════════════════════ -->
+<div class="doc-header">
+  <div class="doc-header-inner">
+    <div class="doc-badge">Referencia Técnica</div>
+    <h1>CotizaPro <span>System Reference</span></h1>
+    <p class="subtitle">Documentación técnica de módulos, APIs y capacidades del sistema para equipos de integración y evaluación técnica.</p>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><strong>Versión</strong> MVP 1.0 — Sprint 6</div>
+      <div class="doc-meta-item"><strong>API</strong> REST / Next.js App Router</div>
+      <div class="doc-meta-item"><strong>Base de Datos</strong> PostgreSQL / Supabase</div>
+      <div class="doc-meta-item"><strong>Fecha</strong> Febrero 2026</div>
+      <div class="doc-meta-item"><strong>Estado</strong> Producción-Ready</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ STACK ══════════════════════ -->
+<div class="stack-bar">
+  <div class="stack-inner">
+    <span class="stack-label">Stack</span>
+    <span class="stack-tag primary">Next.js 15</span>
+    <span class="stack-tag primary">TypeScript 5</span>
+    <span class="stack-tag primary">Supabase</span>
+    <span class="stack-tag">PostgreSQL 16</span>
+    <span class="stack-tag">React 19</span>
+    <span class="stack-tag">TailwindCSS 3</span>
+    <span class="stack-tag">Zod</span>
+    <span class="stack-tag">jsPDF</span>
+    <span class="stack-tag">Twilio</span>
+    <span class="stack-tag">Resend</span>
+    <span class="stack-tag">Stripe</span>
+    <span class="stack-tag">Playwright</span>
+  </div>
+</div>
+
+<!-- ══════════════════════ TOC ══════════════════════ -->
+<div class="toc-section">
+  <div class="toc-inner">
+    <div class="toc-title">Contenido</div>
+    <div class="toc-grid">
+      <a href="#auth" class="toc-item"><span class="toc-num">01</span> Autenticación y Multi-tenancy</a>
+      <a href="#clients" class="toc-item"><span class="toc-num">02</span> Módulo de Clientes</a>
+      <a href="#services" class="toc-item"><span class="toc-num">03</span> Catálogo de Servicios</a>
+      <a href="#quotes" class="toc-item"><span class="toc-num">04</span> Motor de Cotizaciones</a>
+      <a href="#payments" class="toc-item"><span class="toc-num">05</span> Módulo de Pagos</a>
+      <a href="#integrations" class="toc-item"><span class="toc-num">06</span> Integraciones (WhatsApp/Email/PDF)</a>
+      <a href="#reminders" class="toc-item"><span class="toc-num">07</span> Sistema de Recordatorios</a>
+      <a href="#analytics" class="toc-item"><span class="toc-num">08</span> Analytics e Ingresos</a>
+      <a href="#calendar" class="toc-item"><span class="toc-num">09</span> Calendario de Trabajo</a>
+      <a href="#templates" class="toc-item"><span class="toc-num">10</span> Plantillas de Cotización</a>
+      <a href="#export" class="toc-item"><span class="toc-num">11</span> Exportación de Datos</a>
+      <a href="#webhooks" class="toc-item"><span class="toc-num">12</span> Webhooks y Automatización</a>
+      <a href="#custom-fields" class="toc-item"><span class="toc-num">13</span> Campos Personalizados</a>
+      <a href="#cron" class="toc-item"><span class="toc-num">14</span> Cron Jobs</a>
+      <a href="#security" class="toc-item"><span class="toc-num">15</span> Seguridad y Rate Limiting</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CONTENT ══════════════════════ -->
+<div class="content">
+<div class="content-inner">
+
+<!-- ── 01 AUTH ── -->
+<div class="module" id="auth">
+  <div class="module-header">
+    <div class="module-icon blue">🔐</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 01</div>
+      <div class="module-title">Autenticación y Multi-tenancy</div>
+      <div class="module-desc">Sistema de identidad basado en JWT con aislamiento de datos por organización vía Row-Level Security (RLS) a nivel de base de datos.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Arquitectura de Identidad</div>
+      <div class="feature-grid">
+        <div class="feature-item">JWT sin estado — tokens revalidados en cada request vía middleware</div>
+        <div class="feature-item">RLS en todas las tablas — el DBMS rechaza queries cross-tenant</div>
+        <div class="feature-item">Sesiones gestionadas por Supabase Auth (GoTrue)</div>
+        <div class="feature-item">Refresh token automático en middleware de Next.js</div>
+        <div class="feature-item">Server Components usan <code>createServerClient()</code> — cero estado cliente</div>
+        <div class="feature-item">Client Components usan <code>createBrowserClient()</code> aislado</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Sistema de Roles</div>
+      <table class="role-table">
+        <thead>
+          <tr>
+            <th>Rol</th>
+            <th>Crear/Editar registros</th>
+            <th>Eliminar</th>
+            <th>Admin del catálogo</th>
+            <th>Gestionar equipo</th>
+            <th>Campos personalizados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>owner</strong></td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td><strong>admin</strong></td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td><strong>member</strong></td>
+            <td class="check">✓</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+          </tr>
+          <tr>
+            <td><strong>viewer</strong></td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/auth/logout</span>
+          <span class="endpoint-desc">Invalida sesión y limpia cookies</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/team/invitations</span>
+          <span class="endpoint-desc">Invitar miembro por email (expira en 7 días)</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/team/invitations/accept</span>
+          <span class="endpoint-desc">Aceptar invitación y unirse a la organización</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/team/members</span>
+          <span class="endpoint-desc">Listar miembros del equipo con roles</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/team/members/[id]</span>
+          <span class="endpoint-desc">Cambiar rol de un miembro</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/team/members/[id]</span>
+          <span class="endpoint-desc">Remover miembro del equipo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 02 CLIENTS ── -->
+<div class="module" id="clients">
+  <div class="module-header">
+    <div class="module-icon green">👥</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 02</div>
+      <div class="module-title">Gestión de Clientes</div>
+      <div class="module-desc">CRUD completo de clientes con búsqueda full-text, tags, empresa y protección ante eliminación si existen cotizaciones activas.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Campos del Modelo</div>
+      <div class="schema-block">
+<span class="key">clients</span> {
+  id              <span class="type">UUID</span>          <span class="comment">-- PK generado automáticamente</span>
+  organization_id <span class="type">UUID</span>          <span class="comment">-- FK → organizations (multi-tenant)</span>
+  name            <span class="type">TEXT</span>          <span class="comment">-- Nombre completo del contacto</span>
+  company_name    <span class="type">TEXT?</span>         <span class="comment">-- Empresa / razón social</span>
+  email           <span class="type">TEXT?</span>         <span class="comment">-- Con validación de formato</span>
+  phone           <span class="type">TEXT?</span>         <span class="comment">-- Teléfono / WhatsApp</span>
+  address         <span class="type">TEXT?</span>         <span class="comment">-- Dirección de instalación</span>
+  tags            <span class="type">TEXT[]</span>        <span class="comment">-- Etiquetas clasificatorias</span>
+  notes           <span class="type">TEXT?</span>         <span class="comment">-- Notas internas</span>
+  created_at      <span class="type">TIMESTAMPTZ</span>   <span class="comment">-- Auto</span>
+  updated_at      <span class="type">TIMESTAMPTZ</span>   <span class="comment">-- Trigger automático</span>
+}
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/clients</span>
+          <span class="endpoint-desc">Listado con búsqueda (name/email/phone), paginación limit/offset</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/clients</span>
+          <span class="endpoint-desc">Crear cliente — validación Zod + asignación automática de org</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/clients/[id]</span>
+          <span class="endpoint-desc">Detalle individual con historial de cotizaciones</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/clients/[id]</span>
+          <span class="endpoint-desc">Actualización parcial con validación</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/clients/[id]</span>
+          <span class="endpoint-desc">Eliminar — bloqueado si tiene cotizaciones asociadas</span>
+        </div>
+      </div>
+      <div class="info-box">Seguridad: RLS garantiza que solo se retornan/modifican clientes de la organización autenticada. Imposible acceder a clientes de otro tenant, incluso con ID válido.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 03 SERVICES ── -->
+<div class="module" id="services">
+  <div class="module-header">
+    <div class="module-icon purple">🛠️</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 03</div>
+      <div class="module-title">Catálogo de Servicios</div>
+      <div class="module-desc">Catálogo centralizado de servicios ofertados, con soporte para 4 tipos de precio y 5 categorías de industria. Solo admin/owner puede crear o modificar entradas.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="two-col">
+      <div class="subsection">
+        <div class="subsection-title">Tipos de Precio</div>
+        <div class="feature-grid" style="grid-template-columns: 1fr;">
+          <div class="feature-item"><strong>fixed</strong> — precio fijo por servicio</div>
+          <div class="feature-item"><strong>per_hour</strong> — tarifa por hora</div>
+          <div class="feature-item"><strong>per_sqm</strong> — precio por m²</div>
+          <div class="feature-item"><strong>per_unit</strong> — precio por unidad/pieza</div>
+        </div>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">Categorías</div>
+        <div class="feature-grid" style="grid-template-columns: 1fr;">
+          <div class="feature-item">hvac — Climatización</div>
+          <div class="feature-item">painting — Pintura</div>
+          <div class="feature-item">plumbing — Plomería</div>
+          <div class="feature-item">electrical — Eléctrico</div>
+          <div class="feature-item">other — Otros</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/services</span>
+          <span class="endpoint-desc">Listado — filtros: ?category=hvac &active=true</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/services</span>
+          <span class="endpoint-desc">Crear servicio — requiere rol admin/owner</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/services/[id]</span>
+          <span class="endpoint-desc">Actualizar precio, descripción, estado activo/inactivo</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/services/[id]</span>
+          <span class="endpoint-desc">Eliminar del catálogo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 04 QUOTES ── -->
+<div class="module" id="quotes">
+  <div class="module-header">
+    <div class="module-icon amber">📋</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 04</div>
+      <div class="module-title">Motor de Cotizaciones</div>
+      <div class="module-desc">Core del sistema. Cotizaciones multi-item con cálculo automático de subtotal, descuento, IVA 16% y total. Numeración automática. Ciclo de vida completo desde borrador hasta cobro.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Ciclo de Vida — Estados</div>
+      <div class="status-row">
+        <span class="status-badge s-draft">draft</span>
+        <span style="color:#94a3b8;font-size:18px;">→</span>
+        <span class="status-badge s-sent">sent</span>
+        <span style="color:#94a3b8;font-size:18px;">→</span>
+        <span class="status-badge s-viewed">viewed</span>
+        <span style="color:#94a3b8;font-size:18px;">→</span>
+        <span class="status-badge s-accepted">accepted</span>
+        <span style="color:#94a3b8;font-size:18px;">→</span>
+        <span class="status-badge s-install">en_instalacion</span>
+        <span style="color:#94a3b8;font-size:18px;">→</span>
+        <span class="status-badge s-completed">completado</span>
+        <span style="color:#94a3b8;font-size:18px;">→</span>
+        <span class="status-badge s-charged">cobrado</span>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center; font-size:12px; color:var(--slate-500);">
+        Terminales alternativos:
+        <span class="status-badge s-rejected">rejected</span>
+        <span class="status-badge s-expired">expired</span>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Lógica de Cálculo Automático</div>
+      <div class="schema-block">
+subtotal  = SUM(item.quantity × item.unit_price)
+descuento = subtotal × (discount_rate / 100)
+iva       = (subtotal - descuento) × 0.16   <span class="comment">-- IVA 16% fijo</span>
+total     = subtotal - descuento + iva
+
+<span class="comment">-- Numeración automática vía función PostgreSQL:</span>
+quote_number = <span class="type">COT-{YEAR}-{NNN}</span>   <span class="comment">-- ej: COT-2026-001</span>
+<span class="comment">-- Secuencia reiniciada por año, única por organización</span>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/quotes</span>
+          <span class="endpoint-desc">Listado con filtros: status, date range, client_id — paginado</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/quotes</span>
+          <span class="endpoint-desc">Crear cotización con items en transacción atómica. Rollback si fallan items.</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/quotes/[id]</span>
+          <span class="endpoint-desc">Detalle completo: quote + items + client + notifications + payments</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/quotes/[id]</span>
+          <span class="endpoint-desc">Actualizar — recalcula totales, reemplaza items completo</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/quotes/[id]</span>
+          <span class="endpoint-desc">Solo permitido en estado draft</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/quotes/[id]/send</span>
+          <span class="endpoint-desc">Generar PDF → subir a Storage → enviar Email + WhatsApp simultáneamente</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 05 PAYMENTS ── -->
+<div class="module" id="payments">
+  <div class="module-header">
+    <div class="module-icon green">💰</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 05</div>
+      <div class="module-title">Registro de Pagos</div>
+      <div class="module-desc">Módulo de cobranza parcial o total por cotización. Soporta múltiples abonos con validación de saldo, tipos de pago y generación de recibos en PDF.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Capacidades Clave</div>
+      <div class="feature-grid">
+        <div class="feature-item">Múltiples abonos por cotización (anticipo + saldo)</div>
+        <div class="feature-item">Validación: monto no puede exceder saldo pendiente</div>
+        <div class="feature-item">Tipos: anticipo, parcial, liquidación, devolución</div>
+        <div class="feature-item">Métodos: efectivo, transferencia, tarjeta, cheque, otro</div>
+        <div class="feature-item">Campo <code>received_by</code> para auditoría de quién cobró</div>
+        <div class="feature-item">Cálculo automático de total_paid y total_pending</div>
+        <div class="feature-item">Generación de recibo PDF descargable por pago</div>
+        <div class="feature-item">Solo owner/admin pueden eliminar pagos registrados</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/quotes/[id]/payments</span>
+          <span class="endpoint-desc">Lista pagos + total_paid + total_pending</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/quotes/[id]/payments</span>
+          <span class="endpoint-desc">Registrar pago — valida que no supere saldo, status 201</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/quotes/[id]/payments/[paymentId]</span>
+          <span class="endpoint-desc">Eliminar pago — solo owner/admin, status 204</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/quotes/[id]/payments/receipt/[paymentId]</span>
+          <span class="endpoint-desc">Descargar recibo PDF del pago específico</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 06 INTEGRATIONS ── -->
+<div class="module" id="integrations">
+  <div class="module-header">
+    <div class="module-icon teal">📤</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 06</div>
+      <div class="module-title">Integraciones Externas</div>
+      <div class="module-desc">Pipeline completo para entregar cotizaciones: generación de PDF profesional → almacenamiento en cloud → envío multicanal (Email + WhatsApp) con tracking de entrega.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Generación de PDF — jsPDF</div>
+      <div class="feature-grid">
+        <div class="feature-item">Header con número de cotización y logo de empresa</div>
+        <div class="feature-item">Tabla de items con cantidad, precio unitario y subtotal</div>
+        <div class="feature-item">Bloque de totales: subtotal, descuento (condicional), IVA, total</div>
+        <div class="feature-item">Datos del cliente (nombre, teléfono, email)</div>
+        <div class="feature-item">Fecha de emisión y validez en formato es-MX</div>
+        <div class="feature-item">Notas y términos con saltos de línea automáticos</div>
+        <div class="feature-item">Retorna Buffer — listo para upload y attachment</div>
+        <div class="feature-item">Sin dependencias de navegador — 100% servidor</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">WhatsApp — Twilio</div>
+      <div class="feature-grid">
+        <div class="feature-item">Envío via API de Twilio WhatsApp Business</div>
+        <div class="feature-item">Mensaje con link público al PDF en Supabase Storage</div>
+        <div class="feature-item">Formato automático de números (+52 México)</div>
+        <div class="feature-item">Soporte para media (imagen de portada del PDF)</div>
+        <div class="feature-item">Consulta de status de entrega (delivered/read/failed)</div>
+        <div class="feature-item">Override de número destino (whatsapp_override)</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Email — Resend</div>
+      <div class="feature-grid">
+        <div class="feature-item">Template HTML profesional con estilos inline</div>
+        <div class="feature-item">PDF adjunto directo al email</div>
+        <div class="feature-item">Botón CTA para ver cotización online</div>
+        <div class="feature-item">Campos del cliente en el cuerpo del email</div>
+        <div class="feature-item">Override de destinatario (email_override)</div>
+        <div class="feature-item">Tracking de notificación en quote_notifications</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Storage — Supabase</div>
+      <div class="feature-grid">
+        <div class="feature-item">Bucket <code>documents</code> público para PDFs generados</div>
+        <div class="feature-item">Path: <code>org_id/quote_id/cotizacion.pdf</code></div>
+        <div class="feature-item">URL permanente y pública para links en WhatsApp</div>
+        <div class="feature-item">RLS: solo usuarios autenticados pueden subir</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoint de Envío</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/quotes/[id]/send</span>
+          <span class="endpoint-desc">Orquesta: PDF → Storage → Email + WhatsApp → actualiza status → registra notificación</span>
+        </div>
+      </div>
+      <div class="info-box">El endpoint retorna <code>{ success, results: { email, whatsapp }, pdf_url }</code>. Cada canal falla independientemente — si el email falla, el WhatsApp continúa y viceversa.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 07 REMINDERS ── -->
+<div class="module" id="reminders">
+  <div class="module-header">
+    <div class="module-icon blue">🔔</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 07</div>
+      <div class="module-title">Sistema de Recordatorios de Seguimiento</div>
+      <div class="module-desc">Recordatorios programados para seguimiento post-servicio. Soporta recurrencia automática — al completar un recordatorio, el sistema crea automáticamente el siguiente.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="two-col">
+      <div class="subsection">
+        <div class="subsection-title">Tipos de Recordatorio</div>
+        <div class="feature-grid" style="grid-template-columns:1fr;">
+          <div class="feature-item"><strong>maintenance</strong> — mantenimiento preventivo</div>
+          <div class="feature-item"><strong>follow_up</strong> — seguimiento de cotización</div>
+          <div class="feature-item"><strong>renewal</strong> — renovación de contrato</div>
+          <div class="feature-item"><strong>custom</strong> — recordatorio personalizado</div>
+        </div>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">Prioridades / Estados</div>
+        <div class="feature-grid" style="grid-template-columns:1fr;">
+          <div class="feature-item">Prioridad: baja / normal / alta / urgente</div>
+          <div class="feature-item">Estado: pendiente → enviado → completado</div>
+          <div class="feature-item">Pospuesto: snooze N días configurable</div>
+          <div class="feature-item">Cancelado: soft-delete con registro</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Recurrencia Automática</div>
+      <div class="info-box">Caso de uso real: al instalar un minisplit, crear recordatorio de mantenimiento anual. Al marcarlo como completado, el sistema crea automáticamente el siguiente con fecha +12 meses. Sin intervención manual.</div>
+      <div class="schema-block" style="margin-top:12px;">
+<span class="comment">-- Configuración de recurrencia:</span>
+is_recurring             <span class="type">BOOLEAN</span>
+recurrence_interval_months <span class="type">INT</span>   <span class="comment">-- ej: 6, 12</span>
+
+<span class="comment">-- Función SQL disparada al completar:</span>
+create_next_reminder_occurrence(reminder_id)
+<span class="comment">-- Clona el recordatorio con nueva fecha calculada</span>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/reminders</span>
+          <span class="endpoint-desc">Listado con filtros: status, type, priority, due_only, days_ahead</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/reminders</span>
+          <span class="endpoint-desc">Crear — vincula a client_id, quote_id (opcional), category</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/reminders/due</span>
+          <span class="endpoint-desc">Recordatorios vencidos en próximos N días (?days_ahead=7)</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/reminders/[id]/complete</span>
+          <span class="endpoint-desc">Marcar completado — activa creación del siguiente si is_recurring</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/reminders/[id]/snooze</span>
+          <span class="endpoint-desc">Posponer N días — body: { days: number }</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/reminders/[id]</span>
+          <span class="endpoint-desc">Editar título, fecha, prioridad, notas</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/reminders/[id]</span>
+          <span class="endpoint-desc">Cancelar recordatorio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 08 ANALYTICS ── -->
+<div class="module" id="analytics">
+  <div class="module-header">
+    <div class="module-icon purple">📊</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 08</div>
+      <div class="module-title">Analytics e Ingresos</div>
+      <div class="module-desc">Tres capas de análisis: métricas generales del negocio, tendencias en series de tiempo e ingresos reales cobrados vs pipeline esperado.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Dashboard Analytics — Métricas Clave</div>
+      <div class="feature-grid">
+        <div class="feature-item">Conteos totales: clientes, cotizaciones, recordatorios, servicios</div>
+        <div class="feature-item">Distribución de cotizaciones por estado</div>
+        <div class="feature-item">Tasa de conversión: accepted / (accepted + rejected)</div>
+        <div class="feature-item">Response rate: viewed / sent</div>
+        <div class="feature-item">Ingreso total y del mes en curso</div>
+        <div class="feature-item">Top 5 servicios más cotizados</div>
+        <div class="feature-item">Valor promedio de cotización</div>
+        <div class="feature-item">Actividad reciente (últimos 30 días)</div>
+        <div class="feature-item">Recordatorios vencidos y próximos 7 días</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Trends — Series de Tiempo</div>
+      <div class="feature-grid">
+        <div class="feature-item">Períodos: week / month / quarter / year</div>
+        <div class="feature-item">Agrupación: día / semana / mes</div>
+        <div class="feature-item">Métricas: quotes, revenue, clients, reminders, all</div>
+        <div class="feature-item">Cotizaciones creadas vs aceptadas en el tiempo</div>
+        <div class="feature-item">Ingresos facturados en el tiempo</div>
+        <div class="feature-item">Nuevos clientes por período</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Income Analytics — Ingresos Reales</div>
+      <div class="feature-grid">
+        <div class="feature-item">Ingresos cobrados en período actual (semana o mes)</div>
+        <div class="feature-item">Comparación vs período anterior con % de cambio</div>
+        <div class="feature-item">Desglose semanal dentro del mes</div>
+        <div class="feature-item">Pipeline value: cotizaciones aceptadas + en instalación</div>
+        <div class="feature-item">Saldo pendiente de cobro en cartera activa</div>
+      </div>
+      <div class="warn-box">Los ingresos reportados son pagos realmente registrados en <code>quote_payments</code>, no el valor de cotizaciones emitidas. Refleja flujo de caja real.</div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/analytics/dashboard</span>
+          <span class="endpoint-desc">Métricas completas del negocio para el dashboard principal</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/analytics/trends</span>
+          <span class="endpoint-desc">Series de tiempo — ?period=month &metric=all &group_by=week</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/analytics/income</span>
+          <span class="endpoint-desc">Ingresos reales — ?period=month &compare=true</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 09 CALENDAR ── -->
+<div class="module" id="calendar">
+  <div class="module-header">
+    <div class="module-icon slate">📅</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 09</div>
+      <div class="module-title">Calendario de Trabajo</div>
+      <div class="module-desc">Vista semanal de eventos de trabajo (instalaciones, visitas, mantenimientos). Eventos vinculables a clientes y cotizaciones con soporte para colores por tipo.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Tipos de Evento</div>
+      <div class="feature-grid">
+        <div class="feature-item"><strong>installation</strong> — instalación de equipo</div>
+        <div class="feature-item"><strong>maintenance</strong> — mantenimiento preventivo</div>
+        <div class="feature-item"><strong>visit</strong> — visita de diagnóstico</div>
+        <div class="feature-item"><strong>meeting</strong> — reunión con cliente</div>
+        <div class="feature-item"><strong>other</strong> — evento personalizado</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/calendar/events</span>
+          <span class="endpoint-desc">Eventos en rango de fechas — ?start=YYYY-MM-DD &end=YYYY-MM-DD</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/calendar/events</span>
+          <span class="endpoint-desc">Crear evento — acepta datetime local sin conversión UTC</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/calendar/events/[id]</span>
+          <span class="endpoint-desc">Actualizar título, fechas, tipo, notas</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/calendar/events/[id]</span>
+          <span class="endpoint-desc">Eliminar evento</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 10 TEMPLATES ── -->
+<div class="module" id="templates">
+  <div class="module-header">
+    <div class="module-icon amber">📑</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 10</div>
+      <div class="module-title">Plantillas de Cotización</div>
+      <div class="module-desc">Plantillas reutilizables con items predefinidos, notas, términos y etiquetas promocionales. Contador de uso para identificar las más populares.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Campos del Modelo</div>
+      <div class="schema-block">
+quote_templates {
+  name                   <span class="type">TEXT</span>         <span class="comment">-- Nombre de la plantilla</span>
+  description            <span class="type">TEXT?</span>
+  category               <span class="type">TEXT?</span>        <span class="comment">-- hvac, painting, etc.</span>
+  default_items          <span class="type">JSONB[]</span>      <span class="comment">-- Items pre-cargados</span>
+  default_notes          <span class="type">TEXT?</span>
+  default_terms          <span class="type">TEXT?</span>
+  default_discount_rate  <span class="type">NUMERIC(5,2)</span>
+  default_valid_days     <span class="type">INT</span>          <span class="comment">-- Días de validez por defecto</span>
+  promotional_label      <span class="type">TEXT?</span>        <span class="comment">-- Etiqueta promo: "Oferta Verano"</span>
+  promotional_valid_until <span class="type">DATE?</span>       <span class="comment">-- Vigencia de la promo</span>
+  is_active              <span class="type">BOOLEAN</span>
+  usage_count            <span class="type">INT</span>          <span class="comment">-- Auto-increment al usar</span>
+}
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/templates</span>
+          <span class="endpoint-desc">Listado ordenado por usage_count — ?category=hvac &active=true</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/templates</span>
+          <span class="endpoint-desc">Crear plantilla con items JSONB</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/templates/[id]</span>
+          <span class="endpoint-desc">Editar — incluye activar/desactivar y campos promocionales</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/templates/[id]</span>
+          <span class="endpoint-desc">Eliminar plantilla</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 11 EXPORT ── -->
+<div class="module" id="export">
+  <div class="module-header">
+    <div class="module-icon green">📥</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 11</div>
+      <div class="module-title">Exportación de Datos</div>
+      <div class="module-desc">Exportación de clientes y cotizaciones a CSV (compatible con Excel en UTF-8) y generación de reportes analíticos en PDF descargable.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Capacidades</div>
+      <div class="feature-grid">
+        <div class="feature-item">CSV Clientes: nombre, empresa, email, teléfono, tags, fecha — con filtros</div>
+        <div class="feature-item">CSV Cotizaciones: datos financieros completos (subtotal, IVA, total, descuento)</div>
+        <div class="feature-item">BOM UTF-8 en CSV para compatibilidad con Excel en Windows</div>
+        <div class="feature-item">Escape automático de comas y comillas en campos de texto</div>
+        <div class="feature-item">PDF Reporte Analytics: métricas, conversión, top servicios</div>
+        <div class="feature-item">Nombre de archivo con timestamp: <code>clientes-2026-02-24.csv</code></div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/export/clients</span>
+          <span class="endpoint-desc">CSV de clientes — ?tags=hvac,pintura</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/export/quotes</span>
+          <span class="endpoint-desc">CSV de cotizaciones — ?status=accepted &date_from=2026-01-01</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/export/analytics-report</span>
+          <span class="endpoint-desc">PDF con reporte completo — ?period=month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 12 WEBHOOKS ── -->
+<div class="module" id="webhooks">
+  <div class="module-header">
+    <div class="module-icon purple">🔗</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 12</div>
+      <div class="module-title">Webhooks para Integraciones Externas</div>
+      <div class="module-desc">Sistema de webhooks salientes para notificar sistemas externos (CRMs, ERPs, apps internas) sobre eventos del ciclo de vida de cotizaciones, clientes y recordatorios.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Eventos Disponibles</div>
+      <div class="feature-grid">
+        <div class="feature-item">quote.created — nueva cotización creada</div>
+        <div class="feature-item">quote.sent — cotización enviada al cliente</div>
+        <div class="feature-item">quote.accepted — cliente aceptó</div>
+        <div class="feature-item">quote.rejected — cliente rechazó</div>
+        <div class="feature-item">client.created — nuevo cliente registrado</div>
+        <div class="feature-item">client.updated — datos de cliente actualizados</div>
+        <div class="feature-item">reminder.due — recordatorio vencido</div>
+        <div class="feature-item">reminder.completed — recordatorio marcado completado</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Características Técnicas</div>
+      <div class="feature-grid">
+        <div class="feature-item">Secret key por suscripción (crypto.randomBytes) para verificación HMAC</div>
+        <div class="feature-item">Configuración de reintentos: max_retries y retry_delay_seconds</div>
+        <div class="feature-item">Log de entregas en webhook_delivery_logs (status, latencia, respuesta)</div>
+        <div class="feature-item">Estados de entrega: pending / success / failed / retrying</div>
+        <div class="feature-item">Solo admin/owner puede gestionar suscripciones</div>
+        <div class="feature-item">Función SQL get_pending_webhook_deliveries() para procesamiento</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/webhooks</span>
+          <span class="endpoint-desc">Listar suscripciones activas de la organización</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/webhooks</span>
+          <span class="endpoint-desc">Crear suscripción — body: { url, events[], description }</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 13 CUSTOM FIELDS ── -->
+<div class="module" id="custom-fields">
+  <div class="module-header">
+    <div class="module-icon teal">🔧</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 13</div>
+      <div class="module-title">Campos Personalizados</div>
+      <div class="module-desc">Sistema extensible de campos personalizados por entidad. Permite a cada organización agregar atributos propios a clientes, servicios y cotizaciones sin modificar el esquema base.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="two-col">
+      <div class="subsection">
+        <div class="subsection-title">Tipos de Campo</div>
+        <div class="feature-grid" style="grid-template-columns:1fr;">
+          <div class="feature-item">text — campo de texto simple</div>
+          <div class="feature-item">textarea — texto largo / multilinea</div>
+          <div class="feature-item">number — valor numérico</div>
+          <div class="feature-item">date — selector de fecha</div>
+          <div class="feature-item">select — dropdown con opciones</div>
+          <div class="feature-item">checkbox — booleano</div>
+          <div class="feature-item">url — link validado</div>
+          <div class="feature-item">phone / email — con validación de formato</div>
+        </div>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">Características</div>
+        <div class="feature-grid" style="grid-template-columns:1fr;">
+          <div class="feature-item">Entidades soportadas: client, service, quote</div>
+          <div class="feature-item">Ordenamiento manual (sort_order)</div>
+          <div class="feature-item">Campos requeridos / opcionales</div>
+          <div class="feature-item">Activar/desactivar sin borrar datos</div>
+          <div class="feature-item">Opciones configurables para campos select</div>
+          <div class="feature-item">Valor por defecto configurable</div>
+          <div class="feature-item">Placeholder de ayuda al usuario</div>
+          <div class="feature-item">Solo admin/owner puede definir campos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/custom-fields</span>
+          <span class="endpoint-desc">Listado — ?entity_type=client &active_only=true</span>
+        </div>
+        <div class="endpoint">
+          <span class="method post">POST</span>
+          <span class="endpoint-path">/api/custom-fields</span>
+          <span class="endpoint-desc">Crear campo — requiere admin/owner. Clave única por entidad.</span>
+        </div>
+        <div class="endpoint">
+          <span class="method patch">PATCH</span>
+          <span class="endpoint-path">/api/custom-fields/[id]</span>
+          <span class="endpoint-desc">Editar label, opciones, placeholder, is_active</span>
+        </div>
+        <div class="endpoint">
+          <span class="method delete">DELETE</span>
+          <span class="endpoint-path">/api/custom-fields/[id]</span>
+          <span class="endpoint-desc">Eliminar definición del campo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 14 CRON ── -->
+<div class="module" id="cron">
+  <div class="module-header">
+    <div class="module-icon slate">⏰</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 14</div>
+      <div class="module-title">Cron Jobs — Automatización</div>
+      <div class="module-desc">Procesamiento automático diario de recordatorios vencidos. Envía notificaciones multicanal sin intervención manual. Configurado para Vercel Cron o servicios externos.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Flujo de Ejecución Diaria</div>
+      <div class="schema-block">
+<span class="comment">-- 9:00 AM UTC / 3:00 AM hora México</span>
+GET /api/cron/reminders-check
+Authorization: Bearer {CRON_SECRET}
+
+1. Obtener recordatorios vencidos (hoy + 1 día) via get_due_reminders()
+2. Por cada recordatorio:
+   a. Enviar Email via Resend al cliente
+   b. Enviar WhatsApp via Twilio al cliente
+   c. Actualizar status → 'sent'
+   d. Registrar notification_sent_at (evita duplicados)
+3. Retornar: { processed, sent, failed, errors[] }
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Seguridad y Compatibilidad</div>
+      <div class="feature-grid">
+        <div class="feature-item">Header <code>Authorization: Bearer CRON_SECRET</code> requerido</div>
+        <div class="feature-item">Compatible con Vercel Cron (plan Pro/Team)</div>
+        <div class="feature-item">Compatible con GitHub Actions (workflow diario)</div>
+        <div class="feature-item">Compatible con cron-job.org (plan gratuito)</div>
+        <div class="feature-item">Idempotente — <code>notification_sent_at</code> previene reenvíos</div>
+        <div class="feature-item">Multi-organización — procesa todos los tenants en una ejecución</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Endpoints</div>
+      <div class="endpoint-list">
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/cron/reminders-check</span>
+          <span class="endpoint-desc">Ejecución automática — requiere CRON_SECRET en Authorization header</span>
+        </div>
+        <div class="endpoint">
+          <span class="method get">GET</span>
+          <span class="endpoint-path">/api/health</span>
+          <span class="endpoint-desc">Health check — retorna { status: 'ok', timestamp }</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 15 SECURITY ── -->
+<div class="module" id="security">
+  <div class="module-header">
+    <div class="module-icon red">🛡️</div>
+    <div class="module-header-text">
+      <div class="module-num">Módulo 15</div>
+      <div class="module-title">Seguridad y Rate Limiting</div>
+      <div class="module-desc">Capas de seguridad aplicadas a nivel de middleware, API route y base de datos. Diseño defense-in-depth con múltiples puntos de validación.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="subsection">
+      <div class="subsection-title">Capas de Seguridad</div>
+      <div class="feature-grid">
+        <div class="feature-item"><strong>Middleware</strong> — refresca JWT, verifica sesión en rutas protegidas</div>
+        <div class="feature-item"><strong>CORS configurado</strong> — whitelist de orígenes + soporte localhost dinámico</div>
+        <div class="feature-item"><strong>RLS en DB</strong> — aislamiento de tenant imposible de bypass desde la API</div>
+        <div class="feature-item"><strong>Zod en cada endpoint</strong> — validación estricta de inputs antes de cualquier query</div>
+        <div class="feature-item"><strong>Role enforcement</strong> — verificación de rol en operaciones admin</div>
+        <div class="feature-item"><strong>Error logging</strong> — logger.security() para intentos no autorizados</div>
+        <div class="feature-item"><strong>No secrets en cliente</strong> — SUPABASE_SERVICE_ROLE_KEY nunca expuesto</div>
+        <div class="feature-item"><strong>Parameterized queries</strong> — Supabase SDK previene SQL injection</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Rate Limiting</div>
+      <div class="schema-block">
+<span class="comment">-- lib/rate-limit.ts</span>
+defaultApiLimiter: <span class="type">100 req / 15 min</span> por IP
+
+<span class="comment">-- Activo solo en producción (NODE_ENV === 'production')</span>
+<span class="comment">-- Desactivado en desarrollo/tests para no bloquear E2E</span>
+
+<span class="comment">-- Respuesta al superar límite:</span>
+HTTP 429 Too Many Requests
+Retry-After: {seconds}
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Logging Estructurado</div>
+      <div class="feature-grid">
+        <div class="feature-item"><code>logger.api(method, path, status, count)</code> — todas las respuestas</div>
+        <div class="feature-item"><code>logger.security(msg, context)</code> — intentos no autorizados</div>
+        <div class="feature-item"><code>logger.database(op, table, context)</code> — queries críticas</div>
+        <div class="feature-item"><code>logger.error(msg, error, context)</code> — errores con stack trace</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="subsection-title">Stack de Tecnologías de Seguridad</div>
+      <div class="tech-pills">
+        <span class="tech-pill">Supabase Auth (GoTrue)</span>
+        <span class="tech-pill">PostgreSQL RLS</span>
+        <span class="tech-pill">JWT RS256</span>
+        <span class="tech-pill">Zod Schema Validation</span>
+        <span class="tech-pill">CORS Middleware</span>
+        <span class="tech-pill">Rate Limiting (Production)</span>
+        <span class="tech-pill">TypeScript Strict Mode</span>
+        <span class="tech-pill">Server Actions Only</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── API SUMMARY ── -->
+<div class="module">
+  <div class="module-header">
+    <div class="module-icon blue">🗺️</div>
+    <div class="module-header-text">
+      <div class="module-num">Resumen</div>
+      <div class="module-title">Inventario Completo de Endpoints</div>
+      <div class="module-desc">50 endpoints REST documentados, todos con autenticación JWT, RLS y validación Zod. Rate limited en producción.</div>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="schema-block">
+<span class="comment">-- AUTENTICACIÓN</span>
+POST   /api/auth/logout
+GET    /api/team/members         PATCH  /api/team/members/[id]   DELETE /api/team/members/[id]
+POST   /api/team/invitations     POST   /api/team/invitations/accept
+DELETE /api/team/invitations/[id]
+
+<span class="comment">-- CLIENTES</span>
+GET    /api/clients              POST   /api/clients
+GET    /api/clients/[id]         PATCH  /api/clients/[id]         DELETE /api/clients/[id]
+
+<span class="comment">-- SERVICIOS</span>
+GET    /api/services             POST   /api/services
+GET    /api/services/[id]        PATCH  /api/services/[id]        DELETE /api/services/[id]
+
+<span class="comment">-- COTIZACIONES</span>
+GET    /api/quotes               POST   /api/quotes
+GET    /api/quotes/[id]          PATCH  /api/quotes/[id]          DELETE /api/quotes/[id]
+POST   /api/quotes/[id]/send
+
+<span class="comment">-- PAGOS</span>
+GET    /api/quotes/[id]/payments               POST   /api/quotes/[id]/payments
+DELETE /api/quotes/[id]/payments/[paymentId]
+GET    /api/quotes/[id]/payments/receipt/[id]
+
+<span class="comment">-- RECORDATORIOS</span>
+GET    /api/reminders            POST   /api/reminders            GET /api/reminders/due
+GET    /api/reminders/[id]       PATCH  /api/reminders/[id]       DELETE /api/reminders/[id]
+POST   /api/reminders/[id]/complete             POST /api/reminders/[id]/snooze
+
+<span class="comment">-- ANALYTICS</span>
+GET    /api/analytics/dashboard
+GET    /api/analytics/trends
+GET    /api/analytics/income
+
+<span class="comment">-- CALENDARIO</span>
+GET    /api/calendar/events      POST   /api/calendar/events
+PATCH  /api/calendar/events/[id] DELETE /api/calendar/events/[id]
+
+<span class="comment">-- PLANTILLAS</span>
+GET    /api/templates            POST   /api/templates
+PATCH  /api/templates/[id]       DELETE /api/templates/[id]
+
+<span class="comment">-- CAMPOS PERSONALIZADOS</span>
+GET    /api/custom-fields        POST   /api/custom-fields
+PATCH  /api/custom-fields/[id]   DELETE /api/custom-fields/[id]
+
+<span class="comment">-- EXPORTACIÓN</span>
+GET    /api/export/clients       GET    /api/export/quotes        GET /api/export/analytics-report
+
+<span class="comment">-- WEBHOOKS</span>
+GET    /api/webhooks             POST   /api/webhooks
+
+<span class="comment">-- AUTOMATIZACIÓN</span>
+GET    /api/cron/reminders-check
+GET    /api/health
+    </div>
+  </div>
+</div>
+
+</div><!-- /content-inner -->
+</div><!-- /content -->
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<div class="doc-footer">
+  <div class="doc-footer-inner">
+    <div>
+      <strong style="color:#e2e8f0;">CotizaPro</strong> — Referencia Técnica del Sistema<br />
+      MVP 1.0 · Sprint 6 · Febrero 2026
+    </div>
+    <div style="text-align:right; font-size:12px;">
+      Stack: Next.js 15 · Supabase · TypeScript 5 · PostgreSQL 16<br />
+      15 módulos · 50 endpoints REST · Multi-tenant · RLS
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

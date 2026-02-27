@@ -92,14 +92,14 @@ export default async function ServicesPage({
       {/* Header + inline stats */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-            <Wrench className="w-4 h-4 text-orange-600" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+            <Wrench className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Servicios</h2>
-            <div className="flex items-center gap-3 text-sm text-gray-500">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Servicios</h2>
+            <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
               <span>{services?.length || 0} total</span>
-              <span className="text-green-600">{activeServices.length} activos</span>
+              <span className="text-green-600 dark:text-green-400">{activeServices.length} activos</span>
               <span>{Object.keys(servicesByCategory).length} categorías</span>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default async function ServicesPage({
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3">
         <ServiceFilters activeUnitType={unit_type} activeFilter={active} defaultSearch={q} />
       </div>
 
@@ -121,34 +121,34 @@ export default async function ServicesPage({
       {Object.keys(servicesByCategory).length > 0 ? (
         <div className="space-y-3">
           {(Object.entries(servicesByCategory) as [string, Service[]][]).map(([category, categoryServices]) => (
-            <div key={category} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="px-4 py-2.5 bg-gray-50/60 border-b border-gray-100">
-                <span className="text-sm font-semibold text-gray-700">{categoryLabels[category] || 'Otros'}</span>
-                <span className="ml-2 text-xs text-gray-400">{categoryServices.length}</span>
+            <div key={category} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50/60 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{categoryLabels[category] || 'Otros'}</span>
+                <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">{categoryServices.length}</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-50">
-                      <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Servicio</th>
-                      <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Descripción</th>
-                      <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Precio</th>
-                      <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Unidad</th>
-                      <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 uppercase">Estado</th>
-                      <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    <tr className="border-b border-gray-50 dark:border-gray-700">
+                      <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Servicio</th>
+                      <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Descripción</th>
+                      <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Precio</th>
+                      <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Unidad</th>
+                      <th className="text-center py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
+                      <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     {categoryServices.map((service) => (
-                      <tr key={service.id} className="border-b border-gray-50 last:border-0 hover:bg-orange-50/40 cursor-pointer">
-                        <td className="py-2 px-4 text-sm font-medium text-gray-900">{service.name}</td>
-                        <td className="py-2 px-4 text-xs text-gray-500 max-w-xs truncate hidden md:table-cell">
+                      <tr key={service.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-orange-50/40 dark:hover:bg-gray-800 cursor-pointer">
+                        <td className="py-2 px-4 text-sm font-medium text-gray-900 dark:text-white">{service.name}</td>
+                        <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate hidden md:table-cell">
                           {service.description || '-'}
                         </td>
-                        <td className="text-right py-2 px-4 text-sm font-medium text-gray-900">
+                        <td className="text-right py-2 px-4 text-sm font-medium text-gray-900 dark:text-white">
                           ${Number(service.unit_price).toLocaleString('es-MX')}
                         </td>
-                        <td className="text-center py-2 px-4 text-xs text-gray-500 hidden sm:table-cell">
+                        <td className="text-center py-2 px-4 text-xs text-gray-500 dark:text-gray-400 hidden sm:table-cell">
                           {unitTypeLabels[service.unit_type] || service.unit_type}
                         </td>
                         <td className="text-center py-2 px-4">
@@ -172,10 +172,10 @@ export default async function ServicesPage({
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 py-10">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 py-10">
           <div className="text-center">
-            <Wrench className="mx-auto h-10 w-10 text-gray-300" />
-            <p className="mt-2 text-sm text-gray-500">No tienes servicios registrados</p>
+            <Wrench className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600" />
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No tienes servicios registrados</p>
             <div className="mt-4">
               <Link href="/dashboard/services/new">
                 <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">

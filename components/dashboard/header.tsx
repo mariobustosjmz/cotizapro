@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, ChevronRight } from 'lucide-react'
+import { ChevronRight, Sun, Moon } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import { QuickActionsList } from './quick-actions'
+import { NotificationBell } from './notification-bell'
+import { useTheme } from '@/components/theme-provider'
 
 interface HeaderProps {
   user: User
@@ -47,9 +49,10 @@ function buildBreadcrumbs(pathname: string): Crumb[] {
 export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps) {
   const pathname = usePathname()
   const crumbs = buildBreadcrumbs(pathname)
+  const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0">
+    <header className="h-14 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-6 shrink-0">
       {/* Breadcrumbs */}
       <nav aria-label="Navegación" className="flex items-center gap-1 min-w-0">
         {crumbs.map((crumb, idx) => {
@@ -60,7 +63,7 @@ export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps)
                 <ChevronRight className="w-3.5 h-3.5 text-gray-300 shrink-0" />
               )}
               {isLast ? (
-                <span className="text-[15px] font-semibold text-gray-900 truncate">
+                <span className="text-[15px] font-semibold text-gray-900 dark:text-white truncate">
                   {crumb.label}
                 </span>
               ) : (
@@ -83,13 +86,17 @@ export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps)
           <QuickActionsList variant="horizontal" />
         </div>
 
-        {/* Notifications */}
+        {/* Theme Toggle */}
         <button
-          className="relative w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-          aria-label="Notificaciones"
+          onClick={toggleTheme}
+          className="w-8 h-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label="Cambiar tema"
         >
-          <Bell className="w-4 h-4" />
+          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
+
+        {/* Notifications */}
+        <NotificationBell />
       </div>
     </header>
   )

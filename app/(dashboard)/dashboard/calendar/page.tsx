@@ -79,12 +79,12 @@ export default async function CalendarPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-            <Calendar className="w-4 h-4 text-orange-600" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+            <Calendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Agenda</h2>
-            <span className="text-sm text-gray-500">{typedEvents.length} eventos esta semana</span>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Agenda</h2>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{typedEvents.length} eventos esta semana</span>
           </div>
         </div>
         <Link href="/dashboard/calendar/new">

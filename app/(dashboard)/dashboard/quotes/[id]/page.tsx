@@ -3,9 +3,10 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Trash2, FileDown, Send, MessageCircle, Mail, Calendar, Plus } from 'lucide-react'
+import { ArrowLeft, Trash2, FileDown, Send, Calendar, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { PaymentSection } from '@/components/dashboard/payment-section'
+import { QuoteShareDialog } from '@/components/dashboard/quote-share-dialog'
 
 interface QuoteItem {
   id: string
@@ -82,6 +83,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
   const [error, setError] = useState('')
   const [quote, setQuote] = useState<Quote | null>(null)
   const [workEvents, setWorkEvents] = useState<WorkEvent[]>([])
+  const [shareOpen, setShareOpen] = useState(false)
 
   useEffect(() => {
     async function fetchQuote() {
@@ -183,34 +185,17 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  function handleSendWhatsApp() {
-    if (!quote?.client?.phone) {
-      setError('No hay numero de telefono disponible para este cliente')
-      return
-    }
-    const phoneNumber = quote.client.phone.replace(/\D/g, '')
-    const message = encodeURIComponent(
-      `Hola ${quote.client.name}, te envio la cotizacion #${quote.quote_number}. Valida hasta: ${new Date(quote.valid_until).toLocaleDateString('es-MX')}`
-    )
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank')
-  }
-
-  function handleSendEmail() {
-    if (!quote?.client?.email) {
-      setError('No hay email disponible para este cliente')
-      return
-    }
-    const subject = encodeURIComponent(`Cotizacion #${quote.quote_number}`)
-    const body = encodeURIComponent(
-      `Hola ${quote.client.name},\n\nTe envio la cotizacion #${quote.quote_number}.\n\nValor Total: $${Number(quote.total).toLocaleString('es-MX')}\nValida hasta: ${new Date(quote.valid_until).toLocaleDateString('es-MX')}\n\nQuedo atento a tus comentarios.`
-    )
-    window.location.href = `mailto:${quote.client.email}?subject=${subject}&body=${body}`
+  function handleRefreshQuote() {
+    fetch(`/api/quotes/${id}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data?.data) setQuote(data.data) })
+      .catch(() => {})
   }
 
   if (!quote) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500 text-sm">{error || 'Cargando...'}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">{error || 'Cargando...'}</p>
       </div>
     )
   }
@@ -227,12 +212,12 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-gray-900">{quote.quote_number}</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{quote.quote_number}</h2>
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColors[quote.status]}`}>
                 {statusLabels[quote.status] || quote.status}
               </span>
             </div>
-            <p className="text-xs text-gray-500">{quote.client?.name || '\u2014'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{quote.client?.name || '\u2014'}</p>
           </div>
         </div>
 
@@ -241,12 +226,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
             <FileDown className="w-3.5 h-3.5 mr-1" />
             PDF
           </Button>
-          {quote.status === 'draft' && (
-            <Button onClick={() => handleStatusChange('sent')} size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
-              <Send className="w-3.5 h-3.5 mr-1" />
-              Enviar
-            </Button>
-          )}
+          <Button onClick={() => setShareOpen(true)} size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+            <Send className="w-3.5 h-3.5 mr-1" />
+            Enviar
+          </Button>
           <Button onClick={handleDelete} variant="destructive" size="sm" disabled={deleting}>
             <Trash2 className="w-3.5 h-3.5 mr-1" />
             {deleting ? '...' : 'Eliminar'}
@@ -255,30 +238,30 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">{error}</div>
       )}
 
       {/* Client Info */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <span className="text-sm font-semibold text-gray-900">Cliente</span>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Cliente</span>
         </div>
         <div className="p-4">
           <div className="grid gap-3 md:grid-cols-3">
             <div>
-              <p className="text-xs text-gray-500">Nombre</p>
-              <p className="text-sm font-medium text-gray-900">{quote.client?.name || '\u2014'}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Nombre</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{quote.client?.name || '\u2014'}</p>
             </div>
             {quote.client?.email && (
               <div>
-                <p className="text-xs text-gray-500">Email</p>
-                <p className="text-sm text-gray-900">{quote.client.email}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                <p className="text-sm text-gray-900 dark:text-white">{quote.client.email}</p>
               </div>
             )}
             {quote.client?.phone && (
               <div>
-                <p className="text-xs text-gray-500">Telefono</p>
-                <p className="text-sm text-gray-900">{quote.client.phone}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Telefono</p>
+                <p className="text-sm text-gray-900 dark:text-white">{quote.client.phone}</p>
               </div>
             )}
           </div>
@@ -286,29 +269,29 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Items */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <span className="text-sm font-semibold text-gray-900">Items de la Cotizacion</span>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Items de la Cotizacion</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Descripcion</th>
-                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500">Cant.</th>
-                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500">Precio</th>
-                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500">Total</th>
+              <tr className="border-b border-gray-100 dark:border-gray-700">
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Descripcion</th>
+                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Cant.</th>
+                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Precio</th>
+                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
               {quote.items.map((item) => (
-                <tr key={item.id} className="hover:bg-orange-50/40">
-                  <td className="py-2.5 px-4 text-gray-900">{item.description}</td>
-                  <td className="text-right py-2.5 px-4 text-gray-600">{item.quantity}</td>
-                  <td className="text-right py-2.5 px-4 text-gray-600">
+                <tr key={item.id} className="hover:bg-orange-50/40 dark:hover:bg-orange-900/10">
+                  <td className="py-2.5 px-4 text-gray-900 dark:text-white">{item.description}</td>
+                  <td className="text-right py-2.5 px-4 text-gray-600 dark:text-gray-300">{item.quantity}</td>
+                  <td className="text-right py-2.5 px-4 text-gray-600 dark:text-gray-300">
                     ${Number(item.unit_price).toLocaleString('es-MX')}
                   </td>
-                  <td className="text-right py-2.5 px-4 font-medium text-gray-900">
+                  <td className="text-right py-2.5 px-4 font-medium text-gray-900 dark:text-white">
                     ${Number(item.subtotal).toLocaleString('es-MX')}
                   </td>
                 </tr>
@@ -317,25 +300,25 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           </table>
         </div>
 
-        <div className="px-4 py-3 border-t border-gray-100">
+        <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
           <div className="space-y-1 ml-auto max-w-xs text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Subtotal:</span>
-              <span className="font-medium">${Number(quote.subtotal).toLocaleString('es-MX')}</span>
+              <span className="text-gray-500 dark:text-gray-400">Subtotal:</span>
+              <span className="font-medium dark:text-white">${Number(quote.subtotal).toLocaleString('es-MX')}</span>
             </div>
             {Number(quote.discount_rate) > 0 && (
-              <div className="flex justify-between text-green-600">
+              <div className="flex justify-between text-green-600 dark:text-green-400">
                 <span>Descuento ({Number(quote.discount_rate)}%):</span>
                 <span>-${((Number(quote.subtotal) * Number(quote.discount_rate)) / 100).toLocaleString('es-MX')}</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-gray-500">IVA ({Number(quote.tax_rate) || 16}%):</span>
-              <span className="font-medium">${Number(quote.tax_amount).toLocaleString('es-MX')}</span>
+              <span className="text-gray-500 dark:text-gray-400">IVA ({Number(quote.tax_rate) || 16}%):</span>
+              <span className="font-medium dark:text-white">${Number(quote.tax_amount).toLocaleString('es-MX')}</span>
             </div>
-            <div className="flex justify-between pt-2 border-t border-gray-100">
-              <span className="font-bold text-gray-900">Total:</span>
-              <span className="font-bold text-orange-600">
+            <div className="flex justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+              <span className="font-bold text-gray-900 dark:text-white">Total:</span>
+              <span className="font-bold text-orange-600 dark:text-orange-400">
                 ${Number(quote.total).toLocaleString('es-MX')}
               </span>
             </div>
@@ -347,10 +330,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       <PaymentSection quoteId={quote.id} quoteTotal={quote.total} />
 
       {/* Work Events */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 text-gray-400" />
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             Eventos de Trabajo
           </span>
           <Link href={`/dashboard/calendar/new?client_id=${quote.client_id}&quote_id=${quote.id}`}>
@@ -362,14 +345,14 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         </div>
         <div className="p-4">
           {workEvents.length === 0 ? (
-            <p className="text-xs text-gray-500">No hay eventos vinculados a esta cotizacion.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">No hay eventos vinculados a esta cotizacion.</p>
           ) : (
             <div className="space-y-2">
               {workEvents.map((event) => (
-                <div key={event.id} className="flex items-center justify-between p-2.5 border border-gray-100 rounded-lg">
+                <div key={event.id} className="flex items-center justify-between p-2.5 border border-gray-100 dark:border-gray-700 rounded-lg">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{event.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {new Date(event.scheduled_start).toLocaleDateString('es-MX', {
                         month: 'short',
                         day: 'numeric',
@@ -381,10 +364,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                     </p>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                    event.status === 'completado' ? 'bg-green-100 text-green-700' :
-                    event.status === 'cancelado' ? 'bg-red-100 text-red-700' :
-                    event.status === 'en_camino' ? 'bg-blue-100 text-blue-700' :
-                    'bg-yellow-100 text-yellow-700'
+                    event.status === 'completado' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                    event.status === 'cancelado' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                    event.status === 'en_camino' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                    'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                   }`}>
                     {event.status}
                   </span>
@@ -399,22 +382,22 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       {(quote.notes || quote.terms_and_conditions) && (
         <div className="grid gap-3 md:grid-cols-2">
           {quote.notes && (
-            <div className="bg-white rounded-xl border border-gray-200">
-              <div className="px-4 py-3 border-b border-gray-100">
-                <span className="text-sm font-semibold text-gray-900">Notas</span>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">Notas</span>
               </div>
               <div className="p-4">
-                <p className="text-sm text-gray-900 whitespace-pre-wrap">{quote.notes}</p>
+                <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{quote.notes}</p>
               </div>
             </div>
           )}
           {quote.terms_and_conditions && (
-            <div className="bg-white rounded-xl border border-gray-200">
-              <div className="px-4 py-3 border-b border-gray-100">
-                <span className="text-sm font-semibold text-gray-900">Terminos y Condiciones</span>
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">Terminos y Condiciones</span>
               </div>
               <div className="p-4">
-                <p className="text-sm text-gray-900 whitespace-pre-wrap">{quote.terms_and_conditions}</p>
+                <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{quote.terms_and_conditions}</p>
               </div>
             </div>
           )}
@@ -422,15 +405,15 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       )}
 
       {/* Metadata & Status Actions */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <span className="text-sm font-semibold text-gray-900">Informacion</span>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Informacion</span>
         </div>
         <div className="p-4">
           <div className="grid gap-3 md:grid-cols-3">
             <div>
-              <p className="text-xs text-gray-500">Creada</p>
-              <p className="text-sm text-gray-900">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Creada</p>
+              <p className="text-sm text-gray-900 dark:text-white">
                 {new Date(quote.created_at).toLocaleDateString('es-MX', {
                   year: 'numeric',
                   month: 'long',
@@ -439,8 +422,8 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Valida Hasta</p>
-              <p className="text-sm text-gray-900">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Valida Hasta</p>
+              <p className="text-sm text-gray-900 dark:text-white">
                 {new Date(quote.valid_until).toLocaleDateString('es-MX', {
                   year: 'numeric',
                   month: 'long',
@@ -449,7 +432,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 mb-1">Acciones</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Acciones</p>
               <div className="flex flex-wrap gap-1.5">
                 {quote.status === 'sent' && (
                   <>
@@ -462,7 +445,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                   </>
                 )}
                 {quote.status === 'draft' && (
-                  <span className="text-xs text-gray-500">Pendiente de envio</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Pendiente de envio</span>
                 )}
                 {quote.status === 'accepted' && (
                   <Button size="sm" onClick={() => handleStatusChange('en_instalacion')} disabled={loading} className="h-7 text-xs bg-orange-500 hover:bg-orange-600 text-white">
@@ -480,10 +463,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                   </Button>
                 )}
                 {quote.status === 'rejected' && (
-                  <span className="text-xs text-gray-500">Cotizacion rechazada</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Cotizacion rechazada</span>
                 )}
                 {quote.status === 'cobrado' && (
-                  <span className="text-xs text-gray-500">Cotizacion cobrada</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Cotizacion cobrada</span>
                 )}
               </div>
             </div>
@@ -495,40 +478,34 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       <div className="h-16 lg:hidden" />
 
       {/* Mobile Sticky Send Bar */}
-      <div className="fixed bottom-0 left-0 right-0 lg:hidden z-30 bg-white border-t border-gray-200 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden z-30 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex gap-2">
-          {quote.status === 'draft' && (
-            <>
-              <Button
-                onClick={handleSendWhatsApp}
-                disabled={loading || !quote.client?.phone}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                <MessageCircle className="w-3.5 h-3.5 mr-1" />
-                WhatsApp
-              </Button>
-              <Button
-                onClick={handleSendEmail}
-                disabled={loading || !quote.client?.email}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                <Mail className="w-3.5 h-3.5 mr-1" />
-                Email
-              </Button>
-            </>
-          )}
-          {quote.status !== 'draft' && (
-            <Button onClick={handleExportPDF} variant="outline" size="sm" className="flex-1">
-              <FileDown className="w-3.5 h-3.5 mr-1" />
-              Descargar
-            </Button>
-          )}
+          <Button
+            onClick={() => setShareOpen(true)}
+            size="sm"
+            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            <Send className="w-3.5 h-3.5 mr-1" />
+            Enviar
+          </Button>
+          <Button onClick={handleExportPDF} variant="outline" size="sm" className="flex-1">
+            <FileDown className="w-3.5 h-3.5 mr-1" />
+            PDF
+          </Button>
         </div>
       </div>
+
+      {/* Share Dialog */}
+      <QuoteShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        quoteId={quote.id}
+        quoteNumber={quote.quote_number}
+        clientName={quote.client?.name || 'Sin cliente'}
+        clientEmail={quote.client?.email || null}
+        clientPhone={quote.client?.phone || null}
+        onSent={handleRefreshQuote}
+      />
     </div>
   )
 }

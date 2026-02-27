@@ -249,20 +249,20 @@ export default function NewQuotePage() {
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <Link href="/dashboard/quotes">
-            <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" type="button">
-              <ArrowLeft className="w-5 h-5 text-gray-500" />
+            <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer" type="button">
+              <ArrowLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
           </Link>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Nueva Cotizaci&oacute;n</h2>
-            <p className="text-sm text-gray-500">Completa los datos y revisa el resumen</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Nueva Cotizaci&oacute;n</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Completa los datos y revisa el resumen</p>
           </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit}>
         {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
@@ -273,10 +273,10 @@ export default function NewQuotePage() {
 
             {/* Client + Template — compact cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-1.5 mb-2">
                   <User className="w-3.5 h-3.5 text-orange-500" />
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Cliente *
                   </label>
                 </div>
@@ -286,7 +286,7 @@ export default function NewQuotePage() {
                   required
                   value={selectedClientId}
                   onChange={(e) => setSelectedClientId(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow cursor-pointer"
                 >
                   <option value="">Selecciona un cliente...</option>
                   {clients.map(client => (
@@ -296,29 +296,29 @@ export default function NewQuotePage() {
                   ))}
                 </select>
                 {selectedClient && (
-                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                  <div className="mt-2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     {selectedClient.email && <span>{selectedClient.email}</span>}
                     {selectedClient.phone && <span>| {selectedClient.phone}</span>}
                   </div>
                 )}
                 {clients.length === 0 && (
-                  <p className="mt-2 text-xs text-gray-500">
-                    No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 hover:underline cursor-pointer">Crear cliente</Link>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 dark:text-orange-400 hover:underline cursor-pointer">Crear cliente</Link>
                   </p>
                 )}
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <LayoutTemplate className="w-3.5 h-3.5 text-gray-400" />
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <LayoutTemplate className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+                  <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Plantilla (opcional)
                   </label>
                 </div>
                 <select
                   value={selectedTemplateId}
                   onChange={(e) => handleTemplateSelect(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow cursor-pointer"
+                  className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow cursor-pointer"
                 >
                   <option value="">Sin plantilla</option>
                   {templates.map(template => (
@@ -329,7 +329,7 @@ export default function NewQuotePage() {
                   ))}
                 </select>
                 {selectedTemplateId && templates.find(t => t.id === selectedTemplateId)?.description && (
-                  <p className="mt-2 text-xs text-gray-500">
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                     {templates.find(t => t.id === selectedTemplateId)?.description}
                   </p>
                 )}
@@ -337,12 +337,12 @@ export default function NewQuotePage() {
             </div>
 
             {/* Items table */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-orange-500" />
-                  <h3 className="font-semibold text-gray-900 text-sm">Items de la cotizaci&oacute;n</h3>
-                  <span className="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full font-medium">{items.length}</span>
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Items de la cotizaci&oacute;n</h3>
+                  <span className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-2 py-0.5 rounded-full font-medium">{items.length}</span>
                 </div>
                 <Button type="button" onClick={addItem} size="sm" variant="outline" data-testid="add-quote-item-btn"
                   className="text-xs h-7 px-2.5 cursor-pointer">
@@ -352,7 +352,7 @@ export default function NewQuotePage() {
               </div>
 
               {/* Table Header (desktop) */}
-              <div className="hidden md:grid grid-cols-[1fr_2fr_80px_120px_100px_36px] gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+              <div className="hidden md:grid grid-cols-[1fr_2fr_80px_120px_100px_36px] gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 <div>Servicio</div>
                 <div>Descripci&oacute;n</div>
                 <div className="text-right">Cant.</div>
@@ -362,13 +362,13 @@ export default function NewQuotePage() {
               </div>
 
               {/* Items rows */}
-              <div className="divide-y divide-gray-50">
+              <div className="divide-y divide-gray-50 dark:divide-gray-700">
                 {items.map((item, index) => {
                   const lineTotal = item.quantity * item.unit_price
                   return (
                     <div key={index} className="group">
                       {/* Desktop row */}
-                      <div className="hidden md:grid grid-cols-[1fr_2fr_80px_120px_100px_36px] gap-2 px-4 py-2 items-center hover:bg-orange-50/30 transition-colors">
+                      <div className="hidden md:grid grid-cols-[1fr_2fr_80px_120px_100px_36px] gap-2 px-4 py-2 items-center hover:bg-orange-50/30 dark:hover:bg-orange-900/10 transition-colors">
                         <select
                           value={item.service_id || ''}
                           onChange={(e) => selectService(index, e.target.value)}
@@ -409,7 +409,7 @@ export default function NewQuotePage() {
                           data-testid={`item-unit-price-${index}`}
                           className="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-gray-200 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all tabular-nums"
                         />
-                        <div className="text-sm font-medium text-right tabular-nums text-gray-700">
+                        <div className="text-sm font-medium text-right tabular-nums text-gray-700 dark:text-gray-300">
                           ${lineTotal.toLocaleString('es-MX')}
                         </div>
                         <button
@@ -425,7 +425,7 @@ export default function NewQuotePage() {
                       {/* Mobile card */}
                       <div className="md:hidden p-4 space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold text-gray-400">Item #{index + 1}</span>
+                          <span className="text-xs font-semibold text-gray-400 dark:text-gray-500">Item #{index + 1}</span>
                           {items.length > 1 && (
                             <button type="button" onClick={() => removeItem(index)} className="p-1 cursor-pointer">
                               <Trash2 className="w-4 h-4 text-red-400" />
@@ -435,7 +435,7 @@ export default function NewQuotePage() {
                         <select
                           value={item.service_id || ''}
                           onChange={(e) => selectService(index, e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm cursor-pointer"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm cursor-pointer"
                         >
                           <option value="">Selecciona servicio...</option>
                           {services.map(service => (
@@ -450,11 +450,11 @@ export default function NewQuotePage() {
                           required
                           placeholder="Descripción"
                           data-testid={`item-description-${index}`}
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                         />
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="text-[11px] text-gray-400 mb-1 block">Cantidad</label>
+                            <label className="text-[11px] text-gray-400 dark:text-gray-500 mb-1 block">Cantidad</label>
                             <input
                               type="number"
                               min="0.01"
@@ -463,11 +463,11 @@ export default function NewQuotePage() {
                               onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                               required
                               data-testid={`item-quantity-${index}`}
-                              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                             />
                           </div>
                           <div>
-                            <label className="text-[11px] text-gray-400 mb-1 block">Precio Unit.</label>
+                            <label className="text-[11px] text-gray-400 dark:text-gray-500 mb-1 block">Precio Unit.</label>
                             <input
                               type="number"
                               min="0"
@@ -476,11 +476,11 @@ export default function NewQuotePage() {
                               onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                               required
                               data-testid={`item-unit-price-${index}`}
-                              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                             />
                           </div>
                         </div>
-                        <div className="text-right text-sm font-medium text-gray-700">
+                        <div className="text-right text-sm font-medium text-gray-700 dark:text-gray-300">
                           Subtotal: ${lineTotal.toLocaleString('es-MX')}
                         </div>
                       </div>
@@ -490,11 +490,11 @@ export default function NewQuotePage() {
               </div>
 
               {/* Quick-add row */}
-              <div ref={itemsEndRef} className="px-4 py-2.5 bg-gray-50/50 border-t border-gray-100">
+              <div ref={itemsEndRef} className="px-4 py-2.5 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={addItem}
-                  className="text-sm text-gray-400 hover:text-orange-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="text-sm text-gray-400 dark:text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Agregar otro item
@@ -504,10 +504,10 @@ export default function NewQuotePage() {
 
             {/* Discount + Validity — always visible inline row */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div className="bg-white rounded-xl border border-gray-200 p-3">
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <Percent className="w-3.5 h-3.5 text-green-500" />
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Descuento</label>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Descuento</label>
                 </div>
                 <div className="relative">
                   <Input
@@ -522,10 +522,10 @@ export default function NewQuotePage() {
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
                 </div>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-3">
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Vigencia</label>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vigencia</label>
                 </div>
                 <div className="relative">
                   <Input
@@ -538,35 +538,35 @@ export default function NewQuotePage() {
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">d&iacute;as</span>
                 </div>
               </div>
-              <div className="col-span-2 md:col-span-1 bg-white rounded-xl border border-gray-200 p-3 flex flex-col justify-center">
+              <div className="col-span-2 md:col-span-1 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 flex flex-col justify-center">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <Hash className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Items v&aacute;lidos</span>
+                  <Hash className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Items v&aacute;lidos</span>
                 </div>
-                <p className="text-lg font-bold text-gray-900 tabular-nums">{itemCount} <span className="text-sm font-normal text-gray-400">de {items.length}</span></p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white tabular-nums">{itemCount} <span className="text-sm font-normal text-gray-400 dark:text-gray-500">de {items.length}</span></p>
               </div>
             </div>
 
             {/* Notes & Terms — collapsible */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               <button
                 type="button"
                 onClick={() => setShowExtras(!showExtras)}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-gray-400" />
-                  <span className="font-semibold text-gray-900 text-sm">Notas y T&eacute;rminos</span>
+                  <Zap className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y T&eacute;rminos</span>
                   {(notes || terms) && (
                     <span className="w-2 h-2 rounded-full bg-orange-400"></span>
                   )}
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showExtras ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${showExtras ? 'rotate-180' : ''}`} />
               </button>
               {showExtras && (
-                <div className="px-4 pb-4 space-y-3 border-t border-gray-100 pt-3">
+                <div className="px-4 pb-4 space-y-3 border-t border-gray-100 dark:border-gray-700 pt-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                       Notas
                     </label>
                     <Textarea
@@ -578,7 +578,7 @@ export default function NewQuotePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                       T&eacute;rminos y Condiciones
                     </label>
                     <Textarea
@@ -604,57 +604,57 @@ export default function NewQuotePage() {
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-20 space-y-3">
               {/* Summary card */}
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                  <h3 className="font-semibold text-gray-900 text-sm">Resumen</h3>
+              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Resumen</h3>
                 </div>
                 <div className="px-4 py-4 space-y-3">
                   {/* Client preview */}
                   {selectedClient ? (
-                    <div className="pb-3 border-b border-gray-100">
-                      <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-1">Para</p>
-                      <p className="text-sm font-medium text-gray-900">{selectedClient.name}</p>
+                    <div className="pb-3 border-b border-gray-100 dark:border-gray-700">
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Para</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedClient.name}</p>
                       {selectedClient.company_name && (
-                        <p className="text-xs text-gray-500">{selectedClient.company_name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{selectedClient.company_name}</p>
                       )}
                     </div>
                   ) : (
-                    <div className="pb-3 border-b border-gray-100">
-                      <p className="text-xs text-gray-400 italic">Sin cliente seleccionado</p>
+                    <div className="pb-3 border-b border-gray-100 dark:border-gray-700">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 italic">Sin cliente seleccionado</p>
                     </div>
                   )}
 
                   {/* Line items count */}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
+                    <span className="text-gray-500 dark:text-gray-400">{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
                   </div>
 
                   {/* Totals */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Subtotal</span>
-                      <span className="tabular-nums text-gray-700">${subtotal.toLocaleString('es-MX')}</span>
+                      <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${subtotal.toLocaleString('es-MX')}</span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Descuento ({discountRate}%)</span>
-                        <span className="tabular-nums text-green-600">-${discount.toLocaleString('es-MX')}</span>
+                        <span className="text-gray-500 dark:text-gray-400">Descuento ({discountRate}%)</span>
+                        <span className="tabular-nums text-green-600 dark:text-green-400">-${discount.toLocaleString('es-MX')}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">IVA (16%)</span>
-                      <span className="tabular-nums text-gray-700">${tax.toLocaleString('es-MX')}</span>
+                      <span className="text-gray-500 dark:text-gray-400">IVA (16%)</span>
+                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${tax.toLocaleString('es-MX')}</span>
                     </div>
-                    <div className="flex justify-between pt-3 border-t border-gray-200">
-                      <span className="font-bold text-gray-900">Total</span>
-                      <span className="font-bold text-lg tabular-nums text-orange-600" data-testid="quote-total">
+                    <div className="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <span className="font-bold text-gray-900 dark:text-white">Total</span>
+                      <span className="font-bold text-lg tabular-nums text-orange-600 dark:text-orange-400" data-testid="quote-total">
                         ${total.toLocaleString('es-MX')}
                       </span>
                     </div>
                   </div>
 
                   {/* Validity */}
-                  <div className="pt-2 text-xs text-gray-400">
+                  <div className="pt-2 text-xs text-gray-400 dark:text-gray-500">
                     V&aacute;lida por {validDays} d&iacute;as
                   </div>
                 </div>

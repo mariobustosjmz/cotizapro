@@ -32,7 +32,7 @@ export function FAB() {
     <div className="lg:hidden fixed bottom-6 right-6 z-50">
       {/* Action Pills - Animated */}
       {isOpen && (
-        <div className="absolute bottom-16 right-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden animate-in fade-in zoom-in-75 duration-200">
+        <div className="absolute bottom-16 right-0 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-in fade-in zoom-in-75 duration-200">
           <QuickActionsList
             variant="vertical"
             onActionClick={handleActionClick}
@@ -44,7 +44,7 @@ export function FAB() {
       {/* Main FAB Button */}
       <button
         onClick={toggleOpen}
-        className="w-14 h-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg flex items-center justify-center transition-all duration-200 active:scale-95"
+        className="w-14 h-14 rounded-full bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-lg flex items-center justify-center transition-all duration-200 active:scale-95"
         aria-label="Acciones rápidas"
         aria-expanded={isOpen}
       >

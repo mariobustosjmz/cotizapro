@@ -145,34 +145,34 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Pagado</span>
-            <span className="font-semibold">
+            <span className="text-gray-600 dark:text-gray-400">Pagado</span>
+            <span className="font-semibold dark:text-white">
               ${Number(totalPaid).toLocaleString('es-MX')} / ${Number(quoteTotal).toLocaleString('es-MX')}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div
               className={`h-2 rounded-full transition-all ${
-                isFullyPaid ? 'bg-green-500' : 'bg-blue-500'
+                isFullyPaid ? 'bg-green-500 dark:bg-green-400' : 'bg-blue-500 dark:bg-blue-400'
               }`}
               style={{ width: `${Math.min(percentagePaid, 100)}%` }}
             />
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             {isFullyPaid ? '100% pagado' : `${percentagePaid.toFixed(1)}% pagado`}
           </div>
         </div>
 
         {/* Full Payment Prompt */}
         {isFullyPaid && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 text-green-700 dark:text-green-400 px-4 py-3 rounded">
             <p className="font-medium">Cotización pagada completamente</p>
             <p className="text-sm mt-1">Considera cambiar el estado a "Cobrado" cuando el cliente confirme el pago.</p>
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-4 py-3 rounded">
             {error}
           </div>
         )}
@@ -188,31 +188,31 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 px-3">Fecha</th>
-                  <th className="text-left py-2 px-3">Tipo</th>
-                  <th className="text-left py-2 px-3">Método</th>
-                  <th className="text-right py-2 px-3">Monto</th>
-                  <th className="text-left py-2 px-3">Recibido por</th>
-                  <th className="text-center py-2 px-3">Acciones</th>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-2 px-3 text-gray-900 dark:text-white">Fecha</th>
+                  <th className="text-left py-2 px-3 text-gray-900 dark:text-white">Tipo</th>
+                  <th className="text-left py-2 px-3 text-gray-900 dark:text-white">Método</th>
+                  <th className="text-right py-2 px-3 text-gray-900 dark:text-white">Monto</th>
+                  <th className="text-left py-2 px-3 text-gray-900 dark:text-white">Recibido por</th>
+                  <th className="text-center py-2 px-3 text-gray-900 dark:text-white">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-3">
+                  <tr key={payment.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td className="py-3 px-3 text-gray-900 dark:text-white">
                       {new Date(payment.payment_date).toLocaleDateString('es-MX')}
                     </td>
-                    <td className="py-3 px-3">
+                    <td className="py-3 px-3 text-gray-900 dark:text-white">
                       {paymentTypeLabels[payment.payment_type]}
                     </td>
-                    <td className="py-3 px-3">
+                    <td className="py-3 px-3 text-gray-900 dark:text-white">
                       {paymentMethodLabels[payment.payment_method]}
                     </td>
-                    <td className="text-right py-3 px-3 font-semibold">
+                    <td className="text-right py-3 px-3 font-semibold text-gray-900 dark:text-white">
                       ${Number(payment.amount).toLocaleString('es-MX')}
                     </td>
-                    <td className="py-3 px-3 text-gray-600">
+                    <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
                       {payment.received_by ? payment.received_by.slice(-8) : '—'}
                     </td>
                     <td className="text-center py-3 px-3">
@@ -243,18 +243,18 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
         )}
 
         {!loading && payments.length === 0 && (
-          <p className="text-center text-gray-500 py-8">No hay pagos registrados</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-8">No hay pagos registrados</p>
         )}
 
         {loading && (
-          <p className="text-center text-gray-500 py-8">Cargando...</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-8">Cargando...</p>
         )}
       </CardContent>
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black dark:bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4 dark:bg-gray-900 dark:border-gray-700">
             <CardHeader>
               <CardTitle>Registrar Pago</CardTitle>
             </CardHeader>
@@ -290,7 +290,7 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
                         payment_type: e.target.value as PaymentType,
                       })
                     }
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-blue-500 dark:focus:border-blue-600"
                   >
                     <option value="anticipo">Anticipo</option>
                     <option value="parcial">Parcial</option>
@@ -310,7 +310,7 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
                         payment_method: e.target.value as PaymentMethod,
                       })
                     }
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-blue-500 dark:focus:border-blue-600"
                   >
                     <option value="efectivo">Efectivo</option>
                     <option value="transferencia">Transferencia</option>

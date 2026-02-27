@@ -67,16 +67,16 @@ export default function NewClientPage() {
           </Button>
         </Link>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Nuevo Cliente</h2>
-          <p className="text-xs text-gray-500">Agrega un nuevo cliente a tu cartera</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Nuevo Cliente</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Agrega un nuevo cliente a tu cartera</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">
               {error}
             </div>
           )}
@@ -118,7 +118,7 @@ export default function NewClientPage() {
           />
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <Link href="/dashboard/clients">
               <Button type="button" variant="outline" size="sm" disabled={loading}>
                 Cancelar

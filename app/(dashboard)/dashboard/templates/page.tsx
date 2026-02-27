@@ -145,13 +145,13 @@ export default function TemplatesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100">
-            <FileStack className="w-4 h-4 text-orange-600" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+            <FileStack className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Templates</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Templates</h2>
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-gray-500">{templates.length} templates</span>
+              <span className="text-gray-500 dark:text-gray-400">{templates.length} templates</span>
               <span className="text-green-600">{activeCount} activos</span>
             </div>
           </div>
@@ -163,65 +163,68 @@ export default function TemplatesPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">{error}</div>
       )}
 
       {loading ? (
-        <div className="py-10 text-center text-sm text-gray-400">Cargando...</div>
+        <div className="py-10 text-center text-sm text-gray-400 dark:text-gray-500">Cargando...</div>
       ) : templates.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 text-center py-10">
-          <FileStack className="mx-auto h-10 w-10 text-gray-300" />
-          <p className="mt-2 text-sm text-gray-500">No hay templates aun</p>
-          <button onClick={openCreateModal} className="mt-2 text-xs font-medium text-orange-600 hover:text-orange-700">
-            Crear el primero
-          </button>
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 text-center py-10">
+          <FileStack className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-700" />
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No hay templates aun</p>
+          <div className="mt-4">
+            <Button onClick={openCreateModal} size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+              <Plus className="w-4 h-4 mr-1" />
+              Crear Primer Template
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-50">
-                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Descripcion</th>
-                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Descuento</th>
-                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Promo</th>
-                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 uppercase">Estado</th>
-                  <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                <tr className="border-b border-gray-50 dark:border-gray-800">
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nombre</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Descripcion</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Descuento</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Promo</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
+                  <th className="text-right py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {templates.map((template) => (
-                  <tr key={template.id} className="hover:bg-orange-50/40">
+                  <tr key={template.id} className="hover:bg-orange-50/40 dark:hover:bg-gray-800/40">
                     <td className="py-2.5 px-4">
-                      <span className="font-medium text-gray-900">{template.name}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{template.name}</span>
                     </td>
-                    <td className="py-2.5 px-4 text-gray-500 hidden md:table-cell">
+                    <td className="py-2.5 px-4 text-gray-500 dark:text-gray-400 hidden md:table-cell">
                       {template.description
                         ? template.description.length > 60
                           ? `${template.description.slice(0, 60)}...`
                           : template.description
                         : '\u2014'}
                     </td>
-                    <td className="py-2.5 px-4 text-gray-700 hidden lg:table-cell">
+                    <td className="py-2.5 px-4 text-gray-700 dark:text-gray-300 hidden lg:table-cell">
                       {template.default_discount_rate ? `${template.default_discount_rate}%` : '\u2014'}
                     </td>
                     <td className="py-2.5 px-4 hidden lg:table-cell">
                       {template.promotional_label ? (
-                        <span className="px-2 py-0.5 rounded-full bg-orange-100 text-[10px] font-medium text-orange-700">
+                        <span className="px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-[10px] font-medium text-orange-700 dark:text-orange-400">
                           {template.promotional_label}
                         </span>
                       ) : (
-                        <span className="text-gray-400">\u2014</span>
+                        <span className="text-gray-400 dark:text-gray-600">\u2014</span>
                       )}
                     </td>
                     <td className="py-2.5 px-4">
                       {template.is_active ? (
-                        <span className="px-2 py-0.5 rounded-full bg-green-100 text-[10px] font-medium text-green-700">
+                        <span className="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-[10px] font-medium text-green-700 dark:text-green-400">
                           Activo
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-medium text-gray-500">
+                        <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[10px] font-medium text-gray-500 dark:text-gray-400">
                           Inactivo
                         </span>
                       )}
@@ -230,14 +233,14 @@ export default function TemplatesPage() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => openEditModal(template)}
-                          className="p-1 text-gray-400 hover:text-orange-600 rounded"
+                          className="p-1 text-gray-400 dark:text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 rounded"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDeleteTemplate(template.id)}
                           disabled={deleting === template.id}
-                          className="p-1 text-gray-400 hover:text-red-600 rounded disabled:opacity-50"
+                          className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 rounded disabled:opacity-50"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -254,9 +257,9 @@ export default function TemplatesPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl border border-gray-200">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                 {editingId ? 'Editar Template' : 'Nuevo Template'}
               </h3>
             </div>
@@ -332,14 +335,14 @@ export default function TemplatesPage() {
                   type="checkbox"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
+                  className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 dark:border-gray-600 rounded cursor-pointer dark:bg-gray-800"
                 />
-                <label htmlFor="modal_is_active" className="text-sm text-gray-700 cursor-pointer">
+                <label htmlFor="modal_is_active" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                   Template activo
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+              <div className="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowModal(false)}>
                   Cancelar
                 </Button>

@@ -1,0 +1,719 @@
+
+> my-saas-app@0.1.0 test:e2e
+> playwright test
+
+[dotenv@17.3.1] injecting env (5) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+🚀 Running global setup...
+🧹 Cleaning test database...
+  ✅ Deleted user: member@example.com
+  ✅ Deleted user: admin@example.com
+  ⚠️  Failed to delete user owner@example.com: Database error deleting user
+  ✅ Deleted test organization
+✅ Test database cleaned successfully
+🌱 Seeding test database...
+  ✅ Test organization created: 00000000-0000-0000-0000-000000000001
+  ℹ️  User owner@example.com already exists, ensuring profile...
+  ✅ Profile ensured for owner: owner@example.com
+  ✅ Created admin: admin@example.com
+  ✅ Created member: member@example.com
+✅ Test database seeded successfully
+✅ Application is ready
+✅ Global setup complete
+
+Running 438 tests using 2 workers
+
+  ✓    1 [chromium] › e2e/specs/00-smoke.spec.ts:13:7 › Smoke Tests - Page Load & Form Rendering › Dashboard loads (2.9s)
+  ✓    2 [chromium] › e2e/specs/00-smoke.spec.ts:18:7 › Smoke Tests - Page Load & Form Rendering › Clients list loads (4.1s)
+  ✓    3 [chromium] › e2e/specs/00-smoke.spec.ts:25:7 › Smoke Tests - Page Load & Form Rendering › New client form renders (3.1s)
+  ✓    4 [chromium] › e2e/specs/00-smoke.spec.ts:32:7 › Smoke Tests - Page Load & Form Rendering › Services list loads (3.8s)
+  ✓    5 [chromium] › e2e/specs/00-smoke.spec.ts:38:7 › Smoke Tests - Page Load & Form Rendering › New service form renders (2.4s)
+  ✓    6 [chromium] › e2e/specs/00-smoke.spec.ts:45:7 › Smoke Tests - Page Load & Form Rendering › Quotes list loads (1.6s)
+  ✓    7 [chromium] › e2e/specs/00-smoke.spec.ts:51:7 › Smoke Tests - Page Load & Form Rendering › New quote form renders (2.2s)
+  ✓    8 [chromium] › e2e/specs/00-smoke.spec.ts:58:7 › Smoke Tests - Page Load & Form Rendering › Reminders list loads (2.6s)
+  ✓    9 [chromium] › e2e/specs/00-smoke.spec.ts:64:7 › Smoke Tests - Page Load & Form Rendering › New reminder form renders (2.3s)
+  ✓   10 [chromium] › e2e/specs/00-smoke.spec.ts:71:7 › Smoke Tests - Page Load & Form Rendering › Service detail page renders (first service) (2.5s)
+  ✓   11 [chromium] › e2e/specs/00-smoke.spec.ts:85:7 › Smoke Tests - Page Load & Form Rendering › Quote detail page renders (first quote) (2.7s)
+  ✓   13 [chromium] › e2e/specs/01-auth.spec.ts:8:7 › Authentication Flow › User can navigate to login page (499ms)
+  ✓   14 [chromium] › e2e/specs/01-auth.spec.ts:16:7 › Authentication Flow › User can navigate to signup page (509ms)
+  ✓   15 [chromium] › e2e/specs/01-auth.spec.ts:24:7 › Authentication Flow › Login page has navigation to signup (546ms)
+  ✓   12 [chromium] › e2e/specs/00-smoke.spec.ts:99:7 › Smoke Tests - Page Load & Form Rendering › Client detail page renders (first client) (2.9s)
+  ✓   16 [chromium] › e2e/specs/01-auth.spec.ts:32:7 › Authentication Flow › Signup page has navigation to login (591ms)
+  ✓   18 [chromium] › e2e/specs/01-auth.spec.ts:52:7 › Authentication Flow › Login page shows all required fields (495ms)
+  ✓   17 [chromium] › e2e/specs/01-auth.spec.ts:40:7 › Authentication Flow › Login with valid credentials redirects to dashboard (1.5s)
+  ✓   19 [chromium] › e2e/specs/01-auth.spec.ts:65:7 › Authentication Flow › Login with invalid email format shows validation (610ms)
+  ✓   21 [chromium] › e2e/specs/01-auth.spec.ts:89:7 › Authentication Flow › User cannot access protected dashboard without login (524ms)
+  ✓   20 [chromium] › e2e/specs/01-auth.spec.ts:77:7 › Authentication Flow › Forgot password page is accessible from login (872ms)
+  ✓   23 [chromium] › e2e/specs/01-auth.spec.ts:111:7 › Authentication Flow › Password field is masked for security (2.7s)
+  ✓   22 [chromium] › e2e/specs/01-auth.spec.ts:97:7 › Authentication Flow › Logout clears session and redirects to login (3.6s)
+  ✓   24 [chromium] › e2e/specs/01-auth.spec.ts:121:7 › Authentication Flow › Signup form has all required fields (749ms)
+  ✓   25 [chromium] › e2e/specs/01-auth.spec.ts:136:7 › Authentication Flow › Signup form shows password minimum length requirement (578ms)
+  ✓   27 [chromium] › e2e/specs/01-auth.spec.ts:161:7 › Authentication Flow › User logged out cannot access protected routes (1.6s)
+  ✓   28 [chromium] › e2e/specs/01-auth.spec.ts:173:7 › Authentication Flow › Login with incomplete form shows validation errors (662ms)
+  ✓   26 [chromium] › e2e/specs/01-auth.spec.ts:147:7 › Authentication Flow › Session persists across page reloads (2.6s)
+  ✓   30 [chromium] › e2e/specs/02-dashboard.spec.ts:21:7 › Dashboard Navigation › Dashboard displays welcome message (2.3s)
+  ✓   29 [chromium] › e2e/specs/02-dashboard.spec.ts:13:7 › Dashboard Navigation › Dashboard page loads with correct title (2.3s)
+  ✓   32 [chromium] › e2e/specs/02-dashboard.spec.ts:40:7 › Dashboard Navigation › User can navigate to Quotes section (3.5s)
+  ✓   31 [chromium] › e2e/specs/02-dashboard.spec.ts:29:7 › Dashboard Navigation › User can navigate to Clients section (3.5s)
+  ✓   34 [chromium] › e2e/specs/02-dashboard.spec.ts:59:7 › Dashboard Navigation › User can navigate to Reminders section (7.6s)
+  ✓   33 [chromium] › e2e/specs/02-dashboard.spec.ts:51:7 › Dashboard Navigation › User can navigate to Team section (7.6s)
+  ✓   36 [chromium] › e2e/specs/02-dashboard.spec.ts:75:7 › Dashboard Navigation › Dashboard displays stats cards (4.7s)
+  ✓   35 [chromium] › e2e/specs/02-dashboard.spec.ts:67:7 › Dashboard Navigation › User can navigate to Settings section (4.9s)
+  ✓   37 [chromium] › e2e/specs/02-dashboard.spec.ts:84:7 › Dashboard Navigation › Sidebar navigation is visible (7.0s)
+  ✓   38 [chromium] › e2e/specs/02-dashboard.spec.ts:92:7 › Dashboard Navigation › Main content area is visible (6.9s)
+  ✓   39 [chromium] › e2e/specs/02-dashboard.spec.ts:100:7 › Dashboard Navigation › User info is displayed in header (9.4s)
+  ✓   41 [chromium] › e2e/specs/02-dashboard.spec.ts:124:7 › Dashboard Navigation › Logo links back to dashboard/home (3.9s)
+  ✓   42 [chromium] › e2e/specs/02-dashboard.spec.ts:135:7 › Dashboard Navigation › Mobile responsive navigation (mobile viewport) (1.8s)
+  ✓   43 [chromium] › e2e/specs/03-clients.spec.ts:14:7 › Client Management › Clients page loads successfully (2.4s)
+  ✓   40 [chromium] › e2e/specs/02-dashboard.spec.ts:111:7 › Dashboard Navigation › Navigation links have correct href attributes (21.1s)
+  ✓   44 [chromium] › e2e/specs/03-clients.spec.ts:23:7 › Client Management › New Client button navigates to form (8.7s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "156cf134-ca5a-4bd4-8524-eb6f9fee8e5a",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "ACME Corporation",
+    "email": "contact@acme.com",
+    "phone": "+34 912 345 678",
+    "whatsapp_phone": null,
+    "address": "Calle Principal 123, Madrid",
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [
+      "corporativo",
+      "cliente-frecuente"
+    ],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:30:50.200981+00:00",
+    "updated_at": "2026-02-24T07:30:50.200981+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "49d7e8c9-edc4-43a0-ab6a-22a6ab4c27f0",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Creative Solutions",
+    "email": null,
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:30:55.054617+00:00",
+    "updated_at": "2026-02-24T07:30:55.054617+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✓   45 [chromium] › e2e/specs/03-clients.spec.ts:32:7 › Client Management › Create client with all fields (10.7s)
+  ✓   46 [chromium] › e2e/specs/03-clients.spec.ts:40:7 › Client Management › Create client with minimal fields (7.8s)
+  ✓   47 [chromium] › e2e/specs/03-clients.spec.ts:52:7 › Client Management › Client list displays correctly (3.2s)
+  ✓   48 [chromium] › e2e/specs/03-clients.spec.ts:62:7 › Client Management › Empty state shown when no clients (5.4s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "4100d14e-4fd3-458d-9af5-ded861e2c9ba",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Creative Labs",
+    "email": "test-1771918264690@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:31:05.938865+00:00",
+    "updated_at": "2026-02-24T07:31:05.938865+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✓   50 [chromium] › e2e/specs/03-clients.spec.ts:91:7 › Client Management › Client form has required name field (7.7s)
+  ✓   49 [chromium] › e2e/specs/03-clients.spec.ts:73:7 › Client Management › Total clients count updates after creating client (14.5s)
+  ✓   51 [chromium] › e2e/specs/03-clients.spec.ts:100:7 › Client Management › Client email is validated (7.8s)
+  ✓   52 [chromium] › e2e/specs/03-clients.spec.ts:114:7 › Client Management › Client phone format is validated (6.3s)
+  ✓   53 [chromium] › e2e/specs/03-clients.spec.ts:125:7 › Client Management › Click on client row navigates to details (6.0s)
+  ✓   54 [chromium] › e2e/specs/03-clients.spec.ts:136:7 › Client Management › Client table displays all columns (7.2s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "0ce46cb8-4fc3-4dc7-ae31-259a733c3960",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Smart Media 1",
+    "email": "client1-1771918289898@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:31:31.943656+00:00",
+    "updated_at": "2026-02-24T07:31:31.943656+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "47db9a9c-9a05-4ab4-82da-ea0452b847d0",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Labs",
+    "email": null,
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:31:42.095616+00:00",
+    "updated_at": "2026-02-24T07:31:42.095616+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 193ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 239ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 726ms
+  ✘   56 [chromium] › e2e/specs/03-clients.spec.ts:172:7 › Client Management › Client form submission shows loading state (31.1s)
+  ✘   55 [chromium] › e2e/specs/03-clients.spec.ts:149:7 › Client Management › Multiple clients can be created (33.7s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "5bfa50a9-f5be-43d8-a91b-7173621a0d34",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Ventures 1",
+    "email": "client1-1771918364528@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:32:45.174442+00:00",
+    "updated_at": "2026-02-24T07:32:45.174442+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✘   57 [chromium] › e2e/specs/03-clients.spec.ts:172:7 › Client Management › Client form submission shows loading state (retry #1) (34.4s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "ee174c01-9d91-462e-9780-1d30a97474f0",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Solutions 2",
+    "email": "client2-1771918364528@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:32:50.549253+00:00",
+    "updated_at": "2026-02-24T07:32:50.549253+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✓   58 [chromium] › e2e/specs/03-clients.spec.ts:149:7 › Client Management › Multiple clients can be created (retry #1) (23.7s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "01897f09-d327-4bf8-9b85-f8f71de9049e",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Tech Labs",
+    "email": "test-1771918375866@example.com",
+    "phone": "+34 912 345 678",
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:32:56.428577+00:00",
+    "updated_at": "2026-02-24T07:32:56.428577+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✘   60 [chromium] › e2e/specs/03-clients.spec.ts:202:7 › Client Management › Update client information (35.9s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "781792d2-c115-4e32-8f0e-cc1988f74e1f",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Smart Ventures",
+    "email": "test-1771918416882@example.com",
+    "phone": "+34 912 345 678",
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:33:37.894574+00:00",
+    "updated_at": "2026-02-24T07:33:37.894574+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✘   59 [chromium] › e2e/specs/03-clients.spec.ts:188:7 › Client Management › Client table has proper accessibility labels (33.5s)
+  ✘   61 [chromium] › e2e/specs/03-clients.spec.ts:202:7 › Client Management › Update client information (retry #1) (42.5s)
+  ✘   62 [chromium] › e2e/specs/03-clients.spec.ts:188:7 › Client Management › Client table has proper accessibility labels (retry #1) (32.1s)
+  ✘   63 [chromium] › e2e/specs/03-clients.spec.ts:222:7 › Client Management › Delete client with confirmation (30.4s)
+  ✓   64 [chromium] › e2e/specs/03-clients.spec.ts:247:7 › Client Management › Search/filter clients by name (18.2s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "4cc671a9-823d-4f71-9584-5ebf1e1a3adc",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "To Delete 1771918532431",
+    "email": "delete-1771918532431@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:35:52.285044+00:00",
+    "updated_at": "2026-02-24T07:35:52.285044+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 114ms
+  ✘   66 [chromium] › e2e/specs/03-clients.spec.ts:264:7 › Client Management › Clear search filter shows all clients (41.5s)
+  ✘   65 [chromium] › e2e/specs/03-clients.spec.ts:222:7 › Client Management › Delete client with confirmation (retry #1) (43.7s)
+  ✓   68 [chromium] › e2e/specs/03-clients.spec.ts:283:7 › Client Management › Client pagination works (if applicable) (8.3s)
+  ✓   67 [chromium] › e2e/specs/03-clients.spec.ts:264:7 › Client Management › Clear search filter shows all clients (retry #1) (10.3s)
+[E2E] Error waiting for API response: page.waitForResponse: Test timeout of 30000ms exceeded.
+    at ClientsPage.submitClientForm [90m(/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/pages/clients.page.ts:55:39[90m)[39m
+    at ClientsPage.createClient [90m(/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/pages/clients.page.ts:98:16[90m)[39m
+    at [90m/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/specs/03-clients.spec.ts:321:5 {
+  [[32mSymbol(step)[39m]: {
+    location: {
+      file: [32m'/Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/pages/clients.page.ts'[39m,
+      line: [33m55[39m,
+      column: [33m39[39m,
+      function: [32m'ClientsPage.submitClientForm'[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m'Wait for event "response"'[39m,
+    apiName: [32m'page.waitForResponse'[39m,
+    params: { info: [36m[Object][39m },
+    group: [90mundefined[39m,
+    stepId: [32m'pw:api@37'[39m,
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@37'[39m,
+      _title: [32m'Wait for event "response"'[39m,
+      _parentStep: [36m[TestStepInfoImpl][39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1771918601343[39m,
+    error: {
+      message: [32m'Error: page.waitForResponse: Test timeout of 30000ms exceeded.'[39m,
+      stack: [32m'Error: page.waitForResponse: Test timeout of 30000ms exceeded.\n'[39m +
+        [32m'    at ClientsPage.submitClientForm (/Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/pages/clients.page.ts:55:39)\n'[39m +
+        [32m'    at ClientsPage.createClient (/Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/pages/clients.page.ts:98:16)\n'[39m +
+        [32m'    at /Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/specs/03-clients.spec.ts:321:5'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 357ms
+  ✘   70 [chromium] › e2e/specs/03-clients.spec.ts:312:7 › Client Management › Client address is displayed in list (35.2s)
+  ✘   69 [chromium] › e2e/specs/03-clients.spec.ts:297:7 › Client Management › Client with tags displays correctly (40.2s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "94519eb7-11a6-40b2-913a-22ffa9d988d1",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Systems - With Tags",
+    "email": "tags-1771918611500@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [
+      "vip",
+      "corporativo"
+    ],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:36:58.610579+00:00",
+    "updated_at": "2026-02-24T07:36:58.610579+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] done in 554ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 100ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 129ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 109ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 145ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 226ms
+[E2E] API Response body: {
+  "client": {
+    "id": "1117c0c7-01b9-45cf-9d62-d1d25b865050",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Labs - Address Test",
+    "email": "address-1771918613813@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": "Calle Principal 123, Madrid",
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:36:59.051873+00:00",
+    "updated_at": "2026-02-24T07:36:59.051873+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✘   72 [chromium] › e2e/specs/03-clients.spec.ts:297:7 › Client Management › Client with tags displays correctly (retry #1) (43.7s)
+  ✘   71 [chromium] › e2e/specs/03-clients.spec.ts:312:7 › Client Management › Client address is displayed in list (retry #1) (43.7s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "3365d88f-4b8a-4241-a403-edda58d07ca0",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Smart Systems",
+    "email": "client-1771918668863@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:37:51.837636+00:00",
+    "updated_at": "2026-02-24T07:37:51.837636+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "ce50fb98-0270-4a91-b016-c766aa570843",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Tech Systems",
+    "email": "client-1771918668901@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:37:52.719897+00:00",
+    "updated_at": "2026-02-24T07:37:52.719897+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✘   74 [chromium] › e2e/specs/04-quotes.spec.ts:24:7 › Quote Management › Quotes page loads successfully (32.2s)
+  ✘   73 [chromium] › e2e/specs/04-quotes.spec.ts:33:7 › Quote Management › New Quote button navigates to form (32.1s)
+[E2E] API Response status: [33m401[39m
+[E2E] API Response body: {
+  "error": "Unauthorized. Please log in.",
+  "code": "UNAUTHORIZED"
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 168ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 683ms
+[error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[E2E] Error waiting for API response: Error: API returned 401: {"error":"Unauthorized. Please log in.","code":"UNAUTHORIZED"}
+    at ClientsPage.submitClientForm [90m(/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/pages/clients.page.ts:70:15[90m)[39m
+[90m    at runNextTicks (node:internal/process/task_queues:65:5)[39m
+[90m    at processImmediate (node:internal/timers:453:9)[39m
+[90m    at process.callbackTrampoline (node:internal/async_hooks:130:17)[39m
+    at ClientsPage.createClient [90m(/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/pages/clients.page.ts:98:5[90m)[39m
+    at [90m/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/specs/04-quotes.spec.ts:18:5
+    at [90m/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39mnode_modules/[4mplaywright[24m/lib/worker/testInfo.js:320:11
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 168ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 683ms
+[error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[error] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "510dc1e8-bf4d-4bd2-98f8-acfb4c0d6d1d",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Tech Ventures",
+    "email": "client-1771918705871@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:38:49.811844+00:00",
+    "updated_at": "2026-02-24T07:38:49.811844+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 167ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 683ms
+  ✘   75 [chromium] › e2e/specs/04-quotes.spec.ts:24:7 › Quote Management › Quotes page loads successfully (retry #1) (34.5s)
+  ✘   76 [chromium] › e2e/specs/04-quotes.spec.ts:33:7 › Quote Management › New Quote button navigates to form (retry #1) (34.5s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "5c458306-cd19-4479-8250-b3373b48a33e",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Tech Systems",
+    "email": "client-1771918746727@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:39:08.533429+00:00",
+    "updated_at": "2026-02-24T07:39:08.533429+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] done in 111ms
+[E2E] API Response body: {
+  "client": {
+    "id": "d74c2959-d3fb-4c23-8b97-05c688f8d099",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Creative Solutions",
+    "email": "client-1771918746774@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:39:08.543159+00:00",
+    "updated_at": "2026-02-24T07:39:08.543159+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 106ms
+  ✘   77 [chromium] › e2e/specs/04-quotes.spec.ts:49:7 › Quote Management › Quote form loads with required fields (33.0s)
+  ✘   78 [chromium] › e2e/specs/04-quotes.spec.ts:57:7 › Quote Management › Can add service to quote (40.9s)
+  ✘   79 [chromium] › e2e/specs/04-quotes.spec.ts:49:7 › Quote Management › Quote form loads with required fields (retry #1) (40.1s)
+  ✘   80 [chromium] › e2e/specs/04-quotes.spec.ts:57:7 › Quote Management › Can add service to quote (retry #1) (36.7s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "a8cb6793-69a1-4292-9193-b1938a593899",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Labs",
+    "email": "client-1771918874887@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:41:21.61037+00:00",
+    "updated_at": "2026-02-24T07:41:21.61037+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✓   82 [chromium] › e2e/specs/04-quotes.spec.ts:77:7 › Quote Management › Quote status badges display correctly (18.1s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "de202669-7f14-44e3-a47e-4055399f89fa",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Digital Solutions",
+    "email": "client-1771918886427@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:41:27.268459+00:00",
+    "updated_at": "2026-02-24T07:41:27.268459+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✓   83 [chromium] › e2e/specs/04-quotes.spec.ts:92:7 › Quote Management › Quote table displays all required columns (4.7s)
+[E2E] API Response status: [33m201[39m
+[E2E] API Response body: {
+  "client": {
+    "id": "5252d839-e4e6-438c-a6dd-7a733fec0e4e",
+    "organization_id": "00000000-0000-0000-0000-000000000001",
+    "name": "Creative Labs",
+    "email": "client-1771918892506@example.com",
+    "phone": null,
+    "whatsapp_phone": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postal_code": null,
+    "notes": null,
+    "tags": [],
+    "created_by": "7dd1504b-b8ae-47d8-826f-5a4b77698e58",
+    "created_at": "2026-02-24T07:41:34.002985+00:00",
+    "updated_at": "2026-02-24T07:41:34.002985+00:00",
+    "company_name": null,
+    "custom_fields": {}
+  }
+}
+[E2E] Console messages: 
+  ✘   81 [chromium] › e2e/specs/04-quotes.spec.ts:68:7 › Quote Management › Quote list displays correctly (41.2s)
+  ✓   84 [chromium] › e2e/specs/04-quotes.spec.ts:105:7 › Quote Management › Empty state shown when no quotes (7.5s)
+[E2E] Error waiting for API response: page.waitForResponse: Test timeout of 30000ms exceeded.
+    at ClientsPage.submitClientForm [90m(/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/pages/clients.page.ts:55:39[90m)[39m
+    at ClientsPage.createClient [90m(/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/pages/clients.page.ts:98:16[90m)[39m
+    at [90m/Users/mariobustosjmz/Desktop/claude/my-saas-app/[39me2e/specs/04-quotes.spec.ts:18:5 {
+  [[32mSymbol(step)[39m]: {
+    location: {
+      file: [32m'/Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/pages/clients.page.ts'[39m,
+      line: [33m55[39m,
+      column: [33m39[39m,
+      function: [32m'ClientsPage.submitClientForm'[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m'Wait for event "response"'[39m,
+    apiName: [32m'page.waitForResponse'[39m,
+    params: { info: [36m[Object][39m },
+    group: [90mundefined[39m,
+    stepId: [32m'pw:api@35'[39m,
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@35'[39m,
+      _title: [32m'Wait for event "response"'[39m,
+      _parentStep: [36m[TestStepInfoImpl][39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1771918927775[39m,
+    error: {
+      message: [32m'Error: page.waitForResponse: Test timeout of 30000ms exceeded.'[39m,
+      stack: [32m'Error: page.waitForResponse: Test timeout of 30000ms exceeded.\n'[39m +
+        [32m'    at ClientsPage.submitClientForm (/Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/pages/clients.page.ts:55:39)\n'[39m +
+        [32m'    at ClientsPage.createClient (/Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/pages/clients.page.ts:98:16)\n'[39m +
+        [32m'    at /Users/mariobustosjmz/Desktop/claude/my-saas-app/e2e/specs/04-quotes.spec.ts:18:5'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+[E2E] Console messages: [log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 1396ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 304ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 176ms
+  ✘   85 [chromium] › e2e/specs/04-quotes.spec.ts:115:7 › Quote Management › Quote form has client selection (32.1s)
+  ✘   86 [chromium] › e2e/specs/04-quotes.spec.ts:68:7 › Quote Management › Quote list displays correctly (retry #1) (36.9s)
+  ✘   88 [chromium] › e2e/specs/04-quotes.spec.ts:115:7 › Quote Management › Quote form has client selection (retry #1) (35.7s)
+  ✘   87 [chromium] › e2e/specs/04-quotes.spec.ts:123:7 › Quote Management › Service quantity defaults to 1 (35.2s)
+  ✘   90 [chromium] › e2e/specs/04-quotes.spec.ts:140:7 › Quote Management › Multiple services can be added to quote (41.3s)
+  ✘   89 [chromium] › e2e/specs/04-quotes.spec.ts:123:7 › Quote Management › Service quantity defaults to 1 (retry #1) (42.0s)
+  ✘   91 [chromium] › e2e/specs/04-quotes.spec.ts:140:7 › Quote Management › Multiple services can be added to quote (retry #1) (44.6s)
+  ✘   92 [chromium] › e2e/specs/04-quotes.spec.ts:152:7 › Quote Management › Quote form validates numeric price input (43.6s)
+  ✘   93 [chromium] › e2e/specs/04-quotes.spec.ts:167:7 › Quote Management › Quote form can be cancelled (36.1s)
+  ✘   94 [chromium] › e2e/specs/04-quotes.spec.ts:152:7 › Quote Management › Quote form validates numeric price input (retry #1) (38.7s)
+  ✘   95 [chromium] › e2e/specs/04-quotes.spec.ts:167:7 › Quote Management › Quote form can be cancelled (retry #1) (38.3s)
+  ✘   96 [chromium] › e2e/specs/04-quotes.spec.ts:178:7 › Quote Management › Quote total calculation includes all services (41.2s)
