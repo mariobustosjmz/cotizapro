@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FormField } from '@/components/ui/form-field'
+import { PasswordChangeForm } from '@/components/dashboard/PasswordChangeForm'
 import { Save, Building, User, Bell, Shield, Settings2 } from 'lucide-react'
 
 interface Profile {
@@ -42,7 +43,7 @@ export default function SettingsPage() {
     async function fetchSettings() {
       try {
         const [profileRes, orgRes] = await Promise.all([
-          fetch('/api/auth/profile'),
+          fetch('/api/team/me'),
           fetch('/api/auth/organization')
         ])
 
@@ -77,7 +78,7 @@ export default function SettingsPage() {
     }
 
     try {
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch('/api/settings/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -119,7 +120,7 @@ export default function SettingsPage() {
     }
 
     try {
-      const response = await fetch('/api/auth/organization', {
+      const response = await fetch('/api/settings/organization', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -363,15 +364,20 @@ export default function SettingsPage() {
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Seguridad</h3>
           </div>
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-6">
+            {/* Password Change Form */}
             <div>
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Cambiar Contrasena</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                Usa la opcion &quot;Olvidaste tu contrasena?&quot; en la pagina de inicio de sesion.
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Ingresa una nueva contrasena segura con al menos 8 caracteres
               </p>
-              <Button variant="outline" size="sm" asChild>
-                <a href="/forgot-password">Cambiar Contrasena</a>
-              </Button>
+              <PasswordChangeForm disabled={loading} onSuccess={() => {
+                setSuccess('Contrasena actualizada correctamente')
+                setError('')
+              }} onError={(msg) => {
+                setError(msg)
+                setSuccess('')
+              }} />
             </div>
 
             <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
