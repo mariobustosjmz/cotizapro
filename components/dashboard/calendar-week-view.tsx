@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { WORK_EVENT_TYPE_LABELS } from '@/lib/constants/work-events'
 
@@ -88,11 +89,14 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
 
   const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
+  // Check if there are any events in the current week
+  const hasEvents = events.length > 0
+
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg border border-gray-200">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
       {/* Header with week navigation */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           {weekStart.toLocaleDateString('es-MX', { month: 'long', day: 'numeric' })} -{' '}
           {new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('es-MX', {
             month: 'long',
@@ -110,14 +114,29 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
         </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="flex-1 overflow-auto">
+      {/* Empty state or Calendar grid */}
+      {!hasEvents ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center py-12">
+            <Calendar className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay eventos esta semana</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza creando tu primer evento</p>
+            <div className="mt-4">
+              <Link href="/dashboard/calendar/new" className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 dark:bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:hover:bg-blue-600">
+                <Plus className="h-4 w-4" />
+                Nuevo Evento
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-auto">
         <div className="flex min-w-min">
           {/* Time column */}
-          <div className="w-20 flex-shrink-0 border-r border-gray-200 bg-gray-50">
-            <div className="h-12 border-b border-gray-200" />
+          <div className="w-20 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div className="h-12 border-b border-gray-200 dark:border-gray-700" />
             {HOURS.map((hour) => (
-              <div key={hour} className="h-12 border-b border-gray-100 flex items-start justify-end pr-2 text-xs text-gray-500 font-medium">
+              <div key={hour} className="h-12 border-b border-gray-100 dark:border-gray-700 flex items-start justify-end pr-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
                 {hour}:00
               </div>
             ))}
@@ -141,14 +160,14 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
               const isToday = day.toDateString() === today.toDateString()
 
               return (
-                <div key={day.toISOString()} className="flex-1 border-r border-gray-200 relative">
+                <div key={day.toISOString()} className="flex-1 border-r border-gray-200 dark:border-gray-700 relative">
                   {/* Day header */}
-                  <div className={`h-12 border-b border-gray-200 px-4 py-2 flex flex-col justify-center ${isToday ? 'bg-blue-50' : 'bg-white'}`}>
-                    <div className="text-xs font-medium text-gray-600">{dayLabels[dayIndex]}</div>
-                    <div className={`text-sm font-semibold ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+                  <div className={`h-12 border-b border-gray-200 dark:border-gray-700 px-4 py-2 flex flex-col justify-center ${isToday ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-white dark:bg-gray-900'}`}>
+                    <div className={`text-xs font-medium ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>{dayLabels[dayIndex]}</div>
+                    <div className={`text-sm font-semibold ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>
                       {day.getDate()}
                     </div>
-                    {isToday && <div className="text-xs text-blue-600 font-medium">Hoy</div>}
+                    {isToday && <div className={`text-xs font-medium ${isToday ? 'text-blue-600 dark:text-blue-400' : ''}`}>Hoy</div>}
                   </div>
 
                   {/* Hour grid */}
@@ -156,7 +175,7 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
                     {HOURS.map((hour) => (
                       <div
                         key={hour}
-                        className="h-12 border-b border-gray-100 cursor-pointer hover:bg-blue-50/30 transition-colors"
+                        className="h-12 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-blue-50/30 dark:hover:bg-blue-900/20 transition-colors"
                         onClick={() => {
                           const dateISO = formatDateISO(day)
                           window.location.href = `/dashboard/calendar/new?date=${dateISO}&hour=${hour}`
@@ -196,7 +215,8 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
             })}
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
