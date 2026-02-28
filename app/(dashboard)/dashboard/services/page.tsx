@@ -90,22 +90,22 @@ export default async function ServicesPage({
   return (
     <div className="space-y-4">
       {/* Header + inline stats */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex-shrink-0">
             <Wrench className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Servicios</h2>
-            <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Servicios</h2>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">
               <span>{services?.length || 0} total</span>
               <span className="text-green-600 dark:text-green-400">{activeServices.length} activos</span>
               <span>{Object.keys(servicesByCategory).length} categorías</span>
             </div>
           </div>
         </div>
-        <Link href="/dashboard/services/new">
-          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+        <Link href="/dashboard/services/new" className="w-full sm:w-auto">
+          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-1" />
             Nuevo
           </Button>

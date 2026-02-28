@@ -247,15 +247,15 @@ export default function NewQuotePage() {
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <Link href="/dashboard/quotes">
-            <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer" type="button">
-              <ArrowLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer flex-shrink-0" type="button">
+              <ArrowLeft className="w-4 sm:w-5 h-4 sm:h-5 text-gray-500 dark:text-gray-400" />
             </button>
           </Link>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Nueva Cotizaci&oacute;n</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Completa los datos y revisa el resumen</p>
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Nueva Cotizaci&oacute;n</h2>
+            <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">Completa los datos y revisa el resumen</p>
           </div>
         </div>
       </div>
@@ -267,9 +267,9 @@ export default function NewQuotePage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* LEFT COLUMN */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="md:col-span-2 space-y-4">
 
             {/* Client + Template — compact cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

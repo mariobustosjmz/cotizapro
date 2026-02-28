@@ -95,18 +95,18 @@ export default async function AnalyticsPage() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex-shrink-0">
           <BarChart3 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Analiticas</h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Metricas y rendimiento del negocio</p>
+        <div className="min-w-0">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Analiticas</h2>
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Metricas y rendimiento del negocio</p>
         </div>
       </div>
 
       {/* Summary KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Cotizaciones</span>

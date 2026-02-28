@@ -195,16 +195,16 @@ export default async function DashboardPage() {
 
       {/* Welcome Header */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
           Bienvenido, {firstName}
         </h2>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5">
           {orgName} — resumen del negocio
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Clientes</span>

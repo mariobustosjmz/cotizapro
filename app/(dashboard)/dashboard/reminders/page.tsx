@@ -93,14 +93,14 @@ export default async function RemindersPage({
   return (
     <div className="space-y-4">
       {/* Header + inline stats */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex-shrink-0">
             <Bell className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recordatorios</h2>
-            <div className="flex items-center gap-3 text-sm">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Recordatorios</h2>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-sm">
               <span className="text-yellow-600 dark:text-yellow-400">{statusCounts.pending} pendientes</span>
               {statusCounts.overdue > 0 && (
                 <span className="text-red-600 dark:text-red-400 font-medium">{statusCounts.overdue} vencidos</span>
@@ -109,8 +109,8 @@ export default async function RemindersPage({
             </div>
           </div>
         </div>
-        <Link href="/dashboard/reminders/new">
-          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+        <Link href="/dashboard/reminders/new" className="w-full sm:w-auto">
+          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-1" />
             Nuevo
           </Button>

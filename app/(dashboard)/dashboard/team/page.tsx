@@ -81,14 +81,14 @@ export default async function TeamPage() {
   return (
     <div className="space-y-4">
       {/* Header with inline stats */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex-shrink-0">
             <Users className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Equipo</h2>
-            <div className="flex items-center gap-3 text-sm">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Equipo</h2>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-sm">
               <span className="text-gray-500 dark:text-gray-400">{members?.length || 0} miembros</span>
               <span className="text-purple-600 dark:text-purple-400">{adminCount} admins</span>
               {canInvite && invitations.length > 0 && (
@@ -98,8 +98,8 @@ export default async function TeamPage() {
           </div>
         </div>
         {canInvite && (
-          <Link href="/dashboard/team/invite">
-            <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+          <Link href="/dashboard/team/invite" className="w-full sm:w-auto">
+            <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-1" />
               Invitar
             </Button>

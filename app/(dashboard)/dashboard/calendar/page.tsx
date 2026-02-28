@@ -77,18 +77,18 @@ export default async function CalendarPage() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex-shrink-0">
             <Calendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Agenda</h2>
-            <span className="text-sm text-gray-500 dark:text-gray-400">{typedEvents.length} eventos esta semana</span>
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Agenda</h2>
+            <span className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">{typedEvents.length} eventos esta semana</span>
           </div>
         </div>
-        <Link href="/dashboard/calendar/new">
-          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+        <Link href="/dashboard/calendar/new" className="w-full sm:w-auto">
+          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-1" />
             Nuevo
           </Button>

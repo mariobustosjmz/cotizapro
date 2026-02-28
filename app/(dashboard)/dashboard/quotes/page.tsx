@@ -91,14 +91,14 @@ export default async function QuotesPage({
   return (
     <div className="space-y-4">
       {/* Header with inline stats */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex-shrink-0">
             <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Cotizaciones</h2>
-            <div className="flex items-center gap-3 text-sm">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Cotizaciones</h2>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-sm">
               <span className="text-gray-500 dark:text-gray-400" data-testid="draft-quotes-count">{statusCounts.draft} borradores</span>
               <span className="text-orange-600 dark:text-orange-400" data-testid="sent-quotes-count">{statusCounts.sent} enviadas</span>
               <span className="text-green-600 dark:text-green-400" data-testid="accepted-quotes-count">{statusCounts.accepted} aceptadas</span>
@@ -106,11 +106,11 @@ export default async function QuotesPage({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 flex-1 sm:flex-none">
             <Link
               href="/dashboard/quotes"
-              className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors flex-1 sm:flex-none text-center sm:text-left ${
                 !isKanbanView
                   ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
@@ -120,7 +120,7 @@ export default async function QuotesPage({
             </Link>
             <Link
               href="/dashboard/quotes?view=kanban"
-              className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors flex-1 sm:flex-none text-center sm:text-left ${
                 isKanbanView
                   ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
@@ -129,8 +129,8 @@ export default async function QuotesPage({
               Kanban
             </Link>
           </div>
-          <Link href="/dashboard/quotes/new" data-testid="new-quote-header-btn">
-            <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
+          <Link href="/dashboard/quotes/new" data-testid="new-quote-header-btn" className="w-full sm:w-auto">
+            <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-1" />
               Nueva
             </Button>
