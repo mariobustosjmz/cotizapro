@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -14,9 +14,12 @@ interface UseRealtimeOptions {
 
 export function useRealtime(options: UseRealtimeOptions[]) {
   const channelRef = useRef<RealtimeChannel | null>(null)
+  const callbacksRef = useRef(options.map(o => o.onEvent))
 
-  const stableOnEvents = useRef(options.map(o => o.onEvent))
-  stableOnEvents.current = options.map(o => o.onEvent)
+  // Keep callbacks in sync with latest function references
+  useEffect(() => {
+    callbacksRef.current = options.map(o => o.onEvent)
+  }, [options])
 
   const channelKey = options.map(o => `${o.table}:${o.event ?? '*'}:${o.filter ?? ''}`).join('|')
 
@@ -34,7 +37,7 @@ export function useRealtime(options: UseRealtimeOptions[]) {
           ...(opt.filter ? { filter: opt.filter } : {}),
         },
         () => {
-          stableOnEvents.current[idx]?.()
+          callbacksRef.current[idx]?.()
         },
       )
     })
@@ -54,13 +57,11 @@ export function useRealtimeRefresh(
   onRefresh: () => void,
   filter?: string,
 ) {
-  const stableRefresh = useCallback(onRefresh, [onRefresh])
-
   const options: UseRealtimeOptions[] = tables.map(table => ({
     table,
     event: '*',
     filter,
-    onEvent: stableRefresh,
+    onEvent: onRefresh,
   }))
 
   useRealtime(options)
