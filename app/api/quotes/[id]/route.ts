@@ -1,9 +1,22 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { updateQuoteSchema } from '@/lib/validations/cotizapro'
+import { updateQuoteSchema, type QuoteStatus } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+
+// Valid status transitions for quotes
+const VALID_TRANSITIONS: Record<QuoteStatus, QuoteStatus[]> = {
+  draft: ['sent'],
+  sent: ['accepted', 'rejected', 'viewed'],
+  viewed: ['accepted', 'rejected'],
+  accepted: ['en_instalacion'],
+  rejected: [],
+  expired: [],
+  en_instalacion: ['completado'],
+  completado: ['cobrado'],
+  cobrado: [],
+}
 
 // GET /api/quotes/[id] - Obtener cotización completa
 export async function GET(
@@ -128,6 +141,37 @@ export async function PATCH(
     }
 
     const { items, discount_rate, ...updateData } = validation.data
+
+    // Validate status transition if status is being updated
+    if (updateData.status) {
+      const { data: currentQuote } = await supabase
+        .from('quotes')
+        .select('status')
+        .eq('id', id)
+        .single()
+
+      if (!currentQuote) {
+        logger.warn('Quote not found during status validation', { quoteId: id })
+        return handleApiError(ApiErrors.NOT_FOUND('Quote'), 'PATCH /api/quotes/[id] - status validation')
+      }
+
+      const currentStatus = currentQuote.status as QuoteStatus
+      const newStatus = updateData.status
+      const allowedTransitions = VALID_TRANSITIONS[currentStatus]
+
+      if (!allowedTransitions.includes(newStatus)) {
+        logger.warn('Invalid status transition attempt', {
+          quoteId: id,
+          from: currentStatus,
+          to: newStatus,
+          userId: user.id,
+        })
+        return handleApiError(
+          ApiErrors.VALIDATION_FAILED(`Cannot transition from '${currentStatus}' to '${newStatus}'. Allowed transitions: ${allowedTransitions.join(', ')}`),
+          'PATCH /api/quotes/[id] - status transition validation'
+        )
+      }
+    }
 
     // Si se actualizan items, recalcular totales
     if (items) {

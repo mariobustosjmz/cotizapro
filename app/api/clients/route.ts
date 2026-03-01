@@ -150,8 +150,6 @@ export async function POST(request: NextRequest) {
       city: body.city === '' ? null : body.city,
       state: body.state === '' ? null : body.state,
       postal_code: body.postal_code === '' ? null : body.postal_code,
-      country: body.country === '' ? null : body.country,
-      tax_id: body.tax_id === '' ? null : body.tax_id,
       notes: body.notes === '' ? null : body.notes,
     }
 

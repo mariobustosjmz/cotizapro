@@ -45,6 +45,7 @@ export function buildCustomFieldsSchema(fields: CustomFieldDefinition[]): z.ZodO
 
 export const createClientSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(200, 'El nombre es muy largo'),
+  company_name: z.string().max(200, 'Empresa muy larga').optional().nullable(),
   email: z.string().email('Email inválido').optional().nullable(),
   phone: z.string()
     .min(10, 'Teléfono debe tener al menos 10 dígitos')
@@ -53,8 +54,8 @@ export const createClientSchema = z.object({
     .optional()
     .nullable(),
   whatsapp_phone: z.string()
-    .min(10)
-    .max(20)
+    .min(10, 'WhatsApp debe tener al menos 10 dígitos')
+    .max(20, 'WhatsApp es muy largo')
     .regex(/^[\d\s\-\+\(\)]+$/, 'Formato de teléfono inválido')
     .optional()
     .nullable(),
