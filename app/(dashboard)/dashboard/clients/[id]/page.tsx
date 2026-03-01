@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -17,7 +18,11 @@ interface Client {
   company_name: string | null
   email: string | null
   phone: string | null
+  whatsapp_phone: string | null
   address: string | null
+  city: string | null
+  state: string | null
+  postal_code: string | null
   notes: string | null
   tags: string[] | null
   created_at: string
@@ -26,6 +31,7 @@ interface Client {
 
 export default function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const { toast } = useToast()
   const resolvedParams = use(params)
   const clientId = resolvedParams.id
 
@@ -68,7 +74,11 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
       company_name: formData.get('company_name'),
       email: formData.get('email'),
       phone: formData.get('phone'),
+      whatsapp_phone: formData.get('whatsapp_phone'),
       address: formData.get('address'),
+      city: formData.get('city'),
+      state: formData.get('state'),
+      postal_code: formData.get('postal_code'),
       notes: formData.get('notes'),
       tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
       custom_fields: customFields,
@@ -89,10 +99,13 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
       const updated = await response.json()
       setClient(updated.client)
       setIsEditing(false)
+      toast({ message: 'Cliente actualizado exitosamente', variant: 'success' })
       router.push('/dashboard/clients')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al actualizar cliente')
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar cliente'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -116,10 +129,13 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
         throw new Error(errorData.error || 'Error al eliminar cliente')
       }
 
+      toast({ message: 'Cliente eliminado exitosamente', variant: 'success' })
       router.push('/dashboard/clients')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar cliente')
+      const errorMsg = err instanceof Error ? err.message : 'Error al eliminar cliente'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
       setDeleting(false)
     }
   }
@@ -190,6 +206,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
         <div className="p-4">
           {isEditing ? (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Contact Information */}
               <div className="grid gap-3 md:grid-cols-2">
                 <FormField label="Nombre Completo" htmlFor="name" required>
                   <Input id="name" name="name" required defaultValue={client.name} />
@@ -203,27 +220,54 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                   <Input id="email" name="email" type="email" defaultValue={client.email || ''} />
                 </FormField>
 
-                <FormField label="Telefono" htmlFor="phone">
-                  <Input id="phone" name="phone" type="tel" defaultValue={client.phone || ''} />
+                <FormField label="Telefono" htmlFor="phone" required>
+                  <Input id="phone" name="phone" type="tel" required defaultValue={client.phone || ''} />
+                </FormField>
+
+                <FormField label="WhatsApp" htmlFor="whatsapp_phone">
+                  <Input id="whatsapp_phone" name="whatsapp_phone" type="tel" defaultValue={client.whatsapp_phone || ''} />
                 </FormField>
               </div>
 
-              <FormField label="Direccion" htmlFor="address">
-                <Textarea id="address" name="address" rows={2} defaultValue={client.address || ''} />
-              </FormField>
+              {/* Address Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Dirección</h3>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <FormField label="Calle" htmlFor="address">
+                    <Textarea id="address" name="address" rows={2} defaultValue={client.address || ''} />
+                  </FormField>
 
-              <FormField label="Etiquetas" htmlFor="tags" hint="Separa las etiquetas con comas">
-                <Input
-                  id="tags"
-                  name="tags"
-                  placeholder="HVAC, Mantenimiento, VIP"
-                  defaultValue={client.tags?.join(', ') || ''}
-                />
-              </FormField>
+                  <div className="grid gap-3">
+                    <FormField label="Ciudad" htmlFor="city">
+                      <Input id="city" name="city" defaultValue={client.city || ''} />
+                    </FormField>
 
-              <FormField label="Notas" htmlFor="notes">
-                <Textarea id="notes" name="notes" rows={2} defaultValue={client.notes || ''} />
-              </FormField>
+                    <FormField label="Estado" htmlFor="state">
+                      <Input id="state" name="state" defaultValue={client.state || ''} />
+                    </FormField>
+                  </div>
+
+                  <FormField label="Código Postal" htmlFor="postal_code">
+                    <Input id="postal_code" name="postal_code" defaultValue={client.postal_code || ''} />
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Tags and Notes */}
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField label="Etiquetas" htmlFor="tags" hint="Separa con comas">
+                  <Input
+                    id="tags"
+                    name="tags"
+                    placeholder="HVAC, Mantenimiento, VIP"
+                    defaultValue={client.tags?.join(', ') || ''}
+                  />
+                </FormField>
+
+                <FormField label="Notas" htmlFor="notes">
+                  <Textarea id="notes" name="notes" rows={2} defaultValue={client.notes || ''} />
+                </FormField>
+              </div>
 
               <DynamicFieldsSection
                 entityType="client"
@@ -239,34 +283,73 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
               </div>
             </form>
           ) : (
-            <div className="space-y-4">
-              <div className="grid gap-3 md:grid-cols-2">
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Nombre</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{client.name}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Empresa</p>
-                  <p className="text-sm text-gray-900 dark:text-white">{client.company_name || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                  <p className="text-sm text-gray-900 dark:text-white">{client.email || '-'}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Telefono</p>
-                  <p className="text-sm text-gray-900 dark:text-white">{client.phone || '-'}</p>
-                </div>
-              </div>
-
+            <div className="space-y-5">
+              {/* Contact Information */}
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Direccion</p>
-                <p className="text-sm text-gray-900 dark:text-white">{client.address || '-'}</p>
+                <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-3 uppercase tracking-wide">Información de Contacto</p>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Nombre</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{client.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Empresa</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{client.company_name || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{client.email || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Telefono</p>
+                    <p className="text-sm text-gray-900 dark:text-white">{client.phone || '-'}</p>
+                  </div>
+                  {client.whatsapp_phone && (
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">WhatsApp</p>
+                      <p className="text-sm text-gray-900 dark:text-white">{client.whatsapp_phone}</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
+              {/* Address Information */}
+              {(client.address || client.city || client.state || client.postal_code) && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-3 uppercase tracking-wide">Dirección</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {client.address && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Calle</p>
+                        <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{client.address}</p>
+                      </div>
+                    )}
+                    {client.city && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Ciudad</p>
+                        <p className="text-sm text-gray-900 dark:text-white">{client.city}</p>
+                      </div>
+                    )}
+                    {client.state && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Estado</p>
+                        <p className="text-sm text-gray-900 dark:text-white">{client.state}</p>
+                      </div>
+                    )}
+                    {client.postal_code && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Código Postal</p>
+                        <p className="text-sm text-gray-900 dark:text-white">{client.postal_code}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Tags */}
               {client.tags && client.tags.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Etiquetas</p>
+                  <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2 uppercase tracking-wide">Etiquetas</p>
                   <div className="flex flex-wrap gap-1.5">
                     {client.tags.map((tag, index) => (
                       <span
@@ -280,13 +363,15 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                 </div>
               )}
 
+              {/* Notes */}
               {client.notes && (
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Notas</p>
+                  <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2 uppercase tracking-wide">Notas</p>
                   <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{client.notes}</p>
                 </div>
               )}
 
+              {/* Created At */}
               <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Creado</p>
                 <p className="text-sm text-gray-900 dark:text-white">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Trash2, FileDown, Send, Calendar, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -64,19 +65,20 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-700',
-  sent: 'bg-blue-100 text-blue-700',
-  viewed: 'bg-purple-100 text-purple-700',
-  accepted: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-700',
-  expired: 'bg-yellow-100 text-yellow-700',
-  en_instalacion: 'bg-orange-100 text-orange-800',
-  completado: 'bg-teal-100 text-teal-800',
-  cobrado: 'bg-emerald-100 text-emerald-800',
+  draft: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+  sent: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  viewed: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  accepted: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+  rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+  expired: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+  en_instalacion: 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400',
+  completado: 'bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-400',
+  cobrado: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400',
 }
 
 export default function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const { toast } = useToast()
   const { id } = use(params)
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -133,10 +135,13 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         const errorData = await response.json()
         throw new Error(errorData.error || 'Error al eliminar cotizacion')
       }
+      toast({ message: 'Cotizació eliminada exitosamente', variant: 'success' })
       router.push('/dashboard/quotes')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar cotizacion')
+      const errorMsg = err instanceof Error ? err.message : 'Error al eliminar cotizacion'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
       setDeleting(false)
     }
   }
@@ -159,8 +164,11 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
 
       const updated = await response.json()
       setQuote(updated.data)
+      toast({ message: 'Estado actualizado exitosamente', variant: 'success' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al actualizar estado')
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar estado'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -179,9 +187,12 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
+        toast({ message: 'PDF descargado exitosamente', variant: 'success' })
       }
-    } catch {
-      setError('Error al exportar PDF')
+    } catch (err) {
+      const errorMsg = 'Error al exportar PDF'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     }
   }
 

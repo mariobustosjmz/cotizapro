@@ -1,9 +1,10 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Bell, Plus, AlertCircle, CheckCircle } from 'lucide-react'
+import { Bell, Plus, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ReminderFilters } from './filters'
+import { ReminderRowActions } from './reminder-row-actions'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -154,25 +155,30 @@ export default async function RemindersPage({
               <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {reminders.map((reminder) => {
                   const isOverdue = reminder.status === 'pending' && reminder.scheduled_date < today
+                  const isCompleted = reminder.status === 'completed'
                   return (
-                    <tr key={reminder.id} className={`hover:bg-orange-50/40 dark:hover:bg-gray-800 cursor-pointer ${isOverdue ? 'bg-red-50/60 dark:bg-red-900/20' : ''}`}>
+                    <tr key={reminder.id} className={`hover:bg-orange-50/40 dark:hover:bg-gray-800 ${isCompleted ? 'opacity-50' : ''} ${isOverdue && !isCompleted ? 'bg-red-50/60 dark:bg-red-900/20' : ''}`}>
                       <td className="px-4 py-2.5">
-                        <div className="text-sm text-gray-900 dark:text-white">{reminder.clients?.name || 'Sin cliente'}</div>
+                        <div className={`text-sm ${isCompleted ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+                          {reminder.clients?.name || 'Sin cliente'}
+                        </div>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">{reminder.title}</div>
+                        <div className={`text-sm font-medium ${isCompleted ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+                          {reminder.title}
+                        </div>
                         {reminder.message && (
                           <div className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[100px] sm:max-w-[200px]">{reminder.message}</div>
                         )}
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap">
-                        <div className={`text-sm ${isOverdue ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-700 dark:text-gray-300'}`}>
+                        <div className={`text-sm ${isCompleted ? 'line-through text-gray-400 dark:text-gray-500' : isOverdue ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-700 dark:text-gray-300'}`}>
                           {new Date(reminder.scheduled_date).toLocaleDateString('es-MX', {
                             month: 'short',
                             day: 'numeric'
                           })}
                         </div>
-                        {isOverdue && <div className="text-[10px] text-red-500 dark:text-red-400">Vencido</div>}
+                        {isOverdue && !isCompleted && <div className="text-[10px] text-red-500 dark:text-red-400">Vencido</div>}
                       </td>
                       <td className="px-4 py-2.5 hidden md:table-cell">
                         <Badge variant={reminder.reminder_type as 'follow_up' | 'maintenance' | 'renewal' | 'custom'} className="text-xs">
@@ -190,6 +196,9 @@ export default async function RemindersPage({
                         </Badge>
                       </td>
                       <td className="px-4 py-2.5 text-right">
+                        {reminder.status === 'pending' && (
+                          <ReminderRowActions reminderId={reminder.id} />
+                        )}
                         <Link
                           href={`/dashboard/reminders/${reminder.id}`}
                           className="inline-flex items-center justify-center px-2 py-1.5 text-xs text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium rounded"

@@ -1,26 +1,44 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
-export function QuoteSearchInput({ defaultValue }: { defaultValue?: string }) {
+interface QuoteSearchInputProps {
+  defaultValue?: string
+  onSearch?: (term: string) => void
+}
+
+export function QuoteSearchInput({ defaultValue, onSearch }: QuoteSearchInputProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null)
 
   const handleSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (e.target.value) {
-        params.set('q', e.target.value)
-      } else {
-        params.delete('q')
+      const term = e.target.value
+
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
       }
-      router.replace(`${pathname}?${params.toString()}`)
+
+      debounceTimer.current = setTimeout(() => {
+        if (onSearch) {
+          onSearch(term)
+        } else {
+          const params = new URLSearchParams(searchParams.toString())
+          if (term) {
+            params.set('q', term)
+          } else {
+            params.delete('q')
+          }
+          router.replace(`${pathname}?${params.toString()}`)
+        }
+      }, 300)
     },
-    [router, pathname, searchParams]
+    [router, pathname, searchParams, onSearch]
   )
 
   return (

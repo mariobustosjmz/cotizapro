@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,6 +19,7 @@ interface Client {
 
 export default function NewReminderPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [clients, setClients] = useState<Client[]>([])
@@ -77,16 +79,19 @@ export default function NewReminderPage() {
         throw new Error(error.error || 'Error al crear recordatorio')
       }
 
+      toast({ message: 'Recordatorio creado exitosamente', variant: 'success' })
       router.push('/dashboard/reminders')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear recordatorio')
+      const errorMsg = err instanceof Error ? err.message : 'Error al crear recordatorio'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }
   }
 
-  const selectClass = "w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+  const selectClass = "w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
 
   return (
     <div className="space-y-4">
@@ -98,16 +103,16 @@ export default function NewReminderPage() {
           </Button>
         </Link>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Nuevo Recordatorio</h2>
-          <p className="text-xs text-gray-500">Programa un recordatorio de seguimiento</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Nuevo Recordatorio</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Programa un recordatorio de seguimiento</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">
               {error}
             </div>
           )}
@@ -124,8 +129,8 @@ export default function NewReminderPage() {
             </select>
           </FormField>
           {clients.length === 0 && (
-            <p className="text-xs text-gray-500">
-              No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 hover:underline">Crear cliente</Link>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              No hay clientes. <Link href="/dashboard/clients/new" className="text-orange-600 dark:text-orange-400 hover:underline">Crear cliente</Link>
             </p>
           )}
 
@@ -193,13 +198,13 @@ export default function NewReminderPage() {
                 onChange={(e) => setIsRecurring(e.target.checked)}
                 className="h-4 w-4 accent-orange-500 focus:ring-orange-500 border-gray-300 rounded cursor-pointer"
               />
-              <Label htmlFor="is_recurring" className="text-sm cursor-pointer">
+              <Label htmlFor="is_recurring" className="text-sm dark:text-gray-300 cursor-pointer">
                 Recurrente
               </Label>
             </div>
             {isRecurring && (
               <div className="flex items-center gap-2">
-                <Label htmlFor="recurrence_interval_months" className="text-sm text-gray-600 whitespace-nowrap">
+                <Label htmlFor="recurrence_interval_months" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   Cada
                 </Label>
                 <Input
@@ -212,13 +217,13 @@ export default function NewReminderPage() {
                   required={isRecurring}
                   className="w-20"
                 />
-                <span className="text-sm text-gray-500">meses</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">meses</span>
               </div>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <Link href="/dashboard/reminders">
               <Button type="button" variant="outline" size="sm" disabled={loading}>
                 Cancelar

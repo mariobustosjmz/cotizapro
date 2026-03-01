@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -13,6 +14,7 @@ import type { CustomFieldValues } from '@/types/custom-fields'
 
 export default function NewServicePage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
@@ -46,10 +48,13 @@ export default function NewServicePage() {
         throw new Error(error.error || 'Error al crear servicio')
       }
 
+      toast({ message: 'Servicio creado exitosamente', variant: 'success' })
       router.push('/dashboard/services')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear servicio')
+      const errorMsg = err instanceof Error ? err.message : 'Error al crear servicio'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -65,16 +70,16 @@ export default function NewServicePage() {
           </Button>
         </Link>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Nuevo Servicio</h2>
-          <p className="text-xs text-gray-500">Agrega un servicio a tu catálogo</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Nuevo Servicio</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Agrega un servicio a tu catálogo</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">
               {error}
             </div>
           )}
@@ -89,7 +94,7 @@ export default function NewServicePage() {
                 id="category"
                 name="category"
                 required
-                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
                 <option value="">Selecciona...</option>
                 <option value="hvac">HVAC</option>
@@ -105,7 +110,7 @@ export default function NewServicePage() {
                 id="unit_type"
                 name="unit_type"
                 required
-                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
                 <option value="">Selecciona...</option>
                 <option value="fixed">Precio Fijo</option>
@@ -125,7 +130,7 @@ export default function NewServicePage() {
                 name="is_active"
                 required
                 defaultValue="true"
-                className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                className="w-full h-9 px-3 text-sm bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
               >
                 <option value="true">Activo</option>
                 <option value="false">Inactivo</option>
@@ -144,7 +149,7 @@ export default function NewServicePage() {
           />
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <Link href="/dashboard/services">
               <Button type="button" variant="outline" size="sm" disabled={loading}>
                 Cancelar

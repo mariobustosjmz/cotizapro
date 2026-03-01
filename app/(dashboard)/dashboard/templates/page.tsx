@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,6 +10,7 @@ import { Plus, Trash2, Edit2, FileStack } from 'lucide-react'
 import type { QuoteTemplate } from '@/lib/validations/cotizapro'
 
 export default function TemplatesPage() {
+  const { toast } = useToast()
   const [templates, setTemplates] = useState<QuoteTemplate[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -109,8 +111,12 @@ export default function TemplatesPage() {
 
       await fetchTemplates()
       setShowModal(false)
+      const action = editingId ? 'actualizado' : 'creado'
+      toast({ message: `Template ${action} exitosamente`, variant: 'success' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al guardar template')
+      const errorMsg = err instanceof Error ? err.message : 'Error al guardar template'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setSubmitting(false)
     }
@@ -131,8 +137,11 @@ export default function TemplatesPage() {
       }
 
       await fetchTemplates()
+      toast({ message: 'Template eliminado exitosamente', variant: 'success' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar template')
+      const errorMsg = err instanceof Error ? err.message : 'Error al eliminar template'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setDeleting(null)
     }

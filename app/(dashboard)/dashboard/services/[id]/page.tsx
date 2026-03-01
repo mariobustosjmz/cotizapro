@@ -140,7 +140,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     per_unit: 'Por Unidad',
   }
 
-  const selectClass = 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500'
+  const selectClass = 'w-full px-3 py-2 bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500'
 
   return (
     <div className="space-y-4">
@@ -154,14 +154,14 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-gray-900">{service.name}</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{service.name}</h2>
               <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                service.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                service.is_active ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
               }`}>
                 {service.is_active ? 'Activo' : 'Inactivo'}
               </span>
             </div>
-            <p className="text-xs text-gray-500">{categoryLabels[service.category]}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{categoryLabels[service.category]}</p>
           </div>
         </div>
 
@@ -185,13 +185,13 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm">{error}</div>
       )}
 
       {/* Content */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <span className="text-sm font-semibold text-gray-900">Informacion del Servicio</span>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Informacion del Servicio</span>
         </div>
         <div className="p-4">
           {isEditing ? (
@@ -242,7 +242,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 onChange={setCustomFields}
               />
 
-              <div className="flex justify-end pt-2 border-t border-gray-100">
+              <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-700">
                 <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
                   <Save className="w-3.5 h-3.5 mr-1" />
                   {loading ? 'Guardando...' : 'Guardar'}
@@ -253,30 +253,30 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
             <div className="space-y-4">
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
-                  <p className="text-xs text-gray-500">Nombre</p>
-                  <p className="text-sm font-medium text-gray-900">{service.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Nombre</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{service.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Categoria</p>
-                  <p className="text-sm text-gray-900">{categoryLabels[service.category]}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Categoria</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{categoryLabels[service.category]}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Precio Base</p>
-                  <p className="text-lg font-bold text-green-600">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Precio Base</p>
+                  <p className="text-lg font-bold text-green-600 dark:text-green-400">
                     ${Number(service.unit_price).toLocaleString('es-MX')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Unidad de Medida</p>
-                  <p className="text-sm text-gray-900">{unitTypeLabels[service.unit_type] || service.unit_type}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Unidad de Medida</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{unitTypeLabels[service.unit_type] || service.unit_type}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Estado</p>
-                  <p className="text-sm text-gray-900">{service.is_active ? 'Activo' : 'Inactivo'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Estado</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{service.is_active ? 'Activo' : 'Inactivo'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Creado</p>
-                  <p className="text-sm text-gray-900">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Creado</p>
+                  <p className="text-sm text-gray-900 dark:text-white">
                     {new Date(service.created_at).toLocaleDateString('es-MX', {
                       year: 'numeric',
                       month: 'long',
@@ -288,8 +288,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
               {service.description && (
                 <div>
-                  <p className="text-xs text-gray-500">Descripcion</p>
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{service.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Descripcion</p>
+                  <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{service.description}</p>
                 </div>
               )}
 

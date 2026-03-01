@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -32,6 +33,7 @@ interface Organization {
 }
 
 export default function SettingsPage() {
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -92,8 +94,11 @@ export default function SettingsPage() {
       const updated = await response.json()
       setProfile(updated.data)
       setSuccess('Perfil actualizado correctamente')
+      toast({ message: 'Perfil actualizado exitosamente', variant: 'success' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al actualizar perfil')
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar perfil'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -134,8 +139,11 @@ export default function SettingsPage() {
       const updated = await response.json()
       setOrganization(updated.data)
       setSuccess('Organizacion actualizada correctamente')
+      toast({ message: 'Organización actualizada exitosamente', variant: 'success' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al actualizar organizacion')
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar organizacion'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }

@@ -218,7 +218,7 @@ export function DashboardSidebar({ user, profile }: SidebarProps) {
       )}
     >
       {/* Logo area */}
-      <div className="h-16 flex items-center border-b border-white/[0.06] shrink-0 overflow-hidden">
+      <div className="h-16 flex items-center border-b border-white/[0.06] dark:border-white/[0.06] shrink-0 overflow-hidden">
         <Link
           href="/dashboard"
           className={cn(
@@ -226,7 +226,7 @@ export function DashboardSidebar({ user, profile }: SidebarProps) {
             isCollapsed && 'justify-center px-0 w-full'
           )}
         >
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
+          <div className="w-8 h-8 bg-orange-500 dark:bg-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
             C
           </div>
           {!isCollapsed && (

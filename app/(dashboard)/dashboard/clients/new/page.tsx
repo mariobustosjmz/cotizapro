@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -13,6 +14,7 @@ import type { CustomFieldValues } from '@/types/custom-fields'
 
 export default function NewClientPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
@@ -48,10 +50,13 @@ export default function NewClientPage() {
         throw new Error(error.error || 'Error al crear cliente')
       }
 
+      toast({ message: 'Cliente creado exitosamente', variant: 'success' })
       router.push('/dashboard/clients')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear cliente')
+      const errorMsg = err instanceof Error ? err.message : 'Error al crear cliente'
+      setError(errorMsg)
+      toast({ message: errorMsg, variant: 'error' })
     } finally {
       setLoading(false)
     }

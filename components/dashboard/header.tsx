@@ -60,7 +60,7 @@ export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps)
           return (
             <span key={crumb.href} className="flex items-center gap-1">
               {idx > 0 && (
-                <ChevronRight className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+                <ChevronRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 shrink-0" />
               )}
               {isLast ? (
                 <span className="text-[15px] font-semibold text-gray-900 dark:text-white truncate">
@@ -69,7 +69,7 @@ export function DashboardHeader({ user: _user, profile: _profile }: HeaderProps)
               ) : (
                 <Link
                   href={crumb.href}
-                  className="text-sm text-gray-400 hover:text-gray-600 transition-colors truncate"
+                  className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors truncate"
                 >
                   {crumb.label}
                 </Link>

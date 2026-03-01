@@ -59,8 +59,8 @@ export function QuickActionsList({
               }
               className={
                 variant === 'horizontal'
-                  ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-md hover:bg-gray-100 transition-colors'
-                  : 'flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-50 transition-colors'
+                  ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                  : 'flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-900 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors'
               }
             >
               <Icon className="w-4 h-4" />

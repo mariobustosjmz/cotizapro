@@ -44,7 +44,7 @@ export function FAB() {
       {/* Main FAB Button */}
       <button
         onClick={toggleOpen}
-        className="w-14 h-14 rounded-full bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white shadow-lg flex items-center justify-center transition-all duration-200 active:scale-95"
+        className="w-14 h-14 rounded-full bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white shadow-lg flex items-center justify-center transition-all duration-200 active:scale-95"
         aria-label="Acciones rápidas"
         aria-expanded={isOpen}
       >

@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('animate-pulse rounded-md bg-gray-200', className)}
+      className={cn('animate-pulse rounded-md bg-gray-200 dark:bg-gray-700', className)}
       {...props}
     />
   )
@@ -11,7 +11,7 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 
 export function StatCardSkeleton() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 space-y-2">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 space-y-2">
       <div className="flex items-center justify-between">
         <Skeleton className="h-3 w-16" />
         <Skeleton className="h-7 w-7 rounded-lg" />
@@ -24,7 +24,7 @@ export function StatCardSkeleton() {
 
 export function QuoteRowSkeleton() {
   return (
-    <div className="flex items-center justify-between px-4 py-2.5 border-l-[3px] border-l-gray-200">
+    <div className="flex items-center justify-between px-4 py-2.5 border-l-[3px] border-l-gray-200 dark:border-l-gray-700">
       <div className="space-y-1.5">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-3 w-40" />
@@ -54,13 +54,13 @@ export function ListPageSkeleton({ rows = 6, cols = 4 }: { rows?: number; cols?:
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-9 w-32 rounded-lg" />
       </div>
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-100 flex gap-4">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex gap-4">
           {Array.from({ length: cols }).map((_, i) => (
             <Skeleton key={i} className="h-3 flex-1" />
           ))}
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-50 dark:divide-gray-800">
           {Array.from({ length: rows }).map((_, i) => (
             <TableRowSkeleton key={i} cols={cols} />
           ))}
@@ -84,25 +84,25 @@ export function DashboardSkeleton() {
       </div>
       <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-gray-200 p-3">
+          <div key={i} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 border-l-4 border-l-gray-200 dark:border-l-gray-700 p-3">
             <Skeleton className="h-2.5 w-16 mb-1" />
             <Skeleton className="h-6 w-8" />
           </div>
         ))}
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200">
-          <div className="px-4 py-3 border-b border-gray-100">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
             <Skeleton className="h-4 w-36" />
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-800">
             {Array.from({ length: 5 }).map((_, i) => (
               <QuoteRowSkeleton key={i} />
             ))}
           </div>
         </div>
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 space-y-3">
             <Skeleton className="h-4 w-28" />
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-14 rounded-lg" />
