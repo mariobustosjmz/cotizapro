@@ -21,6 +21,8 @@ export const updateOrganizationSchema = z.object({
   quote_terms: z.string().max(2000, 'Los términos son muy largos').nullable().optional(),
   quote_valid_days: z.number().min(1, 'Debe ser al menos 1 día').max(365, 'No puede exceder 365 días').nullable().optional(),
   tax_rate: z.number().min(0, 'La tasa no puede ser negativa').max(100, 'La tasa no puede exceder 100').nullable().optional(),
+  logo_url: z.string().url('URL de logo inválida').max(500).nullable().optional(),
+  brand_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color debe ser formato hex (#RRGGBB)').nullable().optional(),
 })
 
 /**

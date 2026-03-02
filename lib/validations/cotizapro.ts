@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import type { CustomFieldDefinition } from '@/types/custom-fields'
 
+// UUID regex that accepts both RFC 4122 and zero-padded seed UUIDs
+const UUID_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
+const uuidString = (msg = 'UUID inválido') => z.string().regex(UUID_REGEX, msg)
+
 // ========================================
 // Client Schemas
 // ========================================
@@ -108,7 +112,7 @@ export type UpdateServiceInput = z.infer<typeof updateServiceSchema>
 // ========================================
 
 export const quoteItemSchema = z.object({
-  service_id: z.string().uuid('Service ID inválido').optional().nullable(),
+  service_id: uuidString('Service ID inválido').optional().nullable(),
   description: z.string()
     .min(1, 'La descripción es requerida')
     .max(500, 'Descripción muy larga'),
@@ -128,7 +132,7 @@ export type QuoteItemInput = z.infer<typeof quoteItemSchema>
 // ========================================
 
 export const createQuoteSchema = z.object({
-  client_id: z.string().uuid('Cliente inválido'),
+  client_id: uuidString('Cliente inválido'),
   valid_until: z.string().datetime('Fecha inválida').or(z.date()),
   items: z.array(quoteItemSchema)
     .min(1, 'Debe agregar al menos un servicio')
@@ -157,7 +161,7 @@ export const quoteStatusSchema = z.enum([
 export type QuoteStatus = z.infer<typeof quoteStatusSchema>
 
 export const updateQuoteSchema = z.object({
-  client_id: z.string().uuid('Cliente inválido').optional(),
+  client_id: uuidString('Cliente inválido').optional(),
   valid_until: z.string().datetime('Fecha inválida').or(z.date()).optional(),
   items: z.array(quoteItemSchema)
     .min(1, 'Debe agregar al menos un servicio')
@@ -182,7 +186,7 @@ export type UpdateQuoteInput = z.infer<typeof updateQuoteSchema>
 export const sendMethodEnum = z.enum(['email', 'whatsapp'])
 
 export const sendQuoteSchema = z.object({
-  quote_id: z.string().uuid('Quote ID inválido'),
+  quote_id: uuidString('Quote ID inválido'),
   send_via: z.array(sendMethodEnum)
     .min(1, 'Seleccione al menos un método de envío')
     .max(2, 'Máximo 2 métodos de envío'),
@@ -219,7 +223,7 @@ export const serviceQuerySchema = paginationSchema.extend({
 
 export const quoteQuerySchema = paginationSchema.extend({
   status: quoteStatusSchema.optional(),
-  client_id: z.string().uuid().optional(),
+  client_id: uuidString().optional(),
   from_date: z.string().datetime().optional(),
   to_date: z.string().datetime().optional(),
 })
@@ -260,7 +264,7 @@ export const reminderStatusEnum = z.enum(['pending', 'sent', 'completed', 'snooz
 export const reminderPriorityEnum = z.enum(['low', 'normal', 'high', 'urgent'])
 
 export const createReminderSchema = z.object({
-  client_id: z.string().uuid('Cliente inválido'),
+  client_id: uuidString('Cliente inválido'),
   title: z.string().min(1, 'El título es requerido').max(200, 'Título muy largo'),
   description: z.string().max(1000, 'Descripción muy larga').optional().nullable(),
   reminder_type: reminderTypeEnum,
@@ -269,7 +273,7 @@ export const createReminderSchema = z.object({
   priority: reminderPriorityEnum.default('normal'),
   auto_send_notification: z.boolean().default(false),
   notification_channels: z.array(z.enum(['email', 'whatsapp'])).optional().nullable(),
-  related_quote_id: z.string().uuid().optional().nullable(),
+  related_quote_id: uuidString().optional().nullable(),
   related_service_category: serviceCategoryEnum.optional().nullable(),
   is_recurring: z.boolean().default(false),
   recurrence_interval_months: z.number()
@@ -289,7 +293,7 @@ export const updateReminderSchema = z.object({
   priority: reminderPriorityEnum.optional(),
   auto_send_notification: z.boolean().optional(),
   notification_channels: z.array(z.enum(['email', 'whatsapp'])).optional().nullable(),
-  related_quote_id: z.string().uuid().optional().nullable(),
+  related_quote_id: uuidString().optional().nullable(),
   related_service_category: serviceCategoryEnum.optional().nullable(),
   is_recurring: z.boolean().optional(),
   recurrence_interval_months: z.number().int().positive().max(60).optional().nullable(),
@@ -297,7 +301,7 @@ export const updateReminderSchema = z.object({
 })
 
 export const reminderQuerySchema = paginationSchema.extend({
-  client_id: z.string().uuid().optional(),
+  client_id: uuidString().optional(),
   status: reminderStatusEnum.optional(),
   priority: reminderPriorityEnum.optional(),
   reminder_type: reminderTypeEnum.optional(),
@@ -324,7 +328,7 @@ export const createQuotePaymentSchema = z.object({
   payment_method: paymentMethodSchema,
   payment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida (YYYY-MM-DD)'),
   notes: z.string().max(500).optional(),
-  received_by: z.string().uuid().optional(),
+  received_by: uuidString().optional(),
 })
 
 export type PaymentType = z.infer<typeof paymentTypeSchema>
@@ -356,9 +360,9 @@ export const createWorkEventSchema = z.object({
   event_type: workEventTypeEnum,
   scheduled_start: z.string().datetime('Fecha de inicio inválida'),
   scheduled_end: z.string().datetime('Fecha de fin inválida'),
-  client_id: z.string().uuid('Cliente inválido'),
-  quote_id: z.string().uuid().optional().nullable(),
-  assigned_to: z.string().uuid().optional().nullable(),
+  client_id: uuidString('Cliente inválido'),
+  quote_id: uuidString().optional().nullable(),
+  assigned_to: uuidString().optional().nullable(),
   address: z.string().max(500).optional().nullable(),
   notes: z.string().max(1000).optional().nullable(),
 })
@@ -368,9 +372,9 @@ export const updateWorkEventSchema = z.object({
   event_type: workEventTypeEnum.optional(),
   scheduled_start: z.string().datetime().optional(),
   scheduled_end: z.string().datetime().optional(),
-  client_id: z.string().uuid().optional(),
-  quote_id: z.string().uuid().optional().nullable(),
-  assigned_to: z.string().uuid().optional().nullable(),
+  client_id: uuidString().optional(),
+  quote_id: uuidString().optional().nullable(),
+  assigned_to: uuidString().optional().nullable(),
   address: z.string().max(500).optional().nullable(),
   notes: z.string().max(1000).optional().nullable(),
   status: workEventStatusEnum.optional(),

@@ -195,7 +195,8 @@ test.describe('Quote Management', () => {
     const form = page.locator('form')
     expect(await form.isVisible()).toBeTruthy()
 
-    const submitButton = page.locator('button[type="submit"]')
+    // Use .first() — desktop + mobile layouts both render a submit button
+    const submitButton = page.locator('button[type="submit"]').first()
     expect(await submitButton.isVisible()).toBeTruthy()
   })
 

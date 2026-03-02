@@ -142,7 +142,7 @@ INSERT INTO quotes (id, organization_id, client_id, quote_number, status, subtot
 -- Items for Quote 16 (en_instalacion)
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
   (gen_random_uuid(), '00000000-0000-0000-0003-000000000016',
-   '00000000-0000-0000-0001-000000000013',
+   NULL,
    'Sistema Multi-Split (2 zonas) — Suites ejecutivas', 1, 18000.00, 'fixed', 18000.00),
   (gen_random_uuid(), '00000000-0000-0000-0003-000000000016',
    NULL, 'Mano de obra instalación multi-zona', 1, 4800.00, 'fixed', 4800.00);
@@ -150,7 +150,7 @@ INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_p
 -- Items for Quote 17 (en_instalacion)
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
   (gen_random_uuid(), '00000000-0000-0000-0003-000000000017',
-   '00000000-0000-0000-0001-000000000014',
+   NULL,
    'Sistema VRF Comercial — 4 zonas corporativas', 4, 45000.00, 'per_unit', 180000.00),
   (gen_random_uuid(), '00000000-0000-0000-0003-000000000017',
    NULL, 'Materiales y canalización ductos', 1, 15000.00, 'fixed', 15000.00);
@@ -182,7 +182,7 @@ INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_p
 -- Items for Quote 21 (cobrado)
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
   (gen_random_uuid(), '00000000-0000-0000-0003-000000000021',
-   '00000000-0000-0000-0001-000000000013',
+   NULL,
    'Sistema Multi-Split (2 zonas)', 2, 18000.00, 'per_unit', 36000.00),
   (gen_random_uuid(), '00000000-0000-0000-0003-000000000021',
    NULL, 'Instalación y puesta en marcha', 1, 5000.00, 'fixed', 5000.00);
@@ -234,14 +234,14 @@ INSERT INTO quote_payments (id, organization_id, quote_id, amount, payment_type,
 INSERT INTO quote_payments (id, organization_id, quote_id, amount, payment_type, payment_method, payment_date, notes, received_by) VALUES
   ('00000000-0000-0000-0004-000000000105',
    '00000000-0000-0000-0000-000000000002',
-   '00000000-0000-0000-0003-000000000015',
+   '00000000-0000-0000-0003-000000000003',
    2500.00, 'anticipo', 'transferencia', '2026-01-15',
-   'Anticipo enero — COT-2026-010', '00000000-0000-0000-0000-000000000001'),
+   'Anticipo enero — COT-2026-003', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0004-000000000106',
    '00000000-0000-0000-0000-000000000002',
-   '00000000-0000-0000-0003-000000000014',
+   '00000000-0000-0000-0003-000000000004',
    6000.00, 'anticipo', 'transferencia', '2026-01-20',
-   'Anticipo enero — COT-2026-009', '00000000-0000-0000-0000-000000000001');
+   'Anticipo enero — COT-2026-004', '00000000-0000-0000-0000-000000000001');
 
 -- Quote 16 (en_instalacion) advance — Feb 2026
 INSERT INTO quote_payments (id, organization_id, quote_id, amount, payment_type, payment_method, payment_date, notes, received_by) VALUES

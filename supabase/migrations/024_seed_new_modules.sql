@@ -11,6 +11,98 @@
 -- client IDs: 00000000-0000-0000-0002-000000000002, 003, 004
 
 -- ================================================
+-- 0. Foundation: org, auth user, profile, clients, services
+-- ================================================
+
+INSERT INTO organizations (id, name, slug, subscription_status, plan)
+VALUES (
+  '00000000-0000-0000-0000-000000000002',
+  'ClimaSol HVAC',
+  'climasol-hvac',
+  'active',
+  'pro'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO auth.users (
+  id, instance_id, aud, role, email,
+  encrypted_password,
+  email_confirmed_at, created_at, updated_at,
+  raw_app_meta_data, raw_user_meta_data,
+  confirmation_token, recovery_token, email_change_token_new,
+  email_change, phone_change, email_change_token_current,
+  is_super_admin
+) VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated', 'authenticated', 'demo@climasol.mx',
+  crypt('ClimaSol2026!', gen_salt('bf')),
+  NOW(), NOW(), NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"organization_id":"00000000-0000-0000-0000-000000000002","full_name":"Demo Admin"}'::jsonb,
+  '', '', '',
+  '', '', '',
+  false
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO auth.identities (
+  id, user_id, identity_data, provider, provider_id,
+  created_at, updated_at, last_sign_in_at
+) VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000001',
+  '{"sub":"00000000-0000-0000-0000-000000000001","email":"demo@climasol.mx"}'::jsonb,
+  'email',
+  '00000000-0000-0000-0000-000000000001',
+  NOW(), NOW(), NOW()
+) ON CONFLICT DO NOTHING;
+
+INSERT INTO profiles (id, organization_id, role, email, full_name)
+VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000002',
+  'owner',
+  'demo@climasol.mx',
+  'Demo Admin'
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO clients (id, organization_id, name, email, phone, company_name, address, city, created_by) VALUES
+  ('00000000-0000-0000-0002-000000000001', '00000000-0000-0000-0000-000000000002', 'Juan Perez', 'juan@example.com', '8121234567', 'Residencial Las Lomas', 'Av. Roble 123', 'Monterrey', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000002', '00000000-0000-0000-0000-000000000002', 'Maria Garcia', 'maria@example.com', '8129876543', 'Hotel Sierra Madre', 'Blvd. Diaz Ordaz 456', 'San Pedro', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000003', '00000000-0000-0000-0000-000000000002', 'Carlos Rodriguez', 'carlos@example.com', '8125551234', 'Plaza Comercial Norte', 'Av. Universidad 789', 'Monterrey', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000004', '00000000-0000-0000-0000-000000000002', 'Ana Martinez', 'ana@example.com', '8124443210', 'Restaurante El Norte', 'Calle Morelos 321', 'Guadalupe', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000005', '00000000-0000-0000-0000-000000000002', 'Roberto Torres', 'roberto@example.com', '8127778899', 'Oficinas Torres Mora', 'Av. Lazaro Cardenas 500', 'Monterrey', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000006', '00000000-0000-0000-0000-000000000002', 'Laura Fernandez', 'laura@example.com', '8123336644', 'Clinica Dental Sonrisa', 'Calle Hidalgo 88', 'San Nicolas', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000007', '00000000-0000-0000-0000-000000000002', 'Pedro Sanchez', 'pedro@example.com', '8126665544', 'Gym Power Fitness', 'Av. Eugenio Garza Sada 1200', 'Monterrey', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000008', '00000000-0000-0000-0000-000000000002', 'Sofia Lopez', 'sofia@example.com', '8128887722', 'Escuela Primaria Sol', 'Calle Juarez 45', 'Apodaca', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000009', '00000000-0000-0000-0000-000000000002', 'Miguel Ramirez', 'miguel@example.com', '8122221133', 'Taller Mecanico Ramirez', 'Av. Madero 670', 'Escobedo', '00000000-0000-0000-0000-000000000001'),
+  ('00000000-0000-0000-0002-000000000010', '00000000-0000-0000-0000-000000000002', 'Isabella Herrera', 'isabella@example.com', '8129994455', 'Boutique Moda Chic', 'Calle Padre Mier 200', 'Monterrey', '00000000-0000-0000-0000-000000000001')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO service_catalog (id, organization_id, name, description, unit_price, unit_type, category, is_active) VALUES
+  ('00000000-0000-0000-0001-000000000001', '00000000-0000-0000-0000-000000000002', 'Instalacion Minisplit 1 Ton', 'Instalacion completa de minisplit de 1 tonelada', 4500.00, 'fixed', 'hvac', true),
+  ('00000000-0000-0000-0001-000000000002', '00000000-0000-0000-0000-000000000002', 'Mantenimiento Preventivo', 'Limpieza, revision de gas y filtros', 800.00, 'fixed', 'hvac', true),
+  ('00000000-0000-0000-0001-000000000003', '00000000-0000-0000-0000-000000000002', 'Recarga de Gas R410A', 'Recarga de refrigerante R410A por libra', 350.00, 'per_unit', 'hvac', true),
+  ('00000000-0000-0000-0001-000000000004', '00000000-0000-0000-0000-000000000002', 'Diagnostico General', 'Revision y diagnostico de fallas', 500.00, 'fixed', 'hvac', true),
+  ('00000000-0000-0000-0001-000000000005', '00000000-0000-0000-0000-000000000002', 'Mano de Obra Tecnico', 'Hora de trabajo de tecnico certificado', 250.00, 'per_hour', 'hvac', true)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO quotes (id, organization_id, client_id, quote_number, status, subtotal, tax_rate, tax_amount, total, valid_until, notes, created_by, created_at) VALUES
+  ('00000000-0000-0000-0003-000000000001', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0002-000000000001', 'COT-2026-001', 'draft', 4500.00, 16, 720.00, 5220.00, '2026-03-15', 'Instalacion minisplit residencial', '00000000-0000-0000-0000-000000000001', '2026-02-01'),
+  ('00000000-0000-0000-0003-000000000002', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0002-000000000002', 'COT-2026-002', 'sent', 12000.00, 16, 1920.00, 13920.00, '2026-03-20', 'Mantenimiento hotel 15 unidades', '00000000-0000-0000-0000-000000000001', '2026-02-05'),
+  ('00000000-0000-0000-0003-000000000003', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0002-000000000003', 'COT-2026-003', 'accepted', 25000.00, 16, 4000.00, 29000.00, '2026-03-25', 'Instalacion sistema central plaza comercial', '00000000-0000-0000-0000-000000000001', '2026-02-10'),
+  ('00000000-0000-0000-0003-000000000004', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0002-000000000004', 'COT-2026-004', 'rejected', 3200.00, 16, 512.00, 3712.00, '2026-02-28', 'Reparacion equipo restaurante', '00000000-0000-0000-0000-000000000001', '2026-02-08'),
+  ('00000000-0000-0000-0003-000000000005', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0002-000000000005', 'COT-2026-005', 'en_instalacion', 18000.00, 16, 2880.00, 20880.00, '2026-03-30', 'Instalacion 2 minisplits oficinas', '00000000-0000-0000-0000-000000000001', '2026-02-12')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO quote_items (id, quote_id, description, quantity, unit_price, unit_type, subtotal) VALUES
+  ('00000000-0000-0000-0006-000000000001', '00000000-0000-0000-0003-000000000001', 'Instalacion Minisplit 1 Ton', 1, 4500.00, 'fixed', 4500.00),
+  ('00000000-0000-0000-0006-000000000002', '00000000-0000-0000-0003-000000000002', 'Mantenimiento Preventivo', 15, 800.00, 'fixed', 12000.00),
+  ('00000000-0000-0000-0006-000000000003', '00000000-0000-0000-0003-000000000003', 'Instalacion Sistema Central', 1, 25000.00, 'fixed', 25000.00),
+  ('00000000-0000-0000-0006-000000000004', '00000000-0000-0000-0003-000000000004', 'Diagnostico + Reparacion', 1, 3200.00, 'fixed', 3200.00),
+  ('00000000-0000-0000-0006-000000000005', '00000000-0000-0000-0003-000000000005', 'Instalacion Minisplit 1.5 Ton', 2, 9000.00, 'fixed', 18000.00)
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================================
 -- 1. Quote Templates (5 rows)
 -- ================================================
 
@@ -328,7 +420,7 @@ INSERT INTO work_events (
   '00000000-0000-0000-0006-000000000005',
   '00000000-0000-0000-0000-000000000002',
   '00000000-0000-0000-0002-000000000003',
-  '00000000-0000-0000-0003-000000000006',
+  '00000000-0000-0000-0003-000000000003',
   '00000000-0000-0000-0000-000000000001',
   'Recarga de gas refrigerante',
   'mantenimiento',
@@ -342,7 +434,7 @@ INSERT INTO work_events (
   '00000000-0000-0000-0006-000000000006',
   '00000000-0000-0000-0000-000000000002',
   '00000000-0000-0000-0002-000000000004',
-  '00000000-0000-0000-0003-000000000009',
+  '00000000-0000-0000-0003-000000000004',
   '00000000-0000-0000-0000-000000000001',
   'Revisión post-instalación',
   'visita_tecnica',
@@ -384,7 +476,7 @@ INSERT INTO work_events (
   '00000000-0000-0000-0006-000000000009',
   '00000000-0000-0000-0000-000000000002',
   '00000000-0000-0000-0002-000000000004',
-  '00000000-0000-0000-0003-000000000014',
+  '00000000-0000-0000-0003-000000000002',
   '00000000-0000-0000-0000-000000000001',
   'Mantenimiento contrato anual',
   'mantenimiento',
@@ -398,7 +490,7 @@ INSERT INTO work_events (
   '00000000-0000-0000-0006-000000000010',
   '00000000-0000-0000-0000-000000000002',
   '00000000-0000-0000-0002-000000000002',
-  '00000000-0000-0000-0003-000000000015',
+  '00000000-0000-0000-0003-000000000005',
   '00000000-0000-0000-0000-000000000001',
   'Inspección anual equipos',
   'visita_tecnica',
@@ -494,7 +586,7 @@ INSERT INTO quote_payments (
 (
   '00000000-0000-0000-0007-000000000006',
   '00000000-0000-0000-0000-000000000002',
-  '00000000-0000-0000-0003-000000000006',
+  '00000000-0000-0000-0003-000000000003',
   43639.20,
   'anticipo',
   'efectivo',
@@ -505,7 +597,7 @@ INSERT INTO quote_payments (
 (
   '00000000-0000-0000-0007-000000000007',
   '00000000-0000-0000-0000-000000000002',
-  '00000000-0000-0000-0003-000000000014',
+  '00000000-0000-0000-0003-000000000002',
   12162.60,
   'liquidacion',
   'transferencia',
@@ -516,7 +608,7 @@ INSERT INTO quote_payments (
 (
   '00000000-0000-0000-0007-000000000008',
   '00000000-0000-0000-0000-000000000002',
-  '00000000-0000-0000-0003-000000000015',
+  '00000000-0000-0000-0003-000000000005',
   4698.00,
   'liquidacion',
   'efectivo',

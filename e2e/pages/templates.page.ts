@@ -21,7 +21,7 @@ export class TemplatesPage extends BasePage {
   }
 
   async isEmptyStateVisible(): Promise<boolean> {
-    return await this.page.locator('text=No hay templates aún').isVisible()
+    return await this.page.locator('text=No hay templates aun').isVisible()
   }
 
   async isLoadingVisible(): Promise<boolean> {

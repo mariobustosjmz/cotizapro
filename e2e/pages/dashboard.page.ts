@@ -18,9 +18,8 @@ export class DashboardPage extends BasePage {
   }
 
   async getPageSubtitle(): Promise<string> {
-    // Class changed from text-gray-600 to text-muted-foreground in redesign
-    // Use .first() — multiple p.text-muted-foreground elements exist on dashboard
-    return await this.getText(this.page.locator('p.text-muted-foreground').first())
+    // Welcome header subtitle: "OrgName — resumen del negocio"
+    return await this.getText(this.page.locator('p:has-text("resumen")').first())
   }
 
   // Sidebar Navigation — scoped to aside to avoid duplicate hrefs in KPI "Ver" links
@@ -87,8 +86,9 @@ export class DashboardPage extends BasePage {
 
   // Stats
   async getTotalClientsCount(): Promise<string> {
-    // CardTitle renders as <h3> (not <div>) — traverse up to Card root then find text-3xl
-    const stat = this.page.locator('h3:has-text("Clientes")').locator('../..').locator('div.text-3xl')
+    // KPI card: span "Clientes" → sibling div with bold number
+    await this.page.locator('span:has-text("Clientes")').first().waitFor({ state: 'visible', timeout: 10000 })
+    const stat = this.page.locator('span:has-text("Clientes")').first().locator('../..').locator('div.text-xl')
     return await this.getText(stat)
   }
 

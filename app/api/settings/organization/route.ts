@@ -71,6 +71,8 @@ export async function PATCH(request: NextRequest) {
       quote_terms,
       quote_valid_days,
       tax_rate,
+      logo_url,
+      brand_color,
     } = validation.data
 
     // Build settings object (only include provided values)
@@ -81,6 +83,8 @@ export async function PATCH(request: NextRequest) {
       ...(quote_terms !== undefined && { quote_terms }),
       ...(quote_valid_days !== undefined && { quote_valid_days }),
       ...(tax_rate !== undefined && { tax_rate }),
+      ...(logo_url !== undefined && { logo_url }),
+      ...(brand_color !== undefined && { brand_color }),
     }
 
     // Update organization

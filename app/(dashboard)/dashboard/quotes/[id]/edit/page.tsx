@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
@@ -8,14 +8,14 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   ArrowLeft, Plus, Trash2, ChevronDown, FileText, Zap,
-  User, LayoutTemplate, Percent, Calendar, Search,
-  Check, GripVertical
+  User, Percent, Calendar, Search, Check, GripVertical, Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
 
 interface QuoteItem {
+  id?: string
   description: string
   quantity: number
   unit_price: number
@@ -39,24 +39,6 @@ interface Service {
   unit_type: string
 }
 
-interface TemplateItem {
-  description: string
-  quantity: number
-  unit_price: number
-  unit_type: 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
-  service_id?: string | null
-}
-
-interface QuoteTemplate {
-  id: string
-  name: string
-  description: string | null
-  default_items: TemplateItem[] | null
-  default_terms: string | null
-  default_discount_rate: string | null
-  promotional_label: string | null
-}
-
 const UNIT_TYPE_LABELS: Record<string, string> = {
   fixed: 'Fijo',
   per_hour: 'Por Hora',
@@ -64,47 +46,57 @@ const UNIT_TYPE_LABELS: Record<string, string> = {
   per_unit: 'Por Unidad',
 }
 
-export default function NewQuotePage() {
+export default function EditQuotePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { toast } = useToast()
+  const { id } = use(params)
   const [loading, setLoading] = useState(false)
   const [dataLoading, setDataLoading] = useState(true)
   const [error, setError] = useState('')
   const [clients, setClients] = useState<Client[]>([])
   const [services, setServices] = useState<Service[]>([])
-  const [templates, setTemplates] = useState<QuoteTemplate[]>([])
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
   const [selectedClientId, setSelectedClientId] = useState<string>('')
   const [items, setItems] = useState<QuoteItem[]>([
     { description: '', quantity: 1, unit_price: 0, unit_type: 'per_unit', service_id: null }
   ])
   const [discountRate, setDiscountRate] = useState(0)
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
-  const [validDays, setValidDays] = useState(30)
+  const [validUntil, setValidUntil] = useState('')
   const [notes, setNotes] = useState('')
-  const [terms, setTerms] = useState('50% de anticipo al aceptar la cotizaci\u00F3n. 50% restante al completar el trabajo. Garant\u00EDa de 1 a\u00F1o en mano de obra.')
+  const [terms, setTerms] = useState('')
   const [showExtras, setShowExtras] = useState(false)
   const [clientSearch, setClientSearch] = useState('')
   const [showClientDropdown, setShowClientDropdown] = useState(false)
   const [serviceSearchIndex, setServiceSearchIndex] = useState<number | null>(null)
   const [serviceSearch, setServiceSearch] = useState('')
+  const [quoteNumber, setQuoteNumber] = useState('')
   const itemsEndRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const clientSearchRef = useRef<HTMLInputElement>(null)
   const clientDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [clientsRes, servicesRes, templatesRes] = await Promise.all([
+        const [quoteRes, clientsRes, servicesRes] = await Promise.all([
+          fetch(`/api/quotes/${id}`),
           fetch('/api/clients'),
           fetch('/api/services'),
-          fetch('/api/templates'),
         ])
 
+        if (!quoteRes.ok) {
+          setError('Cotizacion no encontrada')
+          setDataLoading(false)
+          return
+        }
+
+        const quoteData = await quoteRes.json()
+        const quote = quoteData.data
+
+        let clientsList: Client[] = []
         if (clientsRes.ok) {
           const data = await clientsRes.json()
-          setClients(data.clients || [])
+          clientsList = data.clients || []
+          setClients(clientsList)
         }
 
         if (servicesRes.ok) {
@@ -112,21 +104,43 @@ export default function NewQuotePage() {
           setServices(data.data || [])
         }
 
-        if (templatesRes.ok) {
-          const data = await templatesRes.json()
-          setTemplates(data.data || [])
+        setQuoteNumber(quote.quote_number)
+        setSelectedClientId(quote.client_id)
+        setDiscountRate(Number(quote.discount_rate) || 0)
+        setNotes(quote.notes || '')
+        setTerms(quote.terms_and_conditions || '')
+        setValidUntil(quote.valid_until ? quote.valid_until.split('T')[0] : '')
+        setCustomFields(quote.custom_fields || {})
+
+        if (quote.notes || quote.terms_and_conditions) {
+          setShowExtras(true)
         }
-      } catch (err) {
-        console.error('Error loading data:', err)
+
+        const client = clientsList.find((c: Client) => c.id === quote.client_id)
+        if (client) {
+          setClientSearch(client.name + (client.company_name ? ` (${client.company_name})` : ''))
+        }
+
+        if (quote.items && quote.items.length > 0) {
+          setItems(quote.items.map((item: { id?: string; description: string; quantity: number; unit_price: number; unit_type?: string; service_id?: string | null }) => ({
+            id: item.id,
+            description: item.description,
+            quantity: Number(item.quantity),
+            unit_price: Number(item.unit_price),
+            unit_type: (item.unit_type as QuoteItem['unit_type']) || 'per_unit',
+            service_id: item.service_id || null,
+          })))
+        }
+      } catch {
+        setError('Error al cargar datos')
       } finally {
         setDataLoading(false)
       }
     }
 
     fetchData()
-  }, [])
+  }, [id])
 
-  // Keyboard shortcut: Ctrl+Enter to submit
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -138,7 +152,6 @@ export default function NewQuotePage() {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Close client dropdown on click outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (clientDropdownRef.current && !clientDropdownRef.current.contains(e.target as Node)) {
@@ -175,40 +188,12 @@ export default function NewQuotePage() {
         service_id: serviceId,
         description: service.name,
         unit_price: Number(service.unit_price),
-        unit_type: service.unit_type as 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
+        unit_type: service.unit_type as QuoteItem['unit_type'],
       }
       setItems(newItems)
     }
     setServiceSearchIndex(null)
     setServiceSearch('')
-  }
-
-  function handleTemplateSelect(templateId: string) {
-    setSelectedTemplateId(templateId)
-    if (!templateId) return
-
-    const template = templates.find(t => t.id === templateId)
-    if (!template) return
-
-    if (template.default_items && template.default_items.length > 0) {
-      setItems(template.default_items.map(item => ({
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        unit_type: item.unit_type,
-        service_id: item.service_id || null,
-      })))
-    }
-
-    if (template.default_discount_rate) {
-      setDiscountRate(Number(template.default_discount_rate))
-    }
-
-    if (template.default_terms) {
-      setTerms(template.default_terms)
-    }
-
-    toast({ message: `Plantilla "${template.name}" aplicada`, variant: 'success' })
   }
 
   function selectClient(clientId: string) {
@@ -227,11 +212,9 @@ export default function NewQuotePage() {
   const total = taxableAmount + tax
   const itemCount = items.filter(i => i.description && i.quantity > 0).length
 
-  // Progress calculation
   const hasClient = !!selectedClientId
   const hasItems = itemCount > 0
   const hasValidPrices = items.some(i => i.unit_price > 0)
-  const completedSteps = [hasClient, hasItems, hasValidPrices].filter(Boolean).length
 
   const filteredClients = clientSearch
     ? clients.filter(c =>
@@ -259,57 +242,39 @@ export default function NewQuotePage() {
       return
     }
 
-    const selectedClient = clients.find(c => c.id === selectedClientId)
-    if (!selectedClient) {
-      setError('Cliente no encontrado')
-      setLoading(false)
-      return
-    }
-
-    const validUntilDate = new Date()
-    validUntilDate.setDate(validUntilDate.getDate() + validDays)
-
     const data = {
       client_id: selectedClientId,
-      items: items.filter(item => item.description && item.quantity > 0),
+      items: items.filter(item => item.description && item.quantity > 0).map(({ id: _id, ...rest }) => rest),
       notes: notes || null,
       terms_and_conditions: terms || null,
-      valid_until: validUntilDate.toISOString(),
+      valid_until: validUntil ? new Date(validUntil + 'T23:59:59').toISOString() : undefined,
       discount_rate: discountRate,
       custom_fields: customFields,
     }
 
     if (data.items.length === 0) {
-      setError('Agrega al menos un item a la cotizaci\u00F3n')
+      setError('Agrega al menos un item a la cotizacion')
       setLoading(false)
       return
     }
 
     try {
-      const response = await fetch('/api/quotes', {
-        method: 'POST',
+      const response = await fetch(`/api/quotes/${id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Error al crear cotizaci\u00F3n')
+        throw new Error(errorData.error || 'Error al actualizar cotizacion')
       }
 
-      if (selectedTemplateId) {
-        fetch(`/api/templates/${selectedTemplateId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ usage_count_increment: true }),
-        }).catch(() => { /* best-effort */ })
-      }
-
-      toast({ message: 'Cotizaci\u00F3n creada exitosamente', variant: 'success' })
-      router.push('/dashboard/quotes')
+      toast({ message: 'Cotizacion actualizada exitosamente', variant: 'success' })
+      router.push(`/dashboard/quotes/${id}`)
       router.refresh()
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al crear cotizaci\u00F3n'
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar cotizacion'
       setError(errorMsg)
       toast({ message: errorMsg, variant: 'error' })
     } finally {
@@ -319,20 +284,29 @@ export default function NewQuotePage() {
 
   const selectedClient = clients.find(c => c.id === selectedClientId)
 
+  if (dataLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Header with progress */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/quotes">
+          <Link href={`/dashboard/quotes/${id}`}>
             <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer" type="button">
               <ArrowLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </button>
           </Link>
           <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Nueva Cotizaci&oacute;n</h2>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              Editar {quoteNumber}
+            </h2>
             <div className="flex items-center gap-2 mt-0.5">
-              {/* Mini progress dots */}
               <div className="flex items-center gap-1">
                 {['Cliente', 'Items', 'Precios'].map((step, i) => {
                   const done = [hasClient, hasItems, hasValidPrices][i]
@@ -351,7 +325,7 @@ export default function NewQuotePage() {
           </div>
         </div>
         <span className="hidden sm:block text-xs text-gray-400 dark:text-gray-500">
-          <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-mono">Ctrl+Enter</kbd> para crear
+          <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-mono">Ctrl+Enter</kbd> para guardar
         </span>
       </div>
 
@@ -366,97 +340,63 @@ export default function NewQuotePage() {
           {/* LEFT COLUMN */}
           <div className="lg:col-span-2 space-y-3">
 
-            {/* Client + Template row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Client selector with search */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <User className="w-3.5 h-3.5 text-orange-500" />
-                  <label className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Cliente *
-                  </label>
-                  {hasClient && <Check className="w-3 h-3 text-green-500 ml-auto" />}
-                </div>
-                <div ref={clientDropdownRef} className="relative">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
-                    <input
-                      ref={clientSearchRef}
-                      type="text"
-                      name="client_id"
-                      required
-                      value={clientSearch}
-                      onChange={(e) => {
-                        setClientSearch(e.target.value)
-                        setShowClientDropdown(true)
-                        if (!e.target.value) setSelectedClientId('')
-                      }}
-                      onFocus={() => setShowClientDropdown(true)}
-                      placeholder={dataLoading ? 'Cargando...' : 'Buscar cliente...'}
-                      className="w-full pl-8 pr-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
-                    />
-                  </div>
-                  {showClientDropdown && !dataLoading && (
-                    <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                      {filteredClients.length === 0 ? (
-                        <div className="px-3 py-4 text-center">
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Sin resultados</p>
-                          <Link href="/dashboard/clients/new" className="text-xs text-orange-600 dark:text-orange-400 hover:underline">
-                            + Crear cliente
-                          </Link>
-                        </div>
-                      ) : (
-                        filteredClients.map(client => (
-                          <button
-                            key={client.id}
-                            type="button"
-                            onClick={() => selectClient(client.id)}
-                            className={`w-full px-3 py-2 text-left hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors cursor-pointer flex items-center justify-between ${
-                              selectedClientId === client.id ? 'bg-orange-50 dark:bg-orange-900/20' : ''
-                            }`}
-                          >
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{client.name}</p>
-                              <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
-                                {[client.company_name, client.email].filter(Boolean).join(' \u00B7 ')}
-                              </p>
-                            </div>
-                            {selectedClientId === client.id && (
-                              <Check className="w-3.5 h-3.5 text-orange-500 shrink-0 ml-2" />
-                            )}
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
+            {/* Client selector with search */}
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <User className="w-3.5 h-3.5 text-orange-500" />
+                <label className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Cliente *
+                </label>
+                {hasClient && <Check className="w-3 h-3 text-green-500 ml-auto" />}
               </div>
-
-              {/* Template selector */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <LayoutTemplate className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                  <label className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Plantilla
-                  </label>
+              <div ref={clientDropdownRef} className="relative">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={clientSearch}
+                    onChange={(e) => {
+                      setClientSearch(e.target.value)
+                      setShowClientDropdown(true)
+                      if (!e.target.value) setSelectedClientId('')
+                    }}
+                    onFocus={() => setShowClientDropdown(true)}
+                    placeholder="Buscar cliente..."
+                    className="w-full pl-8 pr-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
+                  />
                 </div>
-                <select
-                  value={selectedTemplateId}
-                  onChange={(e) => handleTemplateSelect(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow cursor-pointer"
-                >
-                  <option value="">Sin plantilla</option>
-                  {templates.map(template => (
-                    <option key={template.id} value={template.id}>
-                      {template.name}
-                      {template.promotional_label ? ` \u2014 ${template.promotional_label}` : ''}
-                    </option>
-                  ))}
-                </select>
-                {selectedTemplateId && templates.find(t => t.id === selectedTemplateId)?.description && (
-                  <p className="mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
-                    {templates.find(t => t.id === selectedTemplateId)?.description}
-                  </p>
+                {showClientDropdown && (
+                  <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {filteredClients.length === 0 ? (
+                      <div className="px-3 py-4 text-center">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Sin resultados</p>
+                        <Link href="/dashboard/clients/new" className="text-xs text-orange-600 dark:text-orange-400 hover:underline">
+                          + Crear cliente
+                        </Link>
+                      </div>
+                    ) : (
+                      filteredClients.map(client => (
+                        <button
+                          key={client.id}
+                          type="button"
+                          onClick={() => selectClient(client.id)}
+                          className={`w-full px-3 py-2 text-left hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors cursor-pointer flex items-center justify-between ${
+                            selectedClientId === client.id ? 'bg-orange-50 dark:bg-orange-900/20' : ''
+                          }`}
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{client.name}</p>
+                            <p className="text-[11px] text-gray-400 dark:text-gray-500 truncate">
+                              {[client.company_name, client.email].filter(Boolean).join(' \u00B7 ')}
+                            </p>
+                          </div>
+                          {selectedClientId === client.id && (
+                            <Check className="w-3.5 h-3.5 text-orange-500 shrink-0 ml-2" />
+                          )}
+                        </button>
+                      ))
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -471,8 +411,7 @@ export default function NewQuotePage() {
                     {itemCount}/{items.length}
                   </span>
                 </div>
-                <Button type="button" onClick={addItem} size="sm" variant="outline" data-testid="add-quote-item-btn"
-                  className="text-xs h-7 px-2.5 cursor-pointer">
+                <Button type="button" onClick={addItem} size="sm" variant="outline" className="text-xs h-7 px-2.5 cursor-pointer">
                   <Plus className="w-3 h-3 mr-0.5" />
                   Item
                 </Button>
@@ -481,7 +420,7 @@ export default function NewQuotePage() {
               {/* Table Header (desktop) */}
               <div className="hidden md:grid grid-cols-[1fr_2fr_70px_100px_90px_32px] gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 <div>Servicio</div>
-                <div>Descripci&oacute;n</div>
+                <div>Descripcion</div>
                 <div className="text-right">Cant.</div>
                 <div className="text-right">P. Unit.</div>
                 <div className="text-right">Subtotal</div>
@@ -496,7 +435,7 @@ export default function NewQuotePage() {
                     <div key={index} className="group">
                       {/* Desktop row */}
                       <div className="hidden md:grid grid-cols-[1fr_2fr_70px_100px_90px_32px] gap-1.5 px-3 py-1.5 items-center hover:bg-orange-50/30 dark:hover:bg-orange-900/10 transition-colors">
-                        {/* Service - with inline search */}
+                        {/* Service with inline search */}
                         <div className="relative">
                           {serviceSearchIndex === index ? (
                             <div className="relative">
@@ -549,8 +488,7 @@ export default function NewQuotePage() {
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
                           required
-                          placeholder="Descripci\u00F3n del item..."
-                          data-testid={`item-description-${index}`}
+                          placeholder="Descripcion del item..."
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
                         />
                         <input
@@ -560,7 +498,6 @@ export default function NewQuotePage() {
                           value={item.quantity}
                           onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                           required
-                          data-testid={`item-quantity-${index}`}
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all tabular-nums"
                         />
                         <input
@@ -570,7 +507,6 @@ export default function NewQuotePage() {
                           value={item.unit_price}
                           onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                           required
-                          data-testid={`item-unit-price-${index}`}
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all tabular-nums"
                         />
                         <div className="text-sm font-medium text-right tabular-nums text-gray-700 dark:text-gray-300">
@@ -618,8 +554,7 @@ export default function NewQuotePage() {
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
                           required
-                          placeholder="Descripci\u00F3n"
-                          data-testid={`item-description-${index}`}
+                          placeholder="Descripcion"
                           className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                         />
                         <div className="grid grid-cols-2 gap-2">
@@ -632,7 +567,6 @@ export default function NewQuotePage() {
                               value={item.quantity}
                               onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                               required
-                              data-testid={`item-quantity-${index}`}
                               className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                             />
                           </div>
@@ -645,7 +579,6 @@ export default function NewQuotePage() {
                               value={item.unit_price}
                               onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                               required
-                              data-testid={`item-unit-price-${index}`}
                               className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                             />
                           </div>
@@ -681,7 +614,7 @@ export default function NewQuotePage() {
               >
                 <div className="flex items-center gap-2">
                   <Zap className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y T&eacute;rminos</span>
+                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y Terminos</span>
                   {(notes || terms) && (
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
                   )}
@@ -698,13 +631,13 @@ export default function NewQuotePage() {
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={2}
-                      placeholder="Informaci\u00F3n adicional..."
+                      placeholder="Informacion adicional..."
                       className="text-sm resize-none"
                     />
                   </div>
                   <div>
                     <label className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                      T&eacute;rminos y Condiciones
+                      Terminos y Condiciones
                     </label>
                     <Textarea
                       value={terms}
@@ -749,7 +682,6 @@ export default function NewQuotePage() {
                     </div>
                   )}
 
-                  {/* Line items */}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
                   </div>
@@ -772,13 +704,13 @@ export default function NewQuotePage() {
                     </div>
                     <div className="flex justify-between pt-2.5 border-t border-gray-200 dark:border-gray-700">
                       <span className="font-bold text-gray-900 dark:text-white">Total</span>
-                      <span className="font-bold text-lg tabular-nums text-orange-600 dark:text-orange-400" data-testid="quote-total">
+                      <span className="font-bold text-lg tabular-nums text-orange-600 dark:text-orange-400">
                         ${total.toLocaleString('es-MX')}
                       </span>
                     </div>
                   </div>
 
-                  {/* Discount + Validity inline */}
+                  {/* Discount + Validity */}
                   <div className="pt-2.5 border-t border-gray-100 dark:border-gray-700 grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-1">
@@ -801,18 +733,14 @@ export default function NewQuotePage() {
                     <div>
                       <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-1">
                         <Calendar className="w-3 h-3 text-blue-500" />
-                        Vigencia
+                        Valida hasta
                       </label>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          min="1"
-                          value={validDays}
-                          onChange={(e) => setValidDays(parseInt(e.target.value) || 30)}
-                          className="h-8 text-sm pr-10"
-                        />
-                        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">d&iacute;as</span>
-                      </div>
+                      <Input
+                        type="date"
+                        value={validUntil}
+                        onChange={(e) => setValidUntil(e.target.value)}
+                        className="h-8 text-sm"
+                      />
                     </div>
                   </div>
                 </div>
@@ -823,12 +751,11 @@ export default function NewQuotePage() {
                 <Button
                   type="submit"
                   disabled={loading || !hasClient || !hasItems}
-                  data-testid="submit-quote-btn"
                   className="w-full h-11 font-semibold cursor-pointer"
                 >
-                  {loading ? 'Creando...' : 'Crear Cotizaci\u00F3n'}
+                  {loading ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
-                <Link href="/dashboard/quotes" className="block" data-testid="cancel-quote-btn">
+                <Link href={`/dashboard/quotes/${id}`} className="block">
                   <Button type="button" variant="outline" disabled={loading} className="w-full h-9 text-sm cursor-pointer">
                     Cancelar
                   </Button>
@@ -842,7 +769,6 @@ export default function NewQuotePage() {
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              {/* Mobile discount/validity */}
               <div className="flex items-center gap-1">
                 <Percent className="w-3 h-3 text-green-500" />
                 <input
@@ -856,17 +782,6 @@ export default function NewQuotePage() {
                 />
                 <span className="text-[10px] text-gray-400">%</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-blue-500" />
-                <input
-                  type="number"
-                  min="1"
-                  value={validDays}
-                  onChange={(e) => setValidDays(parseInt(e.target.value) || 30)}
-                  className="w-12 px-1.5 py-1 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded text-xs text-center"
-                />
-                <span className="text-[10px] text-gray-400">d</span>
-              </div>
             </div>
             <div className="text-right">
               <p className="text-[10px] text-gray-400 dark:text-gray-500">Total</p>
@@ -876,10 +791,9 @@ export default function NewQuotePage() {
           <Button
             type="submit"
             disabled={loading || !hasClient || !hasItems}
-            data-testid="submit-quote-btn-mobile"
             className="w-full h-10 font-semibold cursor-pointer"
           >
-            {loading ? 'Creando...' : `Crear Cotizaci\u00F3n ($${total.toLocaleString('es-MX')})`}
+            {loading ? 'Guardando...' : `Guardar ($${total.toLocaleString('es-MX')})`}
           </Button>
         </div>
 

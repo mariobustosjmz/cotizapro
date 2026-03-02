@@ -157,33 +157,33 @@ INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_p
 
 -- Quote 02 (COT-2025-007) Clínica Dental — mantenimiento
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000002', '00000000-0000-0000-0001-000000000009', 'Mantenimiento preventivo 3 equipos', 3, 750.00, 'fixed', 2250.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000002', '00000000-0000-0000-0001-000000000012', 'Recarga gas R-410A', 3, 850.00, 'per_unit', 2550.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000002', '00000000-0000-0000-0001-000000000010', 'Limpieza profunda espuma', 3, 600.00, 'fixed', 1800.00);
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000002', NULL, 'Mantenimiento preventivo 3 equipos', 3, 750.00, 'fixed', 2250.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000002', NULL, 'Recarga gas R-410A', 3, 850.00, 'per_unit', 2550.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000002', NULL, 'Limpieza profunda espuma', 3, 600.00, 'fixed', 1800.00);
 
 -- Quote 03 (COT-2025-008) Perinorte — VRF
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000003', '00000000-0000-0000-0001-000000000014', 'VRF comercial ala norte', 1, 45000.00, 'per_unit', 45000.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000003', NULL, 'VRF comercial ala norte', 1, 45000.00, 'per_unit', 45000.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000003', NULL, 'Ductos y canalización', 1, 8000.00, 'fixed', 8000.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000003', NULL, 'Control centralizado', 1, 7000.00, 'fixed', 7000.00);
 
 -- Quote 04 (COT-2025-009) González & Asociados — diagnóstico
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', '00000000-0000-0000-0001-000000000015', 'Diagnóstico 4 equipos', 4, 350.00, 'fixed', 1400.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', '00000000-0000-0000-0001-000000000011', 'Reparación compresor', 6, 450.00, 'per_hour', 2700.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', '00000000-0000-0000-0001-000000000012', 'Recarga gas R-410A', 4, 850.00, 'per_unit', 3400.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', NULL, 'Diagnóstico 4 equipos', 4, 350.00, 'fixed', 1400.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', NULL, 'Reparación compresor', 6, 450.00, 'per_hour', 2700.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', NULL, 'Recarga gas R-410A', 4, 850.00, 'per_unit', 3400.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000004', NULL, 'Refacciones (válvula expansión)', 2, 2500.00, 'per_unit', 5000.00);
 
 -- Quote 05 (COT-2025-010) María González — mantenimiento
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000005', '00000000-0000-0000-0001-000000000009', 'Mantenimiento preventivo', 2, 750.00, 'fixed', 1500.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000005', '00000000-0000-0000-0001-000000000010', 'Limpieza profunda', 2, 600.00, 'fixed', 1200.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000005', '00000000-0000-0000-0001-000000000012', 'Recarga gas refrigerante', 1, 850.00, 'per_unit', 850.00);
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000005', NULL, 'Mantenimiento preventivo', 2, 750.00, 'fixed', 1500.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000005', NULL, 'Limpieza profunda', 2, 600.00, 'fixed', 1200.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000005', NULL, 'Recarga gas refrigerante', 1, 850.00, 'per_unit', 850.00);
 
 -- Quote 06 (COT-2025-011) Hotel Las Palmas — ampliación
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000006', '00000000-0000-0000-0001-000000000004', 'Minisplit 24K BTU suites piso 3', 2, 12500.00, 'per_unit', 25000.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000006', '00000000-0000-0000-0001-000000000008', 'Instalación 24K BTU', 2, 8500.00, 'fixed', 17000.00);
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000006', '00000000-0000-0000-0001-000000000005', 'Instalación 24K BTU', 2, 8500.00, 'fixed', 17000.00);
 
 -- Quote 07 (COT-2026-017) El Asador — extractor
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
@@ -193,15 +193,16 @@ INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_p
 
 -- Quote 08 (COT-2026-018) Colegio Montessori — mantenimiento anual
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', '00000000-0000-0000-0001-000000000009', 'Mantenimiento preventivo', 8, 750.00, 'fixed', 6000.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', '00000000-0000-0000-0001-000000000010', 'Limpieza profunda espuma', 8, 600.00, 'fixed', 4800.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', '00000000-0000-0000-0001-000000000012', 'Recarga gas', 4, 850.00, 'per_unit', 3400.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', NULL, 'Mantenimiento preventivo', 8, 750.00, 'fixed', 6000.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', NULL, 'Limpieza profunda espuma', 8, 600.00, 'fixed', 4800.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', NULL, 'Recarga gas', 4, 850.00, 'per_unit', 3400.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000008', NULL, 'Filtros de repuesto', 8, 450.00, 'per_unit', 3600.00);
 
 -- Quote 09 (COT-2026-019) Plaza Norte — proyecto grande
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000009', '00000000-0000-0000-0001-000000000004', 'Minisplit 24K BTU', 6, 12500.00, 'per_unit', 75000.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000009', '00000000-0000-0000-0001-000000000003', 'Minisplit 18K BTU', 6, 9800.00, 'per_unit', 58800.00),
+
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000009', NULL, 'Control centralizado BMS', 1, 15000.00, 'fixed', 15000.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000009', NULL, 'Instalación y puesta en marcha completa', 1, 18000.00, 'fixed', 18000.00);
 
@@ -213,11 +214,11 @@ INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_p
 -- Quote 11 (COT-2026-021) Clínica Dental — draft
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000011', '00000000-0000-0000-0001-000000000002', 'Minisplit 12K BTU consultorios', 3, 7200.00, 'per_unit', 21600.00),
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000011', '00000000-0000-0000-0001-000000000006', 'Instalación 12K BTU', 3, 5200.00, 'fixed', 15600.00);
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000011', NULL, 'Instalación 12K BTU', 3, 5200.00, 'fixed', 15600.00);
 
 -- Quote 12 (COT-2026-022) González & Asociados — en_instalacion
 INSERT INTO quote_items (id, quote_id, service_id, description, quantity, unit_price, unit_type, subtotal) VALUES
-  (gen_random_uuid(), '00000000-0000-0000-0009-000000000012', '00000000-0000-0000-0001-000000000013', 'Multi-Split 2 zonas (sala juntas + dirección)', 1, 18000.00, 'fixed', 18000.00),
+  (gen_random_uuid(), '00000000-0000-0000-0009-000000000012', NULL, 'Multi-Split 2 zonas (sala juntas + dirección)', 1, 18000.00, 'fixed', 18000.00),
   (gen_random_uuid(), '00000000-0000-0000-0009-000000000012', NULL, 'Instalación + cableado eléctrico', 1, 3000.00, 'fixed', 3000.00);
 
 -- ============================================================
@@ -284,7 +285,7 @@ INSERT INTO quote_payments (id, organization_id, quote_id, amount, payment_type,
    '00000000-0000-0000-0003-000000000004', 90639.50, 'anticipo', 'transferencia', '2026-01-05',
    'Anticipo 50% COT-2025-004', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0007-000000000018', '00000000-0000-0000-0000-000000000002',
-   '00000000-0000-0000-0003-000000000006', 43639.20, 'anticipo', 'transferencia', '2026-01-12',
+   '00000000-0000-0000-0003-000000000003', 43639.20, 'anticipo', 'transferencia', '2026-01-12',
    'Anticipo 50% COT-2026-001', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0007-000000000019', '00000000-0000-0000-0000-000000000002',
    '00000000-0000-0000-0009-000000000004', 6000.00, 'liquidacion', 'transferencia', '2026-01-08',
@@ -304,7 +305,7 @@ INSERT INTO quote_payments (id, organization_id, quote_id, amount, payment_type,
    '00000000-0000-0000-0003-000000000004', 90639.50, 'liquidacion', 'transferencia', '2026-02-08',
    'Liquidación COT-2025-004', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0007-000000000024', '00000000-0000-0000-0000-000000000002',
-   '00000000-0000-0000-0003-000000000006', 43639.20, 'liquidacion', 'cheque', '2026-02-20',
+   '00000000-0000-0000-0003-000000000003', 43639.20, 'liquidacion', 'cheque', '2026-02-20',
    'Liquidación COT-2026-001', '00000000-0000-0000-0000-000000000001'),
   ('00000000-0000-0000-0007-000000000025', '00000000-0000-0000-0000-000000000002',
    '00000000-0000-0000-0009-000000000006', 10000.00, 'parcial', 'transferencia', '2026-02-22',

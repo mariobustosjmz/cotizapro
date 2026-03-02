@@ -74,20 +74,16 @@ export async function POST(
         upsert: true,
       })
 
+    let publicUrl = ''
     if (uploadError) {
-      logger.error('Error uploading PDF to storage', uploadError, { fileName: pdfFileName })
-      return handleApiError(
-        ApiErrors.INTERNAL_ERROR('Failed to upload PDF'),
-        'POST /api/quotes/[id]/send - PDF upload'
-      )
+      logger.warn('Error uploading PDF to storage — continuing without PDF URL', { error: uploadError?.message, fileName: pdfFileName })
+    } else {
+      const { data: { publicUrl: url } } = supabase.storage
+        .from('documents')
+        .getPublicUrl(pdfFileName)
+      publicUrl = url
+      logger.info('PDF generated and uploaded successfully', { quoteNumber: quote.quote_number, pdfUrl: publicUrl })
     }
-
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('documents')
-      .getPublicUrl(pdfFileName)
-
-    logger.info('PDF generated and uploaded successfully', { quoteNumber: quote.quote_number, pdfUrl: publicUrl })
 
     const results: {
       email: EmailResult | null

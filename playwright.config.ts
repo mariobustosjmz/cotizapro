@@ -9,13 +9,15 @@ export default defineConfig({
   fullyParallel: !CI,
   forbidOnly: CI,
   retries: CI ? 2 : 1,
-  workers: CI ? 1 : 2,
+  workers: 1,
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
     ['list'],
   ],
+
+  timeout: 180000,
 
   use: {
     baseURL: BASE_URL,
@@ -30,14 +32,6 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
   ],
 

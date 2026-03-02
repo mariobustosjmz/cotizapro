@@ -7,11 +7,13 @@ export class TeamPage extends BasePage {
   }
 
   async goto() {
-    await super.goto('/dashboard/team')
+    await this.page.goto('/dashboard/team', { waitUntil: 'networkidle' })
+    // Wait for the page heading so streaming content is fully rendered
+    await this.page.locator('h2:has-text("Equipo")').waitFor({ state: 'visible', timeout: 15000 }).catch(() => null)
   }
 
   async goToInvite() {
-    await super.goto('/dashboard/team/invite')
+    await this.page.goto('/dashboard/team/invite', { waitUntil: 'networkidle' })
   }
 
   // Team Members List

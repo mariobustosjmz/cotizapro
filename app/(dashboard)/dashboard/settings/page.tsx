@@ -29,6 +29,8 @@ interface Organization {
     quote_terms?: string
     quote_valid_days?: number
     tax_rate?: number
+    logo_url?: string
+    brand_color?: string
   } | null
 }
 
@@ -114,14 +116,14 @@ export default function SettingsPage() {
 
     const data = {
       name: formData.get('name'),
-      settings: {
-        company_address: formData.get('company_address'),
-        company_phone: formData.get('company_phone'),
-        company_email: formData.get('company_email'),
-        quote_terms: formData.get('quote_terms'),
-        quote_valid_days: parseInt(formData.get('quote_valid_days') as string) || 30,
-        tax_rate: parseFloat(formData.get('tax_rate') as string) || 16,
-      }
+      company_address: formData.get('company_address'),
+      company_phone: formData.get('company_phone'),
+      company_email: formData.get('company_email'),
+      quote_terms: formData.get('quote_terms'),
+      quote_valid_days: parseInt(formData.get('quote_valid_days') as string) || 30,
+      tax_rate: parseFloat(formData.get('tax_rate') as string) || 16,
+      logo_url: formData.get('logo_url') || null,
+      brand_color: formData.get('brand_color') || null,
     }
 
     try {
@@ -279,6 +281,55 @@ export default function SettingsPage() {
                   placeholder="5512345678"
                 />
               </FormField>
+            </div>
+
+            {/* Branding */}
+            <div className="md:col-span-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3">Marca / Branding</p>
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField label="URL del Logo" htmlFor="logo_url" hint="Se usara en PDFs y cotizaciones">
+                  <div className="flex items-center gap-3">
+                    {organization.settings?.logo_url && (
+                      <img
+                        src={organization.settings.logo_url}
+                        alt="Logo"
+                        className="w-10 h-10 rounded-lg object-contain border border-gray-200 dark:border-gray-700 bg-white"
+                      />
+                    )}
+                    <Input
+                      id="logo_url"
+                      name="logo_url"
+                      type="url"
+                      defaultValue={organization.settings?.logo_url || ''}
+                      placeholder="https://ejemplo.com/logo.png"
+                      className="flex-1"
+                    />
+                  </div>
+                </FormField>
+
+                <FormField label="Color de Marca" htmlFor="brand_color" hint="Color principal para PDFs">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      id="brand_color_picker"
+                      defaultValue={organization.settings?.brand_color || '#F97316'}
+                      onChange={(e) => {
+                        const input = document.getElementById('brand_color') as HTMLInputElement
+                        if (input) input.value = e.target.value
+                      }}
+                      className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"
+                    />
+                    <Input
+                      id="brand_color"
+                      name="brand_color"
+                      defaultValue={organization.settings?.brand_color || '#F97316'}
+                      placeholder="#F97316"
+                      pattern="^#[0-9A-Fa-f]{6}$"
+                      className="flex-1 font-mono"
+                    />
+                  </div>
+                </FormField>
+              </div>
             </div>
 
             <FormField label="Direccion" htmlFor="company_address">

@@ -48,7 +48,8 @@ export class QuotesPage extends BasePage {
 
     if (data.description) {
       const index = data.itemIndex ?? 0
-      await this.page.locator(`[data-testid="item-description-${index}"]`).fill(data.description)
+      // Use .first() — desktop + mobile layouts both render the same data-testid
+      await this.page.locator(`[data-testid="item-description-${index}"]`).first().fill(data.description)
     }
 
     if (data.notes) {
@@ -66,9 +67,10 @@ export class QuotesPage extends BasePage {
     }
 
     // Wait for the item fields to be visible before filling
-    const descInput = this.page.locator(`[data-testid="item-description-${itemIndex}"]`)
-    const priceInput = this.page.locator(`[data-testid="item-unit-price-${itemIndex}"]`)
-    const quantityInput = this.page.locator(`[data-testid="item-quantity-${itemIndex}"]`)
+    // Use .first() — desktop + mobile layouts both render the same data-testid
+    const descInput = this.page.locator(`[data-testid="item-description-${itemIndex}"]`).first()
+    const priceInput = this.page.locator(`[data-testid="item-unit-price-${itemIndex}"]`).first()
+    const quantityInput = this.page.locator(`[data-testid="item-quantity-${itemIndex}"]`).first()
 
     // Wait for fields with longer timeout and better error handling
     await descInput.waitFor({ state: 'visible', timeout: 30000 })

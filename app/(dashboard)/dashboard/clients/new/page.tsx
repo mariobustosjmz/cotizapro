@@ -52,7 +52,6 @@ export default function NewClientPage() {
 
       toast({ message: 'Cliente creado exitosamente', variant: 'success' })
       router.push('/dashboard/clients')
-      router.refresh()
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error al crear cliente'
       setError(errorMsg)

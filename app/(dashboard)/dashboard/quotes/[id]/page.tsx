@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Trash2, FileDown, Send, Calendar, Plus } from 'lucide-react'
+import { ArrowLeft, Trash2, FileDown, Send, Calendar, Plus, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { PaymentSection } from '@/components/dashboard/payment-section'
 import { QuoteShareDialog } from '@/components/dashboard/quote-share-dialog'
@@ -233,6 +233,12 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <div className="flex gap-2">
+          <Link href={`/dashboard/quotes/${quote.id}/edit`}>
+            <Button variant="outline" size="sm">
+              <Pencil className="w-3.5 h-3.5 mr-1" />
+              Editar
+            </Button>
+          </Link>
           <Button onClick={handleExportPDF} variant="outline" size="sm">
             <FileDown className="w-3.5 h-3.5 mr-1" />
             PDF

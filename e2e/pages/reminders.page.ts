@@ -109,32 +109,14 @@ export class RemindersPage extends BasePage {
     await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
 
     const response = await responsePromise
-    let createdReminderId: string | null = null
 
+    // Check status only — do NOT call response.text()/json() as it blocks on the body
+    // stream which can hang in Next.js dev mode
     if (response) {
       const status = response.status()
-      console.log(`[E2E] Reminder API response status: ${status}`)
-
-      // Get raw response text first
-      const rawBody = await response.text().catch(() => '')
-      console.log(`[E2E] Reminder API raw response:`, rawBody)
-
       if (status !== 200 && status !== 201) {
-        console.log(`[E2E] Reminder creation failed with status ${status}`)
-      } else {
-        try {
-          const body = rawBody ? JSON.parse(rawBody) : null
-          console.log(`[E2E] Reminder created successfully:`, JSON.stringify(body))
-          if (body && body.id) {
-            createdReminderId = body.id
-            console.log(`[E2E] Created reminder ID: ${createdReminderId}`)
-          }
-        } catch (e) {
-          console.log('[E2E] Failed to parse response JSON:', e)
-        }
+        throw new Error(`Reminder API returned ${status}`)
       }
-    } else {
-      console.log('[E2E] No response received from reminder API')
     }
 
     await this.page.waitForURL('**/dashboard/reminders', { timeout: 30000 })

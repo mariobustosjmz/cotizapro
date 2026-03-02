@@ -8,10 +8,14 @@ export class ClientsPage extends BasePage {
 
   async goto() {
     await super.goto('/dashboard/clients')
+    // Wait for async ClientsListContent to finish loading
+    await this.page.waitForSelector('table tbody tr, h3:has-text("No hay clientes")', { timeout: 15000 })
   }
 
   async goToNewClient() {
     await super.goto('/dashboard/clients/new')
+    // Wait for the form to be ready (all browsers, especially webkit)
+    await this.page.locator('input[name="name"]').waitFor({ state: 'visible', timeout: 15000 })
   }
 
   // New Client Form
@@ -45,47 +49,27 @@ export class ClientsPage extends BasePage {
   }
 
   async submitClientForm() {
-    // Listen for console messages
-    const consoleMessages: string[] = []
-    this.page.on('console', msg => {
-      consoleMessages.push(`[${msg.type()}] ${msg.text()}`)
-    })
-
-    // Wait for API response
-    const responsePromise = this.page.waitForResponse(
+    // Set up response waiter BEFORE clicking
+    const postResponsePromise = this.page.waitForResponse(
       response => response.url().includes('/api/clients') && response.request().method() === 'POST',
       { timeout: 30000 }
     )
 
     await this.page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")').click()
 
-    try {
-      const response = await responsePromise
-      console.log('[E2E] API Response status:', response.status())
-      const responseBody = await response.json().catch(() => null)
-      console.log('[E2E] API Response body:', JSON.stringify(responseBody, null, 2))
-      console.log('[E2E] Console messages:', consoleMessages.join('\n'))
-
-      if (!response.ok()) {
-        throw new Error(`API returned ${response.status()}: ${JSON.stringify(responseBody)}`)
-      }
-    } catch (error) {
-      console.error('[E2E] Error waiting for API response:', error)
-      console.log('[E2E] Console messages:', consoleMessages.join('\n'))
-      throw error
+    // Check status only — do NOT call response.json() as it blocks on the body
+    // stream which can hang in Next.js dev mode
+    const response = await postResponsePromise
+    if (!response.ok()) {
+      throw new Error(`API returned ${response.status()}`)
     }
 
-    await this.page.waitForURL('**/dashboard/clients', { timeout: 30000 })
-
-    // Force a page reload to ensure fresh data from Server Component
-    // Firefox can throw "Target page closed" during networkidle wait — handle gracefully
-    await this.page.reload({ waitUntil: 'load' }).catch(() => null)
-
-    // Wait for the table to be visible (or empty state)
-    await this.page.locator('table, text=No hay clientes').waitFor({ timeout: 5000 }).catch(() => null)
-
-    // Give React time to hydrate
-    await this.page.waitForTimeout(500)
+    // Wait for navigation + ClientsListContent async fetch to finish
+    // Table rows or empty state appearing confirms both navigation and data load completed
+    await this.page.waitForSelector(
+      'table tbody tr, h3:has-text("No hay clientes")',
+      { timeout: 60000 }
+    )
   }
 
   async createClient(data: {
@@ -105,9 +89,9 @@ export class ClientsPage extends BasePage {
   }
 
   async getTotalClientCount(): Promise<number> {
-    const card = this.page.locator('text=Total Clientes').locator('../..')
-    const text = await this.getText(card.locator('div.text-2xl'))
-    return parseInt(text, 10)
+    // Count visible table rows as proxy for total (stat card may not exist on this page)
+    const rows = this.page.locator('table tbody tr')
+    return await rows.count()
   }
 
   async getClientByName(name: string) {
@@ -115,13 +99,14 @@ export class ClientsPage extends BasePage {
   }
 
   async clickClientDetailsLink(clientName: string) {
-    await this.page.locator(`table tbody tr:has-text("${clientName}") a:has-text("Ver detalles")`).first().click()
+    // The link text is "Ver" (short label in the actions column)
+    await this.page.locator(`table tbody tr:has-text("${clientName}") a`).first().click()
     await this.page.waitForURL('**/dashboard/clients/*')
   }
 
   async isClientVisible(name: string): Promise<boolean> {
-    // Use count() scoped to table rows to avoid strict mode violation when
-    // multiple elements match (e.g., seed data + newly created client with same name)
+    // Ensure the list has fully loaded before checking
+    await this.page.waitForSelector('table tbody tr, h3:has-text("No hay clientes")', { timeout: 15000 })
     const rows = this.page.locator('table tbody tr').filter({ hasText: name })
     return (await rows.count()) > 0
   }

@@ -27,12 +27,12 @@ export class CalendarPage extends BasePage {
   }
 
   async isCalendarHeadingVisible(): Promise<boolean> {
-    return await this.page.locator('h1:has-text("Agenda")').isVisible()
+    return await this.page.locator('h2:has-text("Agenda")').isVisible()
   }
 
   async isNewEventPageVisible(): Promise<boolean> {
     const isOnNewEventPage = this.page.url().includes('/calendar/new')
-    const hasHeading = await this.page.locator('h1:has-text("Nuevo Evento")').isVisible()
+    const hasHeading = await this.page.locator('h2:has-text("Nuevo Evento")').isVisible()
     return isOnNewEventPage && hasHeading
   }
 

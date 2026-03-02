@@ -42,8 +42,12 @@ export function useRealtime(options: UseRealtimeOptions[]) {
       )
     })
 
-    channel.subscribe()
-    channelRef.current = channel
+    try {
+      channel.subscribe()
+      channelRef.current = channel
+    } catch {
+      // WebSocket may not be available in some environments (e.g., test runners)
+    }
 
     return () => {
       supabase.removeChannel(channel)
