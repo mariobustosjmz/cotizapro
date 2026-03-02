@@ -1,8 +1,13 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Output standalone for Docker deployment
   output: 'standalone',
+  experimental: {
+    outputFileTracingRoot: path.join(__dirname, '../../'),
+  },
+  transpilePackages: ['@cotizapro/auth', '@cotizapro/db', '@cotizapro/ui'],
 
   // Security headers configuration
   headers: async () => {
