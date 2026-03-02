@@ -15,9 +15,9 @@
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
-    "@cotizapro/auth": "*",
-    "@cotizapro/db": "*",
-    "@cotizapro/ui": "*",
+    "@cotizapro/auth": "workspace:*",
+    "@cotizapro/db": "workspace:*",
+    "@cotizapro/ui": "workspace:*",
     "@radix-ui/react-label": "^2.1.8",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
