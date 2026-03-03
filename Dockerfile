@@ -1,24 +1,27 @@
 FROM node:20-alpine AS base
 RUN apk add --no-cache libc6-compat
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Install dependencies
 FROM base AS deps
 WORKDIR /app
 
 # Copy workspace manifests first (layer caching)
-COPY package.json package-lock.json* turbo.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/auth/package.json ./packages/auth/
 COPY packages/db/package.json ./packages/db/
 COPY packages/ui/package.json ./packages/ui/
 
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Build
 FROM base AS builder
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
+# Copy installed deps (entire workspace with node_modules)
+COPY --from=deps /app ./
+# Overlay full source
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
