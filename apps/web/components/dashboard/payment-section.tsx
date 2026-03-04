@@ -76,7 +76,7 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
         payment_type: formData.payment_type,
         payment_method: formData.payment_method,
         payment_date: formData.payment_date,
-        notes: formData.notes || null,
+        notes: formData.notes || undefined,
       }
 
       const response = await fetch(`/api/quotes/${quoteId}/payments`, {

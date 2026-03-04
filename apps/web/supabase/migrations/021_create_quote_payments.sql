@@ -18,19 +18,19 @@ ALTER TABLE quote_payments ENABLE ROW LEVEL SECURITY;
 -- RLS Policy: Organization members can view payments
 CREATE POLICY "org members can view payments"
   ON quote_payments FOR SELECT
-  USING (organization_id = (auth.jwt()->>'organization_id')::UUID);
+  USING (organization_id = user_organization_id());
 
 -- RLS Policy: Organization members can insert payments
 CREATE POLICY "org members can insert payments"
   ON quote_payments FOR INSERT
-  WITH CHECK (organization_id = (auth.jwt()->>'organization_id')::UUID);
+  WITH CHECK (organization_id = user_organization_id());
 
 -- RLS Policy: Organization admins/owners can delete payments
 CREATE POLICY "org admins can delete payments"
   ON quote_payments FOR DELETE
   USING (
-    organization_id = (auth.jwt()->>'organization_id')::UUID
-    AND (auth.jwt()->>'role') IN ('owner','admin')
+    organization_id = user_organization_id()
+    AND (auth.jwt() -> 'user_metadata' ->> 'role') IN ('owner','admin')
   );
 
 -- Create indexes for common queries
