@@ -216,7 +216,7 @@ export default function TemplatesPage() {
                         : '\u2014'}
                     </td>
                     <td className="py-2.5 px-4 text-gray-700 dark:text-gray-300 hidden lg:table-cell">
-                      {template.default_discount_rate ? `${template.default_discount_rate}%` : '\u2014'}
+                      {template.default_discount_rate ? `${Number(template.default_discount_rate)}%` : '\u2014'}
                     </td>
                     <td className="py-2.5 px-4 hidden lg:table-cell">
                       {template.promotional_label ? (

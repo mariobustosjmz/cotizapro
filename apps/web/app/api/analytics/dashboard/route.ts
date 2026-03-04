@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       .eq('status', 'accepted')
       .limit(10000)
 
-    const totalRevenue = acceptedQuotes?.reduce((sum, q) => sum + (q.total || 0), 0) || 0
+    const totalRevenue = acceptedQuotes?.reduce((sum, q) => sum + Number(q.total || 0), 0) || 0
 
     // Revenue this month
     const firstDayOfMonth = new Date()
@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
     firstDayOfMonth.setHours(0, 0, 0, 0)
     const revenueThisMonth = acceptedQuotes?.filter(q =>
       q.accepted_at && new Date(q.accepted_at) >= firstDayOfMonth
-    ).reduce((sum, q) => sum + (q.total || 0), 0) || 0
+    ).reduce((sum, q) => sum + Number(q.total || 0), 0) || 0
 
     // ========================================
     // 4. Reminder Statistics
@@ -230,7 +230,7 @@ export async function GET(request: NextRequest) {
       .limit(10000)
 
     const avgQuoteValue = allQuotes && allQuotes.length > 0
-      ? allQuotes.reduce((sum, q) => sum + (q.total || 0), 0) / allQuotes.length
+      ? allQuotes.reduce((sum, q) => sum + Number(q.total || 0), 0) / allQuotes.length
       : 0
 
     // ========================================
