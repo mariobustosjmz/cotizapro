@@ -35,7 +35,7 @@ export function BillingClient({
       if (planId === 'free') {
         setMessage({
           type: 'error',
-          text: 'Free plan cannot be selected from billing page',
+          text: 'El plan gratuito no puede seleccionarse desde esta página',
         })
         return
       }

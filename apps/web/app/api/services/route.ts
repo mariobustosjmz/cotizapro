@@ -38,11 +38,11 @@ export async function GET(request: NextRequest) {
     // Construir query
     let query = supabase
       .from('service_catalog')
-      .select('*')
+      .select('id, name, description, category, unit_price, unit_type, is_active, created_at, organization_id')
       .eq('organization_id', profile.organization_id)
       .order('category')
       .order('name')
-      .limit(1000)
+      .limit(100)
 
     if (category) {
       query = query.eq('category', category)

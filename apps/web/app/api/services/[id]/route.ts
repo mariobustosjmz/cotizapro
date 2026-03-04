@@ -25,7 +25,7 @@ export async function GET(
 
     const { data: service, error } = await supabase
       .from('service_catalog')
-      .select('*')
+      .select('id, name, description, category, unit_price, unit_type, is_active, created_at, organization_id')
       .eq('id', id)
       .single()
 
@@ -89,7 +89,7 @@ export async function PATCH(
       .from('service_catalog')
       .update(validation.data)
       .eq('id', id)
-      .select()
+      .select('id, name, description, category, unit_price, unit_type, is_active, created_at, organization_id')
       .single()
 
     if (error) {

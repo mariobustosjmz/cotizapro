@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     // Build query
     let query = supabase
       .from('clients')
-      .select('*', { count: 'exact' })
+      .select('id, name, email, phone, company_name, address, notes, created_at, organization_id', { count: 'exact' })
       .eq('organization_id', profile.organization_id)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)

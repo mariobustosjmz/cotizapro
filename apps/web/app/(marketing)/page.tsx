@@ -807,7 +807,7 @@ export default function LandingPage() {
                 <li><Link href="#caracteristicas" className="text-sm hover:text-white transition-colors cursor-pointer">Características</Link></li>
                 <li><Link href="#precios" className="text-sm hover:text-white transition-colors cursor-pointer">Precios</Link></li>
                 <li><Link href="#faq" className="text-sm hover:text-white transition-colors cursor-pointer">FAQ</Link></li>
-                <li><Link href="/changelog" className="text-sm hover:text-white transition-colors cursor-pointer">Novedades</Link></li>
+                <li><Link href="#caracteristicas" className="text-sm hover:text-white transition-colors cursor-pointer">Novedades</Link></li>
               </ul>
             </div>
 
@@ -815,10 +815,8 @@ export default function LandingPage() {
             <div>
               <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Empresa</p>
               <ul className="space-y-2.5">
-                <li><Link href="/about" className="text-sm hover:text-white transition-colors cursor-pointer">Nosotros</Link></li>
-                <li><Link href="/blog" className="text-sm hover:text-white transition-colors cursor-pointer">Blog</Link></li>
-                <li><Link href="/contact" className="text-sm hover:text-white transition-colors cursor-pointer">Contacto</Link></li>
-                <li><Link href="/careers" className="text-sm hover:text-white transition-colors cursor-pointer">Trabaja con nosotros</Link></li>
+                <li><Link href="/signup" className="text-sm hover:text-white transition-colors cursor-pointer">Empezar gratis</Link></li>
+                <li><Link href="#precios" className="text-sm hover:text-white transition-colors cursor-pointer">Precios</Link></li>
               </ul>
             </div>
 
@@ -826,9 +824,8 @@ export default function LandingPage() {
             <div>
               <p className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">Legal</p>
               <ul className="space-y-2.5">
-                <li><Link href="/privacy" className="text-sm hover:text-white transition-colors cursor-pointer">Privacidad</Link></li>
-                <li><Link href="/terms" className="text-sm hover:text-white transition-colors cursor-pointer">Términos de Uso</Link></li>
-                <li><Link href="/cookies" className="text-sm hover:text-white transition-colors cursor-pointer">Cookies</Link></li>
+                <li><Link href="/privacidad" className="text-sm hover:text-white transition-colors cursor-pointer">Privacidad</Link></li>
+                <li><Link href="/terminos" className="text-sm hover:text-white transition-colors cursor-pointer">Términos de Uso</Link></li>
               </ul>
             </div>
           </div>

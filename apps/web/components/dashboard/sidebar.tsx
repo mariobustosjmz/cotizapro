@@ -23,6 +23,7 @@ import {
   Settings,
   Calendar as CalendarIcon,
   Copy as TemplateIcon,
+  CreditCard,
 } from 'lucide-react'
 
 interface ProfileOrganization {
@@ -56,6 +57,7 @@ const analyticsNav = [
 
 const configNav = [
   { name: 'Equipo', href: '/dashboard/team', icon: UsersRound, shortcut: '' },
+  { name: 'Facturación', href: '/dashboard/billing', icon: CreditCard, shortcut: '' },
   { name: 'Configuración', href: '/dashboard/settings', icon: Settings2, shortcut: '' },
   { name: 'Campos Extra', href: '/dashboard/settings/custom-fields', icon: Sliders, shortcut: '' },
 ]

@@ -167,8 +167,8 @@ export default async function RemindersPage({
                         <div className={`text-sm font-medium ${isCompleted ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
                           {reminder.title}
                         </div>
-                        {reminder.message && (
-                          <div className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[100px] sm:max-w-[200px]">{reminder.message}</div>
+                        {reminder.description && (
+                          <div className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[100px] sm:max-w-[200px]">{reminder.description}</div>
                         )}
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap">

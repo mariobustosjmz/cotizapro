@@ -137,9 +137,7 @@ export default async function TeamPage() {
                       {new Date(invitation.expires_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
                     </td>
                     <td className="text-right py-2.5 px-4">
-                      <Link href={`/dashboard/team/invitations/${invitation.id}`} className="text-xs text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium">
-                        Ver
-                      </Link>
+                      <span className="text-xs text-gray-400 dark:text-gray-600">Pendiente</span>
                     </td>
                   </tr>
                 ))}
@@ -195,11 +193,6 @@ export default async function TeamPage() {
                       {new Date(member.created_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
                     </td>
                     <td className="text-right py-2.5 px-4">
-                      {member.id !== user.id && canInvite && (
-                        <Link href={`/dashboard/team/members/${member.id}`} className="text-xs text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium">
-                          Gestionar
-                        </Link>
-                      )}
                     </td>
                   </tr>
                 ))}

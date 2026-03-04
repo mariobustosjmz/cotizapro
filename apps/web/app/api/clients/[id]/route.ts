@@ -27,7 +27,7 @@ export async function GET(
     // Fetch client (RLS will enforce organization filter)
     const { data: client, error } = await supabase
       .from('clients')
-      .select('*')
+      .select('id, name, email, phone, company_name, address, city, state, postal_code, notes, whatsapp_phone, created_at, organization_id')
       .eq('id', id)
       .single()
 
@@ -93,7 +93,7 @@ export async function PATCH(
       .from('clients')
       .update(validation.data)
       .eq('id', id)
-      .select()
+      .select('id, name, email, phone, company_name, address, city, state, postal_code, notes, whatsapp_phone, created_at, organization_id')
       .single()
 
     if (error) {

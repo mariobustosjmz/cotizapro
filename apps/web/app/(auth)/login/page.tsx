@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; success?: string }>
+}) {
+  const params = await searchParams
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -50,6 +55,24 @@ export default async function LoginPage() {
             </Link>
           </p>
         </div>
+
+        {params.success === 'password-reset' && (
+          <div className="rounded-md bg-green-50 p-4">
+            <p className="text-sm font-medium text-green-800">
+              Contraseña actualizada. Inicia sesión con tu nueva contraseña.
+            </p>
+          </div>
+        )}
+
+        {params.error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <p className="text-sm font-medium text-red-800">
+              {params.error === 'invalid-credentials'
+                ? 'Correo o contraseña incorrectos. Intenta de nuevo.'
+                : 'Ocurrió un error. Intenta de nuevo.'}
+            </p>
+          </div>
+        )}
 
         <form action={login} className="mt-8 space-y-6">
           <div className="space-y-4 rounded-md">
