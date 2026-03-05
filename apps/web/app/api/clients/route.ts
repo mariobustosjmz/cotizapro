@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClientSchema, clientQuerySchema } from '@/lib/validations/cotizapro'
 import type { Client } from '@/types/database.types'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
-import { handleApiError, ApiErrors } from '@/lib/error-handler'
+import { handleApiError, ApiErrors, validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import { sanitizeSearchInput } from '@/lib/search-sanitizer'
 
@@ -156,10 +156,7 @@ export async function POST(request: NextRequest) {
     const validation = createClientSchema.safeParse(sanitizedBody)
 
     if (!validation.success) {
-      return handleApiError(
-        ApiErrors.VALIDATION_FAILED(`Invalid client data: ${validation.error.issues.map(e => `${e.path.join('.')}: ${e.code}`).join(', ')}`),
-        'POST /api/clients - validation'
-      )
+      return validationErrorResponse(validation.error)
     }
 
     // Insert client

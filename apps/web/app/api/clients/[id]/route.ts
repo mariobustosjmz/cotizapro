@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { updateClientSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { validationErrorResponse } from '@/lib/error-handler'
 
 // GET /api/clients/[id] - Get single client
 export async function GET(
@@ -82,10 +83,7 @@ export async function PATCH(
     const validation = updateClientSchema.safeParse(sanitizedBody)
 
     if (!validation.success) {
-      return NextResponse.json({
-        error: 'Datos inválidos',
-        details: validation.error.issues,
-      }, { status: 400 })
+      return validationErrorResponse(validation.error)
     }
 
     // Update client (RLS will enforce organization filter)

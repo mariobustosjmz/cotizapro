@@ -6,6 +6,7 @@
  */
 
 import { NextResponse } from "next/server"
+import { z } from "zod"
 
 /**
  * Custom API Error Class
@@ -137,6 +138,24 @@ export const ApiErrors = {
       `External service error: ${service}`,
       "SERVICE_UNAVAILABLE"
     ),
+}
+
+/**
+ * Return structured field-level validation errors from a ZodError
+ * so the frontend can display them per field
+ */
+export function validationErrorResponse(zodError: z.ZodError): NextResponse {
+  const fieldErrors = zodError.flatten().fieldErrors
+  const errors: Record<string, string> = {}
+  for (const [key, messages] of Object.entries(fieldErrors)) {
+    if (messages && messages.length > 0) {
+      errors[key] = messages[0]
+    }
+  }
+  return NextResponse.json(
+    { error: 'Por favor verifica los datos ingresados.', fieldErrors: errors },
+    { status: 400 }
+  )
 }
 
 /**

@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { validationErrorResponse } from '@/lib/error-handler'
 
 // GET /api/services - Lista de servicios con filtros
 export async function GET(request: NextRequest) {
@@ -105,10 +106,7 @@ export async function POST(request: NextRequest) {
     const validation = createServiceSchema.safeParse(body)
 
     if (!validation.success) {
-      return NextResponse.json({
-        error: 'Validación fallida',
-        details: validation.error.issues,
-      }, { status: 400 })
+      return validationErrorResponse(validation.error)
     }
 
     // Insertar servicio
