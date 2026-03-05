@@ -60,6 +60,7 @@ export default function NewCustomFieldPage() {
   const [options, setOptions] = useState<SelectOption[]>([{ value: '', label: '' }])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   function handleLabelChange(value: string) {
     setFieldLabel(value)
@@ -86,6 +87,22 @@ export default function NewCustomFieldPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setFieldErrors({})
+
+    const errors: Record<string, string> = {}
+    if (!fieldLabel || fieldLabel.trim().length === 0) {
+      errors.field_label = 'La etiqueta es requerida'
+    }
+    if (!fieldKey || fieldKey.trim().length === 0) {
+      errors.field_key = 'El identificador es requerido'
+    } else if (!/^[a-z0-9_]+$/.test(fieldKey)) {
+      errors.field_key = 'Solo letras minúsculas, números y guiones bajos'
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
     setSubmitting(true)
 
     const body: Record<string, unknown> = {
@@ -114,6 +131,11 @@ export default function NewCustomFieldPage() {
       const json = await res.json()
 
       if (!res.ok) {
+        if (json.fieldErrors && Object.keys(json.fieldErrors).length > 0) {
+          setFieldErrors(json.fieldErrors)
+          setError('Por favor corrige los errores marcados.')
+          return
+        }
         setError(json.error ?? 'Error al crear el campo.')
         return
       }
@@ -178,17 +200,18 @@ export default function NewCustomFieldPage() {
             </FormField>
           </div>
 
-          <FormField label="Etiqueta" htmlFor="field_label" required>
+          <FormField label="Etiqueta" htmlFor="field_label" required error={fieldErrors.field_label}>
             <Input
               id="field_label"
               value={fieldLabel}
               onChange={(e) => handleLabelChange(e.target.value)}
               placeholder="Ej: Numero de Licencia"
               required
+              className={fieldErrors.field_label ? 'border-red-500' : ''}
             />
           </FormField>
 
-          <FormField label="Identificador" htmlFor="field_key" required hint="Solo letras minusculas, numeros y guiones bajos. No se puede cambiar despues.">
+          <FormField label="Identificador" htmlFor="field_key" required hint="Solo letras minusculas, numeros y guiones bajos. No se puede cambiar despues." error={fieldErrors.field_key}>
             <Input
               id="field_key"
               value={fieldKey}
@@ -200,6 +223,7 @@ export default function NewCustomFieldPage() {
               pattern="^[a-z0-9_]+$"
               title="Solo letras minusculas, numeros y guiones bajos"
               required
+              className={fieldErrors.field_key ? 'border-red-500' : ''}
             />
           </FormField>
 

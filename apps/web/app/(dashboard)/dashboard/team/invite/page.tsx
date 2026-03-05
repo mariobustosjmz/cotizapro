@@ -12,6 +12,7 @@ export default function InvitePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
     email: '',
     role: 'member',
@@ -19,8 +20,21 @@ export default function InvitePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setFieldErrors({})
+
+    const errors: Record<string, string> = {}
+    if (!formData.email || formData.email.trim().length === 0) {
+      errors.email = 'El email es requerido'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Email inválido'
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
 
     try {
       const response = await fetch('/api/team/invitations', {
@@ -32,6 +46,11 @@ export default function InvitePage() {
       const data = await response.json()
 
       if (!response.ok) {
+        if (data.fieldErrors && Object.keys(data.fieldErrors).length > 0) {
+          setFieldErrors(data.fieldErrors)
+          setError('Por favor corrige los errores marcados.')
+          return
+        }
         throw new Error(data.error || 'Error al enviar invitaci\u00f3n')
       }
 
@@ -70,7 +89,7 @@ export default function InvitePage() {
             </div>
           )}
 
-          <FormField label="Email del Miembro" htmlFor="email" required hint="Se enviar\u00e1 una invitaci\u00f3n a este correo">
+          <FormField label="Email del Miembro" htmlFor="email" required hint="Se enviará una invitación a este correo" error={fieldErrors.email}>
             <Input
               id="email"
               name="email"
@@ -79,6 +98,7 @@ export default function InvitePage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
+              className={fieldErrors.email ? 'border-red-500' : ''}
             />
           </FormField>
 

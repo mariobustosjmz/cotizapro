@@ -17,12 +17,31 @@ export default function NewClientPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
+
+  function validateFields(data: Record<string, unknown>): Record<string, string> {
+    const errors: Record<string, string> = {}
+    const phone = data.phone as string | null
+    const email = data.email as string | null
+
+    if (!data.name || (data.name as string).trim().length === 0) {
+      errors.name = 'El nombre es requerido'
+    }
+    if (phone && phone.trim().length > 0) {
+      if (phone.trim().length < 10) errors.phone = 'Teléfono debe tener al menos 10 dígitos'
+      else if (!/^[\d\s\-\+\(\)]+$/.test(phone)) errors.phone = 'Formato de teléfono inválido'
+    }
+    if (email && email.trim().length > 0) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Email inválido'
+    }
+    return errors
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
     const tags = formData.get('tags') as string
@@ -38,6 +57,14 @@ export default function NewClientPage() {
       custom_fields: customFields,
     }
 
+    const errors = validateFields(data as Record<string, unknown>)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
+
     try {
       const response = await fetch('/api/clients', {
         method: 'POST',
@@ -46,8 +73,13 @@ export default function NewClientPage() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al crear cliente')
+        const data = await response.json()
+        if (data.fieldErrors && Object.keys(data.fieldErrors).length > 0) {
+          setFieldErrors(data.fieldErrors)
+          setError('Por favor corrige los errores marcados.')
+          return
+        }
+        throw new Error(data.error || 'Error al crear cliente')
       }
 
       toast({ message: 'Cliente creado exitosamente', variant: 'success' })
@@ -86,20 +118,20 @@ export default function NewClientPage() {
           )}
 
           <div className="grid gap-3 md:grid-cols-2">
-            <FormField label="Nombre Completo" htmlFor="name" required>
-              <Input id="name" name="name" required placeholder="Juan Pérez" />
+            <FormField label="Nombre Completo" htmlFor="name" required error={fieldErrors.name}>
+              <Input id="name" name="name" required placeholder="Juan Pérez" className={fieldErrors.name ? 'border-red-500' : ''} />
             </FormField>
 
             <FormField label="Empresa" htmlFor="company_name">
               <Input id="company_name" name="company_name" placeholder="Empresa SA de CV" />
             </FormField>
 
-            <FormField label="Email" htmlFor="email">
-              <Input id="email" name="email" type="email" placeholder="juan@ejemplo.com" />
+            <FormField label="Email" htmlFor="email" error={fieldErrors.email}>
+              <Input id="email" name="email" type="email" placeholder="juan@ejemplo.com" className={fieldErrors.email ? 'border-red-500' : ''} />
             </FormField>
 
-            <FormField label="Teléfono" htmlFor="phone">
-              <Input id="phone" name="phone" type="tel" placeholder="5512345678" />
+            <FormField label="Teléfono" htmlFor="phone" error={fieldErrors.phone} hint="Mínimo 10 dígitos">
+              <Input id="phone" name="phone" type="tel" placeholder="5512345678" className={fieldErrors.phone ? 'border-red-500' : ''} />
             </FormField>
           </div>
 

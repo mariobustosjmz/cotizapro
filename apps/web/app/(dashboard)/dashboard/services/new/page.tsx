@@ -17,12 +17,25 @@ export default function NewServicePage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
+
+  function validateFields(data: Record<string, unknown>): Record<string, string> {
+    const errors: Record<string, string> = {}
+    if (!data.name || (data.name as string).trim().length === 0) {
+      errors.name = 'El nombre es requerido'
+    }
+    const price = data.unit_price as number
+    if (isNaN(price) || price < 0) {
+      errors.unit_price = 'El precio debe ser mayor o igual a 0'
+    }
+    return errors
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
 
@@ -36,6 +49,14 @@ export default function NewServicePage() {
       custom_fields: customFields,
     }
 
+    const errors = validateFields(data as Record<string, unknown>)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
+
     try {
       const response = await fetch('/api/services', {
         method: 'POST',
@@ -44,8 +65,13 @@ export default function NewServicePage() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Error al crear servicio')
+        const data = await response.json()
+        if (data.fieldErrors && Object.keys(data.fieldErrors).length > 0) {
+          setFieldErrors(data.fieldErrors)
+          setError('Por favor corrige los errores marcados.')
+          return
+        }
+        throw new Error(data.error || 'Error al crear servicio')
       }
 
       toast({ message: 'Servicio creado exitosamente', variant: 'success' })
@@ -84,8 +110,8 @@ export default function NewServicePage() {
             </div>
           )}
 
-          <FormField label="Nombre del Servicio" htmlFor="name" required>
-            <Input id="name" name="name" required placeholder="Instalación de minisplit 12000 BTU" />
+          <FormField label="Nombre del Servicio" htmlFor="name" required error={fieldErrors.name}>
+            <Input id="name" name="name" required placeholder="Instalación de minisplit 12000 BTU" className={fieldErrors.name ? 'border-red-500' : ''} />
           </FormField>
 
           <div className="grid gap-3 md:grid-cols-2">
@@ -120,8 +146,8 @@ export default function NewServicePage() {
               </select>
             </FormField>
 
-            <FormField label="Precio Base" htmlFor="unit_price" required hint="Precio predeterminado">
-              <Input id="unit_price" name="unit_price" type="number" min="0" step="0.01" required placeholder="0.00" />
+            <FormField label="Precio Base" htmlFor="unit_price" required hint="Precio predeterminado" error={fieldErrors.unit_price}>
+              <Input id="unit_price" name="unit_price" type="number" min="0" step="0.01" required placeholder="0.00" className={fieldErrors.unit_price ? 'border-red-500' : ''} />
             </FormField>
 
             <FormField label="Estado" htmlFor="is_active" required hint="Inactivos no aparecen en cotizaciones">

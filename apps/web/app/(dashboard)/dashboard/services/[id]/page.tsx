@@ -29,6 +29,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [service, setService] = useState<Service | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
@@ -52,10 +53,22 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     fetchService()
   }, [id])
 
+  function validateFields(data: Record<string, unknown>): Record<string, string> {
+    const errors: Record<string, string> = {}
+    if (!data.name || (data.name as string).trim().length === 0) {
+      errors.name = 'El nombre es requerido'
+    }
+    const price = data.unit_price as number
+    if (isNaN(price) || price < 0) {
+      errors.unit_price = 'El precio debe ser mayor o igual a 0'
+    }
+    return errors
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
 
@@ -69,6 +82,14 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       custom_fields: customFields,
     }
 
+    const errors = validateFields(data as Record<string, unknown>)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
+
     try {
       const response = await fetch(`/api/services/${id}`, {
         method: 'PATCH',
@@ -78,6 +99,11 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
       if (!response.ok) {
         const errorData = await response.json()
+        if (errorData.fieldErrors && Object.keys(errorData.fieldErrors).length > 0) {
+          setFieldErrors(errorData.fieldErrors)
+          setError('Por favor corrige los errores marcados.')
+          return
+        }
         throw new Error(errorData.error || 'Error al actualizar servicio')
       }
 
@@ -196,8 +222,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
         <div className="p-4">
           {isEditing ? (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Nombre del Servicio" htmlFor="name" required>
-                <Input id="name" name="name" required defaultValue={service.name} />
+              <FormField label="Nombre del Servicio" htmlFor="name" required error={fieldErrors.name}>
+                <Input id="name" name="name" required defaultValue={service.name} className={fieldErrors.name ? 'border-red-500' : ''} />
               </FormField>
 
               <div className="grid gap-3 md:grid-cols-2">
@@ -220,8 +246,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                   </select>
                 </FormField>
 
-                <FormField label="Precio Base" htmlFor="unit_price" required>
-                  <Input id="unit_price" name="unit_price" type="number" min="0" step="0.01" required defaultValue={service.unit_price} />
+                <FormField label="Precio Base" htmlFor="unit_price" required error={fieldErrors.unit_price}>
+                  <Input id="unit_price" name="unit_price" type="number" min="0" step="0.01" required defaultValue={service.unit_price} className={fieldErrors.unit_price ? 'border-red-500' : ''} />
                 </FormField>
 
                 <FormField label="Estado" htmlFor="is_active" required hint="Los servicios inactivos no aparecen en las cotizaciones">

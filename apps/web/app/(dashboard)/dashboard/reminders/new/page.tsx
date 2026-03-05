@@ -41,19 +41,28 @@ export default function NewReminderPage() {
     fetchClients()
   }, [])
 
+  function validateFields(clientId: string, title: string): Record<string, string> {
+    const errors: Record<string, string> = {}
+    if (!clientId) errors.client_id = 'Selecciona un cliente'
+    if (!title || title.trim().length === 0) errors.title = 'El título es requerido'
+    return errors
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError('')
 
     const formData = new FormData(e.currentTarget)
     const clientId = formData.get('client_id') as string
+    const title = formData.get('title') as string
 
-    if (!clientId) {
-      setError('Selecciona un cliente')
-      setLoading(false)
+    const errors = validateFields(clientId, title)
+    if (Object.keys(errors).length > 0) {
+      setError(Object.values(errors)[0])
       return
     }
+
+    setLoading(true)
 
     const data = {
       client_id: clientId,

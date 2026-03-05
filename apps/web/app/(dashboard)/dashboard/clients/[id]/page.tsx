@@ -38,6 +38,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [client, setClient] = useState<Client | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
@@ -61,10 +62,32 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
     fetchClient()
   }, [clientId])
 
+  function validateFields(data: Record<string, unknown>): Record<string, string> {
+    const errors: Record<string, string> = {}
+    const phone = data.phone as string | null
+    const whatsapp = data.whatsapp_phone as string | null
+    const email = data.email as string | null
+    if (!data.name || (data.name as string).trim().length === 0) {
+      errors.name = 'El nombre es requerido'
+    }
+    if (phone && phone.trim().length > 0) {
+      if (phone.trim().length < 10) errors.phone = 'Teléfono debe tener al menos 10 dígitos'
+      else if (!/^[\d\s\-\+\(\)]+$/.test(phone)) errors.phone = 'Formato de teléfono inválido'
+    }
+    if (whatsapp && whatsapp.trim().length > 0) {
+      if (whatsapp.trim().length < 10) errors.whatsapp_phone = 'WhatsApp debe tener al menos 10 dígitos'
+      else if (!/^[\d\s\-\+\(\)]+$/.test(whatsapp)) errors.whatsapp_phone = 'Formato de WhatsApp inválido'
+    }
+    if (email && email.trim().length > 0) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Email inválido'
+    }
+    return errors
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
     const tags = formData.get('tags') as string
@@ -84,6 +107,14 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
       custom_fields: customFields,
     }
 
+    const errors = validateFields(data as Record<string, unknown>)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
+    setLoading(true)
+
     try {
       const response = await fetch(`/api/clients/${clientId}`, {
         method: 'PATCH',
@@ -93,6 +124,11 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
 
       if (!response.ok) {
         const errorData = await response.json()
+        if (errorData.fieldErrors && Object.keys(errorData.fieldErrors).length > 0) {
+          setFieldErrors(errorData.fieldErrors)
+          setError('Por favor corrige los errores marcados.')
+          return
+        }
         throw new Error(errorData.error || 'Error al actualizar cliente')
       }
 
@@ -208,24 +244,24 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Contact Information */}
               <div className="grid gap-3 md:grid-cols-2">
-                <FormField label="Nombre Completo" htmlFor="name" required>
-                  <Input id="name" name="name" required defaultValue={client.name} />
+                <FormField label="Nombre Completo" htmlFor="name" required error={fieldErrors.name}>
+                  <Input id="name" name="name" required defaultValue={client.name} className={fieldErrors.name ? 'border-red-500' : ''} />
                 </FormField>
 
                 <FormField label="Empresa" htmlFor="company_name">
                   <Input id="company_name" name="company_name" defaultValue={client.company_name || ''} />
                 </FormField>
 
-                <FormField label="Email" htmlFor="email">
-                  <Input id="email" name="email" type="email" defaultValue={client.email || ''} />
+                <FormField label="Email" htmlFor="email" error={fieldErrors.email}>
+                  <Input id="email" name="email" type="email" defaultValue={client.email || ''} className={fieldErrors.email ? 'border-red-500' : ''} />
                 </FormField>
 
-                <FormField label="Telefono" htmlFor="phone" required>
-                  <Input id="phone" name="phone" type="tel" required defaultValue={client.phone || ''} />
+                <FormField label="Telefono" htmlFor="phone" required error={fieldErrors.phone}>
+                  <Input id="phone" name="phone" type="tel" required defaultValue={client.phone || ''} className={fieldErrors.phone ? 'border-red-500' : ''} />
                 </FormField>
 
-                <FormField label="WhatsApp" htmlFor="whatsapp_phone">
-                  <Input id="whatsapp_phone" name="whatsapp_phone" type="tel" defaultValue={client.whatsapp_phone || ''} />
+                <FormField label="WhatsApp" htmlFor="whatsapp_phone" error={fieldErrors.whatsapp_phone}>
+                  <Input id="whatsapp_phone" name="whatsapp_phone" type="tel" defaultValue={client.whatsapp_phone || ''} className={fieldErrors.whatsapp_phone ? 'border-red-500' : ''} />
                 </FormField>
               </div>
 
