@@ -48,3 +48,7 @@ yarn-error.log*
 next-env.d.ts
 
 .info
+# Build/test logs
+build.log
+build_output.log
+test-output.log
