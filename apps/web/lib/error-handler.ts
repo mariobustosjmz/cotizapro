@@ -145,10 +145,10 @@ export const ApiErrors = {
  * so the frontend can display them per field
  */
 export function validationErrorResponse(zodError: z.ZodError): NextResponse {
-  const fieldErrors = zodError.flatten().fieldErrors
+  const fieldErrors = zodError.flatten().fieldErrors as Record<string, string[] | undefined>
   const errors: Record<string, string> = {}
   for (const [key, messages] of Object.entries(fieldErrors)) {
-    if (messages && messages.length > 0) {
+    if (Array.isArray(messages) && messages.length > 0) {
       errors[key] = messages[0]
     }
   }
