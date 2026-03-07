@@ -133,7 +133,7 @@ export type QuoteItemInput = z.infer<typeof quoteItemSchema>
 
 export const createQuoteSchema = z.object({
   client_id: uuidString('Cliente inválido'),
-  valid_until: z.string().datetime('Fecha inválida').or(z.date()),
+  valid_until: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha inválida' }).or(z.date()),
   items: z.array(quoteItemSchema)
     .min(1, 'Debe agregar al menos un servicio')
     .max(50, 'Máximo 50 items por cotización'),
@@ -162,7 +162,7 @@ export type QuoteStatus = z.infer<typeof quoteStatusSchema>
 
 export const updateQuoteSchema = z.object({
   client_id: uuidString('Cliente inválido').optional(),
-  valid_until: z.string().datetime('Fecha inválida').or(z.date()).optional(),
+  valid_until: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha inválida' }).or(z.date()).optional(),
   items: z.array(quoteItemSchema)
     .min(1, 'Debe agregar al menos un servicio')
     .max(50, 'Máximo 50 items por cotización')
@@ -224,8 +224,8 @@ export const serviceQuerySchema = paginationSchema.extend({
 export const quoteQuerySchema = paginationSchema.extend({
   status: quoteStatusSchema.optional(),
   client_id: uuidString().optional(),
-  from_date: z.string().datetime().optional(),
-  to_date: z.string().datetime().optional(),
+  from_date: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha inválida' }).optional(),
+  to_date: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha inválida' }).optional(),
 })
 
 export type PaginationParams = z.infer<typeof paginationSchema>
@@ -358,8 +358,8 @@ export const workEventStatusEnum = z.enum(['pendiente', 'en_camino', 'completado
 export const createWorkEventSchema = z.object({
   title: z.string().min(1, 'El título es requerido').max(200, 'Título muy largo'),
   event_type: workEventTypeEnum,
-  scheduled_start: z.string().datetime('Fecha de inicio inválida'),
-  scheduled_end: z.string().datetime('Fecha de fin inválida'),
+  scheduled_start: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha de inicio inválida' }),
+  scheduled_end: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha de fin inválida' }),
   client_id: uuidString('Cliente inválido'),
   quote_id: uuidString().optional().nullable(),
   assigned_to: uuidString().optional().nullable(),
@@ -370,8 +370,8 @@ export const createWorkEventSchema = z.object({
 export const updateWorkEventSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   event_type: workEventTypeEnum.optional(),
-  scheduled_start: z.string().datetime().optional(),
-  scheduled_end: z.string().datetime().optional(),
+  scheduled_start: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha de inicio inválida' }).optional(),
+  scheduled_end: z.string().refine(v => !isNaN(Date.parse(v)), { message: 'Fecha de fin inválida' }).optional(),
   client_id: uuidString().optional(),
   quote_id: uuidString().optional().nullable(),
   assigned_to: uuidString().optional().nullable(),
