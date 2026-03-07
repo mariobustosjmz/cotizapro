@@ -1,5 +1,4 @@
 import { renderToBuffer } from '@react-pdf/renderer'
-import React from 'react'
 import { QuotePDF, type OrgSettings } from '@/lib/pdf/QuotePDF'
 import type { QuoteWithItems } from '@/types/database.types'
 
@@ -10,7 +9,7 @@ export async function generateQuotePDF(
   orgName: string = 'Tu Empresa',
   orgSettings: OrgSettings = {}
 ): Promise<Buffer> {
-  const element = React.createElement(QuotePDF, { quote, orgName, orgSettings })
+  const element = <QuotePDF quote={quote} orgName={orgName} orgSettings={orgSettings} />
   const buffer = await renderToBuffer(element)
   return Buffer.from(buffer)
 }
