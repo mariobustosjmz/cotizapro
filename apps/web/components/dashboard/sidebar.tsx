@@ -301,6 +301,13 @@ export function DashboardSidebar({ user, profile }: SidebarProps) {
           </button>
         </div>
 
+        {/* Version badge */}
+        {!isCollapsed && (
+          <div className="px-3 pb-1">
+            <span className="text-[10px] text-white/20 font-mono select-none">v0.2.0</span>
+          </div>
+        )}
+
         {/* User menu trigger */}
         <div className={cn('px-3 pb-4', isCollapsed && 'px-2 flex justify-center')} ref={userMenuRef}>
           <div className="relative">
