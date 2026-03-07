@@ -22,6 +22,8 @@ interface WorkEventFormProps {
   quoteId?: string
 }
 
+type FieldErrors = Record<string, string>
+
 function getDefaultTimes(defaultDate?: string, defaultHour?: number): { start: string; end: string } {
   const pad = (n: number) => String(n).padStart(2, '0')
 
@@ -56,9 +58,10 @@ interface ComboboxProps {
   placeholder?: string
   required?: boolean
   disabled?: boolean
+  fieldError?: string
 }
 
-function Combobox({ id, name, options, defaultValue = '', placeholder, required, disabled }: ComboboxProps) {
+function Combobox({ id, name, options, defaultValue = '', placeholder, required, disabled, fieldError }: ComboboxProps) {
   const defaultOption = options.find((o) => o.value === defaultValue)
   const [search, setSearch] = useState(defaultOption?.label ?? '')
   const [selectedValue, setSelectedValue] = useState(defaultValue)
@@ -74,6 +77,8 @@ function Combobox({ id, name, options, defaultValue = '', placeholder, required,
     setSearch(label)
     setOpen(false)
   }
+
+  const hasError = Boolean(fieldError)
 
   return (
     <div ref={containerRef} className="relative">
@@ -93,7 +98,9 @@ function Combobox({ id, name, options, defaultValue = '', placeholder, required,
         required={required}
         disabled={disabled}
         autoComplete="off"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+        className={`w-full px-3 py-2 border rounded-md text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 ${
+          hasError ? 'border-red-500 bg-red-50' : 'border-gray-300'
+        }`}
       />
       {open && filtered.length > 0 && (
         <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg text-sm">
@@ -110,8 +117,16 @@ function Combobox({ id, name, options, defaultValue = '', placeholder, required,
           ))}
         </ul>
       )}
+      {hasError && (
+        <p className="mt-1 text-xs text-red-600">{fieldError}</p>
+      )}
     </div>
   )
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return <p className="mt-1 text-xs text-red-600">{message}</p>
 }
 
 export function WorkEventForm({
@@ -124,6 +139,7 @@ export function WorkEventForm({
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const { start: defaultStartTime, end: defaultEndTime } = getDefaultTimes(defaultDate, defaultHour)
 
@@ -133,6 +149,7 @@ export function WorkEventForm({
   const handleSubmit = async (formData: FormData) => {
     setLoading(true)
     setError(null)
+    setFieldErrors({})
 
     try {
       const title = formData.get('title') as string
@@ -166,9 +183,18 @@ export function WorkEventForm({
         body: JSON.stringify(payload),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Error al crear evento')
+        // Handle structured field errors from backend
+        if (data.fieldErrors && typeof data.fieldErrors === 'object') {
+          setFieldErrors(data.fieldErrors as FieldErrors)
+          setError(data.error || 'Por favor verifica los datos ingresados.')
+        } else {
+          setError(data.error || 'Error al crear evento')
+        }
+        setLoading(false)
+        return
       }
 
       router.push('/dashboard/calendar')
@@ -196,7 +222,9 @@ export function WorkEventForm({
           required
           disabled={loading}
           maxLength={200}
+          className={fieldErrors.title ? 'border-red-500 bg-red-50' : ''}
         />
+        <FieldError message={fieldErrors.title} />
       </div>
 
       <div className="space-y-2">
@@ -209,6 +237,7 @@ export function WorkEventForm({
           placeholder="Buscar cliente..."
           required
           disabled={loading}
+          fieldError={fieldErrors.client_id}
         />
       </div>
 
@@ -222,6 +251,7 @@ export function WorkEventForm({
           placeholder="Buscar tipo..."
           required
           disabled={loading}
+          fieldError={fieldErrors.event_type}
         />
       </div>
 
@@ -235,7 +265,9 @@ export function WorkEventForm({
             required
             disabled={loading}
             defaultValue={defaultStartTime}
+            className={fieldErrors.scheduled_start ? 'border-red-500 bg-red-50' : ''}
           />
+          <FieldError message={fieldErrors.scheduled_start} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="scheduled_end">Fecha y hora fin *</Label>
@@ -246,7 +278,9 @@ export function WorkEventForm({
             required
             disabled={loading}
             defaultValue={defaultEndTime}
+            className={fieldErrors.scheduled_end ? 'border-red-500 bg-red-50' : ''}
           />
+          <FieldError message={fieldErrors.scheduled_end} />
         </div>
       </div>
 
@@ -259,7 +293,9 @@ export function WorkEventForm({
           placeholder="Dirección del servicio"
           disabled={loading}
           maxLength={500}
+          className={fieldErrors.address ? 'border-red-500 bg-red-50' : ''}
         />
+        <FieldError message={fieldErrors.address} />
       </div>
 
       <div className="space-y-2">
@@ -271,7 +307,9 @@ export function WorkEventForm({
           disabled={loading}
           maxLength={1000}
           rows={4}
+          className={fieldErrors.notes ? 'border-red-500 bg-red-50' : ''}
         />
+        <FieldError message={fieldErrors.notes} />
       </div>
 
       {/* Cancelar left — Crear Evento right */}

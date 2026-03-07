@@ -2,7 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createWorkEventSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
-import { handleApiError, ApiErrors } from '@/lib/error-handler'
+import { handleApiError, ApiErrors, validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import type { WorkEvent } from '@/lib/validations/cotizapro'
 
@@ -141,10 +141,8 @@ export async function POST(request: NextRequest) {
     const validation = createWorkEventSchema.safeParse(body)
 
     if (!validation.success) {
-      return handleApiError(
-        ApiErrors.VALIDATION_FAILED(`Invalid work event data: ${validation.error.issues.map(e => `${e.path.join('.')}: ${e.code}`).join(', ')}`),
-        'POST /api/calendar/events - validation'
-      )
+      logger.warn('Validation failed for work event creation', { issues: validation.error.issues })
+      return validationErrorResponse(validation.error)
     }
 
     // Insert work event
