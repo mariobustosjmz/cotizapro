@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/ui/form-field'
+import { Combobox } from '@/components/ui/combobox'
 import { ArrowLeft } from 'lucide-react'
 import type { EntityType, FieldType } from '@/types/custom-fields'
 
@@ -174,29 +175,27 @@ export default function NewCustomFieldPage() {
 
           <div className="grid gap-3 md:grid-cols-2">
             <FormField label="Entidad" htmlFor="entity_type" required>
-              <select
+              <Combobox
                 id="entity_type"
-                className={selectClass}
-                value={entityType}
-                onChange={(e) => setEntityType(e.target.value as EntityType)}
-              >
-                {ENTITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
+                name="entity_type"
+                options={ENTITY_OPTIONS}
+                defaultValue={entityType}
+                placeholder="Seleccionar entidad"
+                required
+                onChange={(val) => setEntityType(val as EntityType)}
+              />
             </FormField>
 
             <FormField label="Tipo" htmlFor="field_type" required>
-              <select
+              <Combobox
                 id="field_type"
-                className={selectClass}
-                value={fieldType}
-                onChange={(e) => setFieldType(e.target.value as FieldType)}
-              >
-                {FIELD_TYPE_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
+                name="field_type"
+                options={FIELD_TYPE_OPTIONS}
+                defaultValue={fieldType}
+                placeholder="Seleccionar tipo"
+                required
+                onChange={(val) => setFieldType(val as FieldType)}
+              />
             </FormField>
           </div>
 
@@ -270,7 +269,7 @@ export default function NewCustomFieldPage() {
           <div className="grid gap-3 md:grid-cols-2">
             {/* Placeholder */}
             {fieldType !== 'checkbox' && (
-              <FormField label="Placeholder" htmlFor="placeholder" hint="Opcional">
+              <FormField label="Placeholder" htmlFor="placeholder">
                 <Input
                   id="placeholder"
                   value={placeholder}
@@ -282,7 +281,7 @@ export default function NewCustomFieldPage() {
 
             {/* Default value */}
             {fieldType !== 'checkbox' && fieldType !== 'select' && (
-              <FormField label="Valor por defecto" htmlFor="default_value" hint="Opcional">
+              <FormField label="Valor por defecto" htmlFor="default_value">
                 <Input
                   id="default_value"
                   value={defaultValue}
@@ -307,13 +306,13 @@ export default function NewCustomFieldPage() {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
-            <Link href="/dashboard/settings/custom-fields">
-              <Button type="button" variant="outline" size="sm" disabled={submitting}>
+          <div className="flex gap-3 pt-2 border-t border-gray-100">
+            <Link href="/dashboard/settings/custom-fields" className="flex-1">
+              <Button type="button" variant="outline" size="sm" disabled={submitting} className="w-full">
                 Cancelar
               </Button>
             </Link>
-            <Button type="submit" size="sm" disabled={submitting} className="bg-orange-500 hover:bg-orange-600 text-white">
+            <Button type="submit" size="sm" disabled={submitting} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
               {submitting ? 'Guardando...' : 'Crear Campo'}
             </Button>
           </div>
