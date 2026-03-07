@@ -1,8 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { generateAnalyticsPDF } from '@/lib/integrations/analytics-pdf'
 
 /**
  * GET /api/export/analytics-report
@@ -13,9 +12,12 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
  * - period: "week" | "month" | "quarter" | "year" (default: "month")
  */
 
+
+type SummaryRow = [string, string]
+type StatusRow = [string, string]
+
 export async function GET(request: NextRequest) {
   try {
-    // Apply rate limiting
     const limitResult = defaultApiLimiter(request)
     if (limitResult.limited) {
       return applyRateLimit(limitResult)
@@ -23,13 +25,11 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createServerClient()
 
-    // Verify authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
-    // Get user's organization
     const { data: profile } = await supabase
       .from('profiles')
       .select('organization_id, organizations(name)')
@@ -41,9 +41,8 @@ export async function GET(request: NextRequest) {
     }
 
     const orgId = profile.organization_id
-    const orgName = (profile.organizations as any)?.name || 'Mi Organización'
+    const orgName = (profile.organizations as { name?: string } | null)?.name ?? 'Mi Organización'
 
-    // Parse period
     const searchParams = request.nextUrl.searchParams
     const period = searchParams.get('period') || 'month'
 
@@ -59,7 +58,6 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - daysBack)
     const startDateStr = startDate.toISOString().split('T')[0]
 
-    // Fetch analytics data
     const [
       { count: totalClients },
       { count: totalQuotes },
@@ -74,76 +72,44 @@ export async function GET(request: NextRequest) {
       supabase.from('quotes').select('total, accepted_at').eq('organization_id', orgId).eq('status', 'accepted').limit(10000),
     ])
 
-    const totalRevenue = acceptedQuotes?.reduce((sum, q) => sum + (q.total || 0), 0) || 0
+    const totalRevenue = acceptedQuotes?.reduce((sum, q) => sum + (Number(q.total) || 0), 0) ?? 0
 
-    // Create PDF
-    const doc = new jsPDF()
-
-    // Title
-    doc.setFontSize(20)
-    doc.text('Reporte de Analíticas', 105, 20, { align: 'center' })
-
-    doc.setFontSize(12)
-    doc.text(orgName, 105, 30, { align: 'center' })
-
-    doc.setFontSize(10)
-    doc.text(`Período: ${new Date(startDateStr).toLocaleDateString('es-MX')} - ${new Date().toLocaleDateString('es-MX')}`, 105, 38, { align: 'center' })
-
-    // Summary table
-    autoTable(doc, {
-      startY: 50,
-      head: [['Métrica', 'Valor']],
-      body: [
-        ['Total Clientes', String(totalClients || 0)],
-        ['Total Cotizaciones', String(totalQuotes || 0)],
-        ['Total Recordatorios', String(totalReminders || 0)],
-        ['Ingresos Totales', `$${totalRevenue.toFixed(2)} MXN`],
-        ['Cotizaciones en Período', String(quotes?.length || 0)],
-      ],
-      theme: 'grid',
-      headStyles: { fillColor: [37, 99, 235] },
-    })
-
-    // Quote status breakdown
     const quoteStats = {
-      draft: quotes?.filter(q => q.status === 'draft').length || 0,
-      sent: quotes?.filter(q => q.status === 'sent').length || 0,
-      accepted: quotes?.filter(q => q.status === 'accepted').length || 0,
-      rejected: quotes?.filter(q => q.status === 'rejected').length || 0,
+      draft: quotes?.filter(q => q.status === 'draft').length ?? 0,
+      sent: quotes?.filter(q => q.status === 'sent').length ?? 0,
+      accepted: quotes?.filter(q => q.status === 'accepted').length ?? 0,
+      rejected: quotes?.filter(q => q.status === 'rejected').length ?? 0,
     }
 
-    autoTable(doc, {
-      startY: (doc as any).lastAutoTable.finalY + 15,
-      head: [['Estado de Cotizaciones', 'Cantidad']],
-      body: [
-        ['Borradores', String(quoteStats.draft)],
-        ['Enviadas', String(quoteStats.sent)],
-        ['Aceptadas', String(quoteStats.accepted)],
-        ['Rechazadas', String(quoteStats.rejected)],
-      ],
-      theme: 'striped',
-      headStyles: { fillColor: [37, 99, 235] },
-    })
-
-    // Conversion rate
     const totalDecided = quoteStats.accepted + quoteStats.rejected
     const conversionRate = totalDecided > 0
       ? ((quoteStats.accepted / totalDecided) * 100).toFixed(2)
       : '0.00'
 
-    doc.setFontSize(12)
-    doc.text(`Tasa de Conversión: ${conversionRate}%`, 20, (doc as any).lastAutoTable.finalY + 15)
+    const summary: SummaryRow[] = [
+      ['Total Clientes', String(totalClients ?? 0)],
+      ['Total Cotizaciones', String(totalQuotes ?? 0)],
+      ['Total Recordatorios', String(totalReminders ?? 0)],
+      ['Ingresos Totales', `$${totalRevenue.toFixed(2)} MXN`],
+      ['Cotizaciones en Período', String(quotes?.length ?? 0)],
+    ]
 
-    // Footer
-    doc.setFontSize(8)
-    doc.text(`Generado el ${new Date().toLocaleString('es-MX')}`, 105, 280, { align: 'center' })
-    doc.text('CotizaPro - Sistema de Gestión de Cotizaciones', 105, 285, { align: 'center' })
+    const statusRows: StatusRow[] = [
+      ['Borradores', String(quoteStats.draft)],
+      ['Enviadas', String(quoteStats.sent)],
+      ['Aceptadas', String(quoteStats.accepted)],
+      ['Rechazadas', String(quoteStats.rejected)],
+    ]
 
-    // Convert to buffer
-    const pdfBuffer = Buffer.from(doc.output('arraybuffer'))
+    const pdfBuffer = await generateAnalyticsPDF({
+      orgName,
+      startDateStr,
+      summary,
+      statusRows,
+      conversionRate,
+    })
 
-    // Return as downloadable file
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer.buffer as ArrayBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
