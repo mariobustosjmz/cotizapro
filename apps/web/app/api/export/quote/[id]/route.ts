@@ -18,19 +18,42 @@ export async function GET(
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'GET /api/export/quote/[id]')
     }
 
-    const { data: quote, error: quoteError } = await supabase
-      .from('quotes')
-      .select(`
-        *,
-        items:quote_items(*),
-        client:clients(*)
-      `)
-      .eq('id', id)
-      .single()
+    const [quoteResult, profileResult] = await Promise.all([
+      supabase
+        .from('quotes')
+        .select(`*, items:quote_items(*), client:clients(*)`)
+        .eq('id', id)
+        .single(),
+      supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single(),
+    ])
 
-    if (quoteError || !quote) {
-      logger.error('Quote not found for PDF export', quoteError, { quoteId: id })
+    if (quoteResult.error || !quoteResult.data) {
+      logger.error('Quote not found for PDF export', quoteResult.error, { quoteId: id })
       return handleApiError(ApiErrors.NOT_FOUND('Quote'), 'GET /api/export/quote/[id]')
+    }
+
+    const quote = quoteResult.data
+    const orgId = profileResult.data?.organization_id
+
+    const { data: org } = orgId
+      ? await supabase
+          .from('organizations')
+          .select('name, settings')
+          .eq('id', orgId)
+          .single()
+      : { data: null }
+
+    const orgName: string = org?.name ?? 'Tu Empresa'
+    const orgSettings = (org?.settings ?? {}) as {
+      company_address?: string
+      company_phone?: string
+      company_email?: string
+      logo_url?: string
+      brand_color?: string
     }
 
     const typedQuote: QuoteWithItems = {
@@ -45,7 +68,7 @@ export async function GET(
       total: Number(quote.total),
     }
 
-    const pdfBuffer = await generateQuotePDF(typedQuote)
+    const pdfBuffer = await generateQuotePDF(typedQuote, orgName, orgSettings)
 
     logger.api('GET', `/api/export/quote/${id}`, 200, 0, { quoteNumber: quote.quote_number })
 
