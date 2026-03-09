@@ -32,7 +32,8 @@ export function createRateLimiter(options: {
     statusCode?: number
   ): { limited: boolean; remaining: number; resetTime: number } {
     // Skip rate limiting in non-production environments (development, test, E2E)
-    if (process.env.NODE_ENV !== 'production') {
+    // Also skip when explicitly disabled via env var (for E2E testing against production build)
+    if (process.env.NODE_ENV !== 'production' || process.env.DISABLE_RATE_LIMIT === 'true') {
       return { limited: false, remaining: max, resetTime: 0 }
     }
 
