@@ -58,12 +58,12 @@ export const testData = {
     followUp: {
       title: 'Seguimiento con cliente',
       description: 'Llamar al cliente para saber si aceptó la propuesta',
-      dueDate: '2026-02-28',
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     },
     paymentDue: {
       title: 'Pago vencido',
       description: 'Recordar al cliente que debe pagar la factura',
-      dueDate: '2026-02-20',
+      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     },
   },
 }

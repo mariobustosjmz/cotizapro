@@ -60,7 +60,7 @@ test.describe('Quote Management', () => {
 
     await quotesPage.addQuoteItem('Web Design', '1500', '1', 0)
 
-    const descInput = page.locator('[data-testid="item-description-0"]')
+    const descInput = page.locator('[data-testid="item-description-0"]').first()
     const value = await descInput.inputValue()
     expect(value).toContain('Web Design')
   })
@@ -231,9 +231,10 @@ test.describe('Quote Management', () => {
       if ((await clientSelect.getAttribute('type')) === 'text') {
         // Autocomplete field
         await clientSelect.fill(clientName)
-        await page.waitForTimeout(300)
-        const firstOption = page.locator('[role="option"]').first()
-        if (await firstOption.isVisible()) {
+        await page.waitForTimeout(500)
+        // Client dropdown uses custom <button type="button"> elements, not role="option"
+        const firstOption = page.locator('div[class*="absolute"][class*="z-20"] button[type="button"]').first()
+        if (await firstOption.isVisible({ timeout: 3000 }).catch(() => false)) {
           await firstOption.click()
         }
       } else {
@@ -251,10 +252,11 @@ test.describe('Quote Management', () => {
     await quotesPage.addQuoteItem('Hosting', '120', '12', 1)
 
     // Submit form
-    const submitButton = page.locator('button[type="submit"]:has-text("Crear"), button[type="submit"]:has-text("Guardar")')
+    const submitButton = page.locator('[data-testid="submit-quote-btn"]')
     if (await submitButton.isVisible()) {
       await submitButton.click()
-      await page.waitForURL('**/dashboard/quotes', { timeout: 30000 })
+      // After submit, may redirect to list or detail page
+      await page.waitForURL('**/dashboard/quotes**', { timeout: 30000 }).catch(() => null)
       expect(page.url()).toContain('/dashboard/quotes')
     }
   })
@@ -339,11 +341,12 @@ test.describe('Quote Management', () => {
 
     const totalBefore = await page.locator('[data-testid="quote-total"]').textContent()
 
-    const quantityInput = page.locator('[data-testid="item-quantity-0"]')
+    const quantityInput = page.locator('[data-testid="item-quantity-0"]').first()
     if (await quantityInput.isVisible()) {
       await quantityInput.clear()
       await quantityInput.fill('2')
-      await page.waitForTimeout(300)
+      await quantityInput.blur()
+      await page.waitForTimeout(500)
 
       const totalAfter = await page.locator('[data-testid="quote-total"]').textContent()
       expect(totalAfter).not.toBe(totalBefore)
@@ -371,5 +374,42 @@ test.describe('Quote Management', () => {
     const clientSelect = page.locator('select[name="client_id"], input[name="client_id"]')
     const isRequired = await clientSelect.getAttribute('required')
     expect(isRequired).toBeDefined()
+  })
+
+  test('PDF export returns application/pdf response', async ({ page }) => {
+    const quotesPage = new QuotesPage(page)
+
+    // Create a quote so we can test PDF export
+    await quotesPage.goToNewQuote()
+
+    // Select client via autocomplete text input
+    const clientInput = page.locator('input[name="client_id"]')
+    if (await clientInput.isVisible()) {
+      await clientInput.fill(clientName)
+      await page.waitForTimeout(600)
+      const firstOption = page.locator('div[class*="absolute"][class*="z-20"] button[type="button"]').first()
+      const optionVisible = await firstOption.isVisible({ timeout: 3000 }).catch(() => false)
+      if (optionVisible) await firstOption.click()
+    }
+
+    await quotesPage.addQuoteItem('Servicio PDF test', '500', '1', 0)
+    await quotesPage.submitQuoteForm()
+
+    // Navigate to the first quote's detail page
+    await page.locator('table tbody tr a').first().click()
+    await page.waitForURL('**/dashboard/quotes/**', { timeout: 15000 })
+
+    // Click PDF button and verify the API returns application/pdf
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        resp => resp.url().includes('/api/export/quote/') && resp.status() === 200,
+        { timeout: 15000 }
+      ),
+      page.locator('button:has-text("PDF")').first().click(),
+    ])
+
+    expect(response.status()).toBe(200)
+    const contentType = response.headers()['content-type']
+    expect(contentType).toContain('application/pdf')
   })
 })

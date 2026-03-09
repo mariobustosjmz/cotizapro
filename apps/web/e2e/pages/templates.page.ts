@@ -7,16 +7,20 @@ export class TemplatesPage extends BasePage {
   }
 
   async goto() {
-    // Use networkidle to wait for the /api/templates fetch in useEffect to complete
-    await this.page.goto('/dashboard/templates', { waitUntil: 'networkidle' })
+    await this.page.goto('/dashboard/templates', { waitUntil: 'domcontentloaded' })
+    // Wait for the useEffect /api/templates fetch to complete
+    await this.page.waitForResponse(
+      (response) => response.url().includes('/api/templates') && response.request().method() === 'GET',
+      { timeout: 15000 }
+    ).catch(() => null)
+    await this.page.waitForTimeout(300)
   }
 
-  // Get the template count from the heading "Templates · N"
+  // Get the template count from the span "{N} templates" near the heading
   async getTemplateCount(): Promise<number> {
-    const heading = this.page.locator('h2:has-text("Templates")')
-    const text = await this.getText(heading)
-    // Extract number from "Templates · N"
-    const match = text.match(/Templates\s*·\s*(\d+)/)
+    const countSpan = this.page.locator('*:has-text("templates")').first()
+    const text = await countSpan.textContent().catch(() => '0')
+    const match = (text || '').match(/(\d+)/)
     return match ? parseInt(match[1], 10) : 0
   }
 
@@ -25,11 +29,12 @@ export class TemplatesPage extends BasePage {
   }
 
   async isLoadingVisible(): Promise<boolean> {
-    return await this.page.locator('text=Cargando templates').isVisible()
+    return await this.page.locator('text=Cargando...').isVisible()
   }
 
   async clickNewTemplate() {
-    const button = this.page.locator('button:has-text("Nuevo Template")')
+    // Button says "Nuevo" (not "Nuevo Template")
+    const button = this.page.locator('button:has-text("Nuevo")').first()
     await button.waitFor({ state: 'visible', timeout: 10000 })
     await this.click(button)
     // Wait for modal to appear
@@ -44,15 +49,15 @@ export class TemplatesPage extends BasePage {
     promotional_label?: string
     promotional_valid_until?: string
   }) {
-    // Fill name (required)
-    const nameInput = this.page.locator('input[id="name"]')
+    // Fill name (required) — modal input IDs have "modal_" prefix
+    const nameInput = this.page.locator('input[id="modal_name"]')
     if (await nameInput.isVisible()) {
       await this.fill(nameInput, data.name)
     }
 
     // Fill description (optional)
     if (data.description) {
-      const descInput = this.page.locator('textarea[id="description"]')
+      const descInput = this.page.locator('textarea[id="modal_description"]')
       if (await descInput.isVisible()) {
         await this.fill(descInput, data.description)
       }
@@ -60,7 +65,7 @@ export class TemplatesPage extends BasePage {
 
     // Fill default terms (optional)
     if (data.default_terms) {
-      const termsInput = this.page.locator('textarea[id="default_terms"]')
+      const termsInput = this.page.locator('textarea[id="modal_terms"]')
       if (await termsInput.isVisible()) {
         await this.fill(termsInput, data.default_terms)
       }
@@ -68,7 +73,7 @@ export class TemplatesPage extends BasePage {
 
     // Fill default discount rate (optional)
     if (data.default_discount_rate) {
-      const discountInput = this.page.locator('input[id="default_discount_rate"]')
+      const discountInput = this.page.locator('input[id="modal_discount"]')
       if (await discountInput.isVisible()) {
         await this.fill(discountInput, data.default_discount_rate)
       }
@@ -76,16 +81,15 @@ export class TemplatesPage extends BasePage {
 
     // Fill promotional label (optional)
     if (data.promotional_label) {
-      const promoInput = this.page.locator('input[id="promotional_label"]')
+      const promoInput = this.page.locator('input[id="modal_promo"]')
       if (await promoInput.isVisible()) {
         await this.fill(promoInput, data.promotional_label)
       }
 
-      // If promotional_label is filled and promotional_valid_until is provided, fill the date field
+      // Date field appears conditionally when promotional_label has value
       if (data.promotional_valid_until) {
-        // Wait for the date field to appear (it's conditionally rendered when promotional_label has value)
         await this.page.waitForTimeout(200)
-        const dateInput = this.page.locator('input[id="promotional_valid_until"]')
+        const dateInput = this.page.locator('input[id="modal_promo_date"]')
         if (await dateInput.isVisible()) {
           await this.fill(dateInput, data.promotional_valid_until)
         }
@@ -123,12 +127,9 @@ export class TemplatesPage extends BasePage {
   }
 
   async editTemplate(name: string) {
-    // Each template card: Card > CardHeader(flex row) > [div.flex-1 with h3] [div.flex.gap-2 with buttons]
-    // The grid contains all cards. Find the card containing the name, then click its first action button.
-    const card = this.page.locator('.grid > div').filter({ hasText: name }).first()
-    const buttons = card.locator('button')
-    // First button = edit, second button = delete
-    const editButton = buttons.nth(0)
+    // Templates render in a table — find the row containing name, click first button (edit)
+    const row = this.page.locator('table tbody tr').filter({ hasText: name }).first()
+    const editButton = row.locator('button').nth(0)
 
     await editButton.waitFor({ state: 'visible', timeout: 5000 })
     await editButton.click()
@@ -139,8 +140,8 @@ export class TemplatesPage extends BasePage {
     // Auto-accept the confirm dialog BEFORE clicking (prevents deadlock)
     this.page.once('dialog', (dialog) => dialog.accept())
 
-    const card = this.page.locator('.grid > div').filter({ hasText: name }).first()
-    const deleteButton = card.locator('button').nth(1)
+    const row = this.page.locator('table tbody tr').filter({ hasText: name }).first()
+    const deleteButton = row.locator('button').nth(1)
 
     await deleteButton.waitFor({ state: 'visible', timeout: 5000 })
     await deleteButton.click()
@@ -155,7 +156,7 @@ export class TemplatesPage extends BasePage {
   }
 
   async isTemplateVisible(name: string): Promise<boolean> {
-    const templateCard = this.page.getByText(name)
-    return (await templateCard.count()) > 0
+    const templateCell = this.page.locator('table tbody tr td').filter({ hasText: name })
+    return (await templateCell.count()) > 0
   }
 }

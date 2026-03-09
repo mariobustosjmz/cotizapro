@@ -145,17 +145,16 @@ test.describe('Quote Templates Management', () => {
       await templatesPage.goto()
     }
 
-    // Get first template name — the card has h3 with template name + status badge
-    const firstCardTitle = page.locator('.grid h3').first()
-    await firstCardTitle.waitFor({ state: 'visible', timeout: 10000 })
-    const firstTemplate = await firstCardTitle.textContent()
+    // Get first template name — templates render in a table, first td has the name
+    const firstCell = page.locator('table tbody tr td:first-child span').first()
+    await firstCell.waitFor({ state: 'visible', timeout: 10000 })
+    const firstTemplate = await firstCell.textContent()
     if (!firstTemplate) {
       test.skip()
       return
     }
 
-    // h3 contains name + "Activo"/"Inactivo" badge text
-    const originalName = firstTemplate.replace(/Activo|Inactivo/g, '').trim()
+    const originalName = firstTemplate.trim()
     const newName = `Updated Template ${Date.now()}`
 
     // Edit the template
@@ -166,7 +165,7 @@ test.describe('Quote Templates Management', () => {
     await editHeading.waitFor({ state: 'visible', timeout: 5000 })
 
     // Clear the name field and enter new name using triple-click + type to ensure React state updates
-    const nameInput = page.locator('input[id="name"]')
+    const nameInput = page.locator('input[id="modal_name"]')
     await nameInput.click({ clickCount: 3 })
     await nameInput.press('Backspace')
     await nameInput.fill(newName)
@@ -188,8 +187,8 @@ test.describe('Quote Templates Management', () => {
     // Force a fresh page load
     await templatesPage.goto()
 
-    const updatedCard = page.locator('h3').filter({ hasText: newName })
-    await expect(updatedCard).toBeVisible({ timeout: 10000 })
+    const updatedCell = page.locator('table tbody tr td').filter({ hasText: newName })
+    await expect(updatedCell.first()).toBeVisible({ timeout: 10000 })
   })
 
   test('Delete template', async ({ page }) => {
@@ -229,8 +228,8 @@ test.describe('Quote Templates Management', () => {
     const templatesPage = new TemplatesPage(page)
     await templatesPage.goto()
 
-    // Get initial count
-    const countBefore = await templatesPage.getTemplateCount()
+    // Count rows directly as a reliable fallback
+    const rowsBefore = await page.locator('table tbody tr').count()
 
     // Create new template
     const newTemplateName = `Template Count Test ${Date.now()}`
@@ -244,11 +243,11 @@ test.describe('Quote Templates Management', () => {
     await page.waitForTimeout(800)
     await templatesPage.goto()
 
-    // Get updated count
-    const countAfter = await templatesPage.getTemplateCount()
+    // Count rows after creation
+    const rowsAfter = await page.locator('table tbody tr').count()
 
-    // Verify count increased
-    expect(countAfter).toBeGreaterThan(countBefore)
+    // Verify row count increased
+    expect(rowsAfter).toBeGreaterThan(rowsBefore)
   })
 
   test('Cancel button closes modal without saving', async ({ page }) => {

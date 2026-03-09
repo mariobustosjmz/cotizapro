@@ -86,9 +86,12 @@ export class DashboardPage extends BasePage {
 
   // Stats
   async getTotalClientsCount(): Promise<string> {
-    // KPI card: span "Clientes" → sibling div with bold number
-    await this.page.locator('span:has-text("Clientes")').first().waitFor({ state: 'visible', timeout: 10000 })
-    const stat = this.page.locator('span:has-text("Clientes")').first().locator('../..').locator('div.text-xl')
+    // Scope to KPI card container to avoid matching sidebar "Clientes" nav link
+    const card = this.page.locator('div.rounded-xl, div.rounded-lg').filter({
+      has: this.page.locator('span:has-text("Clientes")')
+    }).first()
+    await card.waitFor({ state: 'visible', timeout: 10000 })
+    const stat = card.locator('div.text-xl, div.text-2xl, div.font-bold').first()
     return await this.getText(stat)
   }
 

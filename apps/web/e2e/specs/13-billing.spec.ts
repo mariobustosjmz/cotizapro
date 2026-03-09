@@ -10,32 +10,32 @@ test.describe('Billing', () => {
   })
 
   test('Billing page loads successfully', async ({ page }) => {
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     expect(page.url()).toContain('/dashboard/billing')
   })
 
   test('Billing page shows plan section', async ({ page }) => {
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     // Plan section or subscription card should be visible
     const planContent = page.locator('text=/plan|suscripci|billing|facturaci/i').first()
     await expect(planContent).toBeVisible({ timeout: 10000 })
   })
 
   test('Billing page shows current subscription status', async ({ page }) => {
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     // Status badge: active, trialing, free, canceled, etc.
     const statusText = page.locator('text=/activ|trial|gratis|free|cancel/i').first()
     await expect(statusText).toBeVisible({ timeout: 10000 })
   })
 
   test('Billing page shows upgrade/manage button', async ({ page }) => {
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
-    const cta = page.locator('button, a').filter({ hasText: /upgrade|mejorar|manage|gestionar|subscribe|suscrib/i }).first()
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
+    const cta = page.locator('button, a').filter({ hasText: /upgrade|mejorar|manage|gestionar|subscribe|suscrib|portal/i }).first()
     await expect(cta).toBeVisible({ timeout: 10000 })
   })
 
   test('Billing page has plan comparison or feature list', async ({ page }) => {
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     // Plans or pricing cards
     const featureContent = page.locator('text=/starter|pro|enterprise|profesional/i').first()
     await expect(featureContent).toBeVisible({ timeout: 10000 })
@@ -44,7 +44,7 @@ test.describe('Billing', () => {
   test('Member role cannot access billing settings (role restriction)', async ({ page }) => {
     // Log out and log in as member
     const authPage = new AuthPage(page)
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     // Member should either be redirected or see a restricted message
     // Depending on implementation: either redirected or plan shown without manage button
     const isAccessible = page.url().includes('/dashboard/billing')
@@ -54,7 +54,7 @@ test.describe('Billing', () => {
 
   test('Billing page is responsive on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 })
-    await page.goto('/dashboard/billing', { waitUntil: 'networkidle' })
+    await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     expect(page.url()).toContain('/dashboard/billing')
     const body = page.locator('main, [role="main"], .container').first()
     await expect(body).toBeVisible({ timeout: 10000 })

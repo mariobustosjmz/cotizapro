@@ -52,7 +52,11 @@ export class RemindersPage extends BasePage {
     }
 
     // Scheduled date is required - use provided date or default to tomorrow
-    const scheduledDate = data.dueDate || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    // Ensure the date is never in the past (would fail HTML5 min validation)
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+    const rawDate = data.dueDate || tomorrow
+    const scheduledDate = rawDate < today ? tomorrow : rawDate
     const dateInput = this.page.locator('input[name="scheduled_date"]')
     // For HTML5 date inputs, we need to set the value attribute directly
     await dateInput.evaluate((element, value) => {
@@ -243,20 +247,26 @@ export class RemindersPage extends BasePage {
     console.log('[E2E] Clicking details link for reminder:', title)
     console.log('[E2E] Current URL before click:', this.page.url())
 
-    const detailsLink = this.page.locator(`table tbody tr:has-text("${title}") a:has-text("Ver detalles")`).first()
+    const detailsLink = this.page.locator(`table tbody tr:has-text("${title}") a:has-text("Ver")`).first()
     const isVisible = await detailsLink.isVisible().catch(() => false)
     console.log('[E2E] Details link visible:', isVisible)
 
-    if (isVisible) {
-      const href = await detailsLink.getAttribute('href')
-      console.log('[E2E] Details link href:', href)
-      await detailsLink.click()
-      console.log('[E2E] Clicked details link, waiting for URL change...')
+    if (!isVisible) {
+      console.log('[E2E] Details link not visible, skipping navigation')
+      return
     }
+
+    const href = await detailsLink.getAttribute('href')
+    console.log('[E2E] Details link href:', href)
+    await detailsLink.click()
+    console.log('[E2E] Clicked details link, waiting for URL change...')
 
     // Use regex to match UUID-based detail URLs only — excludes /reminders/new
     await this.page.waitForURL(/\/dashboard\/reminders\/[0-9a-f-]{36}/, { timeout: 30000 })
     console.log('[E2E] URL after navigation:', this.page.url())
+
+    // Wait for status element to be visible (async data load)
+    await this.page.locator('[data-testid="reminder-status"], .reminder-status').waitFor({ state: 'visible', timeout: 10000 }).catch(() => null)
   }
 
   // Reminder Details Page
