@@ -618,7 +618,7 @@ export default function NewQuotePage() {
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
                           required
-                          placeholder="Descripci\u00F3n"
+                          placeholder="Descripción"
                           data-testid={`item-description-${index}`}
                           className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                         />

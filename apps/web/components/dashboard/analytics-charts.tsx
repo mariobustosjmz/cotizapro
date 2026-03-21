@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  AreaChart, Area,
 } from 'recharts'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -73,39 +72,37 @@ function QuoteStatusDonut({ data }: QuoteStatusChartProps) {
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
-      <div className="shrink-0" style={{ width: 192, height: 192 }}>
-        <ResponsiveContainer width={192} height={192}>
-          <PieChart>
-            <Pie
-              data={filtered}
-              cx="50%"
-              cy="50%"
-              innerRadius={45}
-              outerRadius={75}
-              paddingAngle={2}
-              dataKey="count"
-              nameKey="status"
-              stroke="none"
-            >
-              {filtered.map((entry) => (
-                <Cell key={entry.status} fill={STATUS_COLORS[entry.status] || '#9CA3AF'} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value, _name, props) => [
-                value as number,
-                STATUS_LABELS[(props.payload as QuoteStatusData).status] || (props.payload as QuoteStatusData).status,
-              ]}
-              contentStyle={{
-                backgroundColor: 'rgba(255,255,255,0.95)',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '12px',
-                padding: '6px 10px',
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+      <div className="shrink-0">
+        <PieChart width={192} height={192}>
+          <Pie
+            data={filtered}
+            cx={96}
+            cy={96}
+            innerRadius={45}
+            outerRadius={75}
+            paddingAngle={2}
+            dataKey="count"
+            nameKey="status"
+            stroke="none"
+          >
+            {filtered.map((entry) => (
+              <Cell key={entry.status} fill={STATUS_COLORS[entry.status] || '#9CA3AF'} />
+            ))}
+          </Pie>
+          <Tooltip
+            formatter={(value, _name, props) => [
+              value as number,
+              STATUS_LABELS[(props.payload as QuoteStatusData).status] || (props.payload as QuoteStatusData).status,
+            ]}
+            contentStyle={{
+              backgroundColor: 'rgba(255,255,255,0.95)',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              fontSize: '12px',
+              padding: '6px 10px',
+            }}
+          />
+        </PieChart>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
         {filtered.map((entry) => (
