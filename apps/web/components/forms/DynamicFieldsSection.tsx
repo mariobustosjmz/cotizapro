@@ -24,8 +24,12 @@ export function DynamicFieldsSection({
     let cancelled = false
 
     async function fetchFields() {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 8000)
       try {
-        const res = await fetch(`/api/custom-fields?entity_type=${entityType}&active_only=true`)
+        const res = await fetch(`/api/custom-fields?entity_type=${entityType}&active_only=true`, {
+          signal: controller.signal,
+        })
         if (!res.ok) return
         const json = await res.json()
         if (!cancelled) {
@@ -34,6 +38,7 @@ export function DynamicFieldsSection({
       } catch {
         // Non-critical — custom fields are optional
       } finally {
+        clearTimeout(timeoutId)
         if (!cancelled) setLoading(false)
       }
     }

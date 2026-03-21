@@ -178,7 +178,7 @@ export default async function TeamPage() {
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
                           {member.full_name || 'Sin nombre'}
                           {member.id === user.id && (
-                            <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(T\u00fa)</span>
+                            <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">(Tú)</span>
                           )}
                         </span>
                       </div>
