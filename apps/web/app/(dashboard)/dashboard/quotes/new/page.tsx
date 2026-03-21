@@ -235,7 +235,7 @@ export default function NewQuotePage() {
 
   const filteredClients = clientSearch
     ? clients.filter(c =>
-        c.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+        (c.name && c.name.toLowerCase().includes(clientSearch.toLowerCase())) ||
         (c.company_name && c.company_name.toLowerCase().includes(clientSearch.toLowerCase())) ||
         (c.email && c.email.toLowerCase().includes(clientSearch.toLowerCase()))
       )

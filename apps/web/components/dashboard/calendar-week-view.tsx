@@ -18,7 +18,7 @@ interface CalendarEvent {
 
 interface CalendarWeekViewProps {
   events: CalendarEvent[]
-  initialDate: Date
+  initialDate: string
 }
 
 const EVENT_TYPE_COLORS: Record<CalendarEvent['event_type'], { bg: string; border: string; text: string }> = {
@@ -62,7 +62,7 @@ function getEventPosition(event: CalendarEvent, dayStart: Date, dayEnd: Date) {
 }
 
 export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps) {
-  const [weekStart, setWeekStart] = useState<Date>(getWeekStart(initialDate))
+  const [weekStart, setWeekStart] = useState<Date>(getWeekStart(new Date(initialDate)))
 
   const weekDays = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => {

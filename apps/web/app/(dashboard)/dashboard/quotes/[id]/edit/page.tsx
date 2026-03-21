@@ -218,7 +218,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
 
   const filteredClients = clientSearch
     ? clients.filter(c =>
-        c.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+        (c.name && c.name.toLowerCase().includes(clientSearch.toLowerCase())) ||
         (c.company_name && c.company_name.toLowerCase().includes(clientSearch.toLowerCase())) ||
         (c.email && c.email.toLowerCase().includes(clientSearch.toLowerCase()))
       )
@@ -631,7 +631,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={2}
-                      placeholder="Informacion adicional..."
+                      placeholder="Información adicional..."
                       className="text-sm resize-none"
                     />
                   </div>

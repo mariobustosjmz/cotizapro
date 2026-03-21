@@ -84,15 +84,24 @@ export function BillingHistory() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('es-MX', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     })
   }
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'paid': return 'Pagado'
+      case 'failed': return 'Fallido'
+      case 'void': return 'Anulado'
+      default: return status
+    }
+  }
+
   if (loading) {
-    return <div className="text-center py-8 text-gray-500">Loading billing history...</div>
+    return <div className="text-center py-8 text-gray-500">Cargando historial...</div>
   }
 
   if (error) {
@@ -100,7 +109,7 @@ export function BillingHistory() {
   }
 
   if (history.length === 0) {
-    return <div className="text-center py-8 text-gray-500">No billing history yet</div>
+    return <div className="text-center py-8 text-gray-500">Sin historial de pagos</div>
   }
 
   return (
@@ -109,19 +118,19 @@ export function BillingHistory() {
         <thead>
           <tr className="border-b">
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Date
+              Fecha
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Invoice
+              Factura
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Amount
+              Monto
             </th>
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-              Status
+              Estado
             </th>
             <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
-              Actions
+              Acciones
             </th>
           </tr>
         </thead>
@@ -139,11 +148,11 @@ export function BillingHistory() {
               </td>
               <td className="px-4 py-3 text-sm">
                 <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(
+                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
                     record.status
                   )}`}
                 >
-                  {record.status}
+                  {getStatusLabel(record.status)}
                 </span>
               </td>
               <td className="px-4 py-3 text-sm text-right space-x-2">

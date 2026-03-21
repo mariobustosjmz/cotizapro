@@ -57,7 +57,7 @@ export function PlanSelector({
           >
             {isCurrent && (
               <div className="absolute -top-3 left-4 bg-blue-500 px-3 py-1 rounded-full text-white text-xs font-semibold">
-                Current Plan
+                Plan Actual
               </div>
             )}
 
@@ -69,11 +69,11 @@ export function PlanSelector({
                   <div className="text-3xl font-bold">
                     {formatPrice(plan.price)}
                   </div>
-                  <div className="text-sm text-gray-600">/month</div>
+                  <div className="text-sm text-gray-600">/mes</div>
                 </div>
               ) : (
                 <div className="text-2xl font-bold text-gray-700">
-                  Custom Pricing
+                  Precio personalizado
                 </div>
               )}
             </div>
@@ -81,17 +81,17 @@ export function PlanSelector({
             <div className="space-y-3 my-6">
               <div>
                 <h4 className="font-semibold text-sm text-gray-700 mb-2">
-                  Limits
+                  Límites
                 </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Projects:</span>
+                    <span className="text-gray-600">Proyectos:</span>
                     <span className="font-medium">
                       {formatUsageLimit(plan.limits.projects)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">API Calls/day:</span>
+                    <span className="text-gray-600">API/día:</span>
                     <span className="font-medium">
                       {formatUsageLimit(plan.limits.apiCalls)}
                     </span>
@@ -101,7 +101,7 @@ export function PlanSelector({
 
               <div>
                 <h4 className="font-semibold text-sm text-gray-700 mb-2">
-                  Features
+                  Funciones
                 </h4>
                 <ul className="space-y-2">
                   {plan.features.map((feature, idx) => (
@@ -114,16 +114,14 @@ export function PlanSelector({
               </div>
             </div>
 
-            {planId !== 'free' && (
-              <Button
-                onClick={() => handleSelectPlan(planId)}
-                disabled={isCurrent || isProcessing || loading}
-                variant={isCurrent ? 'outline' : 'default'}
-                className="w-full mt-4"
-              >
-                {isCurrent ? 'Current Plan' : 'Select Plan'}
-              </Button>
-            )}
+            <Button
+              onClick={planId !== 'free' ? () => handleSelectPlan(planId) : undefined}
+              disabled={isCurrent || isProcessing || loading}
+              variant={isCurrent ? 'outline' : 'default'}
+              className="w-full mt-4"
+            >
+              {isCurrent ? 'Plan Actual' : 'Seleccionar Plan'}
+            </Button>
           </div>
         )
       })}

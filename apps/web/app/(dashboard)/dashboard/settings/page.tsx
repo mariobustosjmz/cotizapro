@@ -61,7 +61,7 @@ export default function SettingsPage() {
           setOrganization(data.data)
         }
       } catch {
-        setError('Error al cargar configuracion')
+        setError('Error al cargar configuración')
       }
     }
 
@@ -166,7 +166,7 @@ export default function SettingsPage() {
           <Settings2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Configuracion</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Configuración</h2>
           <p className="text-xs text-gray-500 dark:text-gray-400">Gestiona tu cuenta y preferencias</p>
         </div>
       </div>
@@ -204,7 +204,7 @@ export default function SettingsPage() {
       {activeTab === 'profile' && profile && (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Informacion Personal</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Información Personal</h3>
           </div>
           <form onSubmit={handleProfileSubmit} className="p-4 space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
@@ -250,7 +250,7 @@ export default function SettingsPage() {
       {activeTab === 'organization' && organization && (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Informacion de la Empresa</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Información de la Empresa</h3>
           </div>
           <form onSubmit={handleOrganizationSubmit} className="p-4 space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
@@ -426,12 +426,12 @@ export default function SettingsPage() {
           <div className="p-4 space-y-6">
             {/* Password Change Form */}
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Cambiar Contrasena</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">Cambiar Contraseña</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                Ingresa una nueva contrasena segura con al menos 8 caracteres
+                Ingresa una nueva contraseña segura con al menos 8 caracteres
               </p>
               <PasswordChangeForm disabled={loading} onSuccess={() => {
-                setSuccess('Contrasena actualizada correctamente')
+                setSuccess('Contraseña actualizada correctamente')
                 setError('')
               }} onError={(msg) => {
                 setError(msg)
@@ -443,8 +443,8 @@ export default function SettingsPage() {
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Sesiones Activas</p>
               <div className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Esta sesion</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Ultima actividad: Ahora</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Esta sesión</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Última actividad: Ahora</p>
                 </div>
                 <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-[10px] font-medium">
                   Actual

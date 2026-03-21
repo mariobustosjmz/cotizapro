@@ -10,8 +10,8 @@ import { BillingClient } from './BillingClient'
 import { CreditCard } from 'lucide-react'
 
 export const metadata = {
-  title: 'Billing',
-  description: 'Manage your subscription and billing settings',
+  title: 'Facturación - CotizaPro',
+  description: 'Gestiona tu suscripción y pagos',
 }
 
 export default async function BillingPage() {
@@ -57,8 +57,8 @@ export default async function BillingPage() {
           <CreditCard className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
         <div className="min-w-0">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Facturacion</h2>
-          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Gestiona tu suscripcion y pagos</p>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Facturación</h2>
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Gestiona tu suscripción y pagos</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export default async function BillingPage() {
             </span>
           </div>
           {trialDaysRemaining !== null && subscriptionStatus === 'trialing' && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{trialDaysRemaining} dias restantes</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{trialDaysRemaining} días restantes</p>
           )}
         </div>
 

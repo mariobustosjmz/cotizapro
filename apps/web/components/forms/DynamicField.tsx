@@ -33,7 +33,7 @@ function ComboboxField({
   const containerRef = useRef<HTMLDivElement>(null)
 
   const filtered = options.filter((o) =>
-    o.label.toLowerCase().includes(search.toLowerCase())
+    o.label && o.label.toLowerCase().includes(search.toLowerCase())
   )
 
   const selectOption = (value: string, label: string) => {

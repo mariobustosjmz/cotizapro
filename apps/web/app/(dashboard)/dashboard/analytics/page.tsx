@@ -68,7 +68,7 @@ export default async function AnalyticsPage() {
 
   if (!analytics) {
     return (
-      <div className="py-10 text-center text-sm text-gray-400">Error al cargar analiticas</div>
+      <div className="py-10 text-center text-sm text-gray-400">Error al cargar analíticas</div>
     )
   }
 
@@ -104,7 +104,7 @@ export default async function AnalyticsPage() {
           <BarChart3 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
         </div>
         <div className="min-w-0">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Analiticas</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Analíticas</h2>
           <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Metricas y rendimiento del negocio</p>
         </div>
       </div>

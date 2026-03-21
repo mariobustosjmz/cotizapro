@@ -14,6 +14,7 @@ interface PasswordChangeFormProps {
 
 export function PasswordChangeForm({ disabled = false, onSuccess, onError }: PasswordChangeFormProps) {
   const [loading, setLoading] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -24,11 +25,16 @@ export function PasswordChangeForm({ disabled = false, onSuccess, onError }: Pas
     setErrors({})
 
     const formData = new FormData(e.currentTarget)
+    const current_password = formData.get('current_password') as string
     const new_password = formData.get('new_password') as string
     const confirm_password = formData.get('confirm_password') as string
 
     // Client-side validation
     const newErrors: Record<string, string> = {}
+
+    if (!current_password) {
+      newErrors.current_password = 'La contraseña actual es requerida'
+    }
 
     if (!new_password) {
       newErrors.new_password = 'La contraseña es requerida'
@@ -61,7 +67,7 @@ export function PasswordChangeForm({ disabled = false, onSuccess, onError }: Pas
       const response = await fetch('/api/settings/password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ new_password }),
+        body: JSON.stringify({ current_password, new_password }),
       })
 
       if (!response.ok) {
@@ -85,7 +91,26 @@ export function PasswordChangeForm({ disabled = false, onSuccess, onError }: Pas
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <FormField label="Nueva Contraseña" htmlFor="new_password" error={errors.new_password}>
+      <FormField label="Contraseña Actual *" htmlFor="current_password" error={errors.current_password}>
+        <div className="relative">
+          <Input
+            id="current_password"
+            name="current_password"
+            type={showCurrent ? 'text' : 'password'}
+            placeholder="Tu contraseña actual"
+            disabled={disabled || loading}
+          />
+          <button
+            type="button"
+            onClick={() => setShowCurrent(!showCurrent)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          >
+            {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+      </FormField>
+
+      <FormField label="Nueva Contraseña *" htmlFor="new_password" error={errors.new_password}>
         <div className="relative">
           <Input
             id="new_password"
@@ -104,7 +129,7 @@ export function PasswordChangeForm({ disabled = false, onSuccess, onError }: Pas
         </div>
       </FormField>
 
-      <FormField label="Confirmar Contraseña" htmlFor="confirm_password" error={errors.confirm_password}>
+      <FormField label="Confirmar Contraseña *" htmlFor="confirm_password" error={errors.confirm_password}>
         <div className="relative">
           <Input
             id="confirm_password"

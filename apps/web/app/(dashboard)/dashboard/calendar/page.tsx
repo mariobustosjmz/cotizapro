@@ -94,7 +94,7 @@ export default async function CalendarPage() {
           </Button>
         </Link>
       </div>
-      <CalendarWeekView events={typedEvents} initialDate={new Date()} />
+      <CalendarWeekView events={typedEvents} initialDate={now.toISOString()} />
     </div>
   )
 }

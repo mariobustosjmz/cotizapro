@@ -100,7 +100,7 @@ export default async function OnboardingPage() {
           </div>
 
           <Button type="submit" className="w-full">
-            Completar Configuracion
+            Completar Configuración
           </Button>
         </form>
       </div>

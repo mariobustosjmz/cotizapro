@@ -41,7 +41,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { new_password } = validation.data
+    const { current_password, new_password } = validation.data
+
+    // Verify current password by attempting sign-in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email!,
+      password: current_password,
+    })
+
+    if (signInError) {
+      return handleApiError(
+        ApiErrors.VALIDATION_FAILED('La contraseña actual es incorrecta'),
+        'POST /api/settings/password - current password verification'
+      )
+    }
 
     // Update password via Supabase Auth
     const { error: updateError } = await supabase.auth.updateUser({

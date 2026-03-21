@@ -217,7 +217,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       {/* Content */}
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">Informacion del Servicio</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Información del Servicio</span>
         </div>
         <div className="p-4">
           {isEditing ? (

@@ -119,10 +119,9 @@ export function BillingClient({
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex gap-3">
           <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-green-900">Payment successful!</h3>
+            <h3 className="font-semibold text-green-900">¡Pago exitoso!</h3>
             <p className="text-sm text-green-700">
-              Your subscription has been updated. It may take a moment for your
-              plan to reflect.
+              Tu suscripción ha sido actualizada. Puede tomar un momento en reflejarse.
             </p>
           </div>
         </div>
@@ -132,9 +131,9 @@ export function BillingClient({
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
           <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-blue-900">Checkout canceled</h3>
+            <h3 className="font-semibold text-blue-900">Pago cancelado</h3>
             <p className="text-sm text-blue-700">
-              You've canceled the checkout. Select a plan below to try again.
+              Cancelaste el proceso de pago. Selecciona un plan para intentarlo de nuevo.
             </p>
           </div>
         </div>
@@ -168,7 +167,7 @@ export function BillingClient({
       )}
 
       <div>
-        <h2 className="text-2xl font-bold mb-6">Select Your Plan</h2>
+        <h2 className="text-2xl font-bold mb-6">Elige tu Plan</h2>
         <PlanSelector
           currentPlan={currentPlan}
           onSelectPlan={handleSelectPlan}
@@ -178,18 +177,18 @@ export function BillingClient({
 
       {currentPlan !== 'free' && subscriptionStatus !== 'canceled' && (
         <div className="bg-white rounded-lg border p-6">
-          <h2 className="text-2xl font-bold mb-4">Payment Methods</h2>
+          <h2 className="text-2xl font-bold mb-4">Métodos de Pago</h2>
           <p className="text-gray-600 mb-4">
-            Manage your payment methods and billing details in the Stripe portal
+            Administra tus métodos de pago y datos de facturación en el portal de Stripe
           </p>
           <Button onClick={handleManagePaymentMethods} disabled={loading}>
-            Open Billing Portal
+            Abrir Portal de Facturación
           </Button>
         </div>
       )}
 
       <div className="bg-white rounded-lg border p-6">
-        <h2 className="text-2xl font-bold mb-6">Billing History</h2>
+        <h2 className="text-2xl font-bold mb-6">Historial de Pagos</h2>
         <BillingHistory />
       </div>
     </div>

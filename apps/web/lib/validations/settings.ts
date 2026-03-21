@@ -30,6 +30,7 @@ export const updateOrganizationSchema = z.object({
  * Validates password update request
  */
 export const changePasswordSchema = z.object({
+  current_password: z.string().min(1, 'La contraseña actual es requerida'),
   new_password: z.string()
     .min(8, 'La contraseña debe tener al menos 8 caracteres')
     .regex(/[A-Z]/, 'La contraseña debe contener al menos una mayúscula')
