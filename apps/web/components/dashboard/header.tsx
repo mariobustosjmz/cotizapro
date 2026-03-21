@@ -23,6 +23,9 @@ const segmentLabels: Record<string, string> = {
   team: 'Equipo',
   settings: 'Configuración',
   'custom-fields': 'Campos Extra',
+  calendar: 'Agenda',
+  templates: 'Templates',
+  billing: 'Facturación',
   new: 'Nuevo',
 }
 

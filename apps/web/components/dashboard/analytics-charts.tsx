@@ -46,7 +46,7 @@ const STATUS_LABELS: Record<string, string> = {
   accepted: 'Aceptadas',
   rejected: 'Rechazadas',
   expired: 'Expiradas',
-  en_instalacion: 'Instalacion',
+  en_instalacion: 'Instalación',
   completado: 'Completadas',
   cobrado: 'Cobradas',
 }
@@ -73,8 +73,8 @@ function QuoteStatusDonut({ data }: QuoteStatusChartProps) {
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
-      <div className="w-48 h-48 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="shrink-0" style={{ width: 192, height: 192 }}>
+        <ResponsiveContainer width={192} height={192}>
           <PieChart>
             <Pie
               data={filtered}
@@ -231,7 +231,7 @@ export function AnalyticsCharts() {
         ? (typeof byStatus === 'object' && !Array.isArray(byStatus))
           ? Object.entries(byStatus).map(([status, count]) => ({
               status,
-              count: count as number,
+              count: Number(count),
             }))
           : byStatus
         : []
@@ -250,9 +250,14 @@ export function AnalyticsCharts() {
         { stage: 'Cobradas', count: cobrado, color: '#22C55E' },
       ]
 
+      const weeklyRevenue = (income.data?.weekly_breakdown || []).map((w: WeeklyBreakdown) => ({
+        ...w,
+        total_paid: Number(w.total_paid),
+      }))
+
       setChartData({
         quotes_by_status: quotesStatusArray,
-        weekly_revenue: income.data?.weekly_breakdown || [],
+        weekly_revenue: weeklyRevenue,
         monthly_trend: [],
         conversion_funnel: funnel,
       })
@@ -286,7 +291,7 @@ export function AnalyticsCharts() {
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              Distribucion de Cotizaciones
+              Distribución de Cotizaciones
             </span>
           </div>
           <div className="p-4">

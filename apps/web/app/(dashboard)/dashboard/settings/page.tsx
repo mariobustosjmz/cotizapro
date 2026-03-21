@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [orgError, setOrgError] = useState('')
   const [profile, setProfile] = useState<Profile | null>(null)
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [activeTab, setActiveTab] = useState<'profile' | 'organization' | 'notifications' | 'security'>('profile')
@@ -59,6 +60,8 @@ export default function SettingsPage() {
         if (orgRes.ok) {
           const data = await orgRes.json()
           setOrganization(data.data)
+        } else {
+          setOrgError('No se pudo cargar la información de la empresa')
         }
       } catch {
         setError('Error al cargar configuración')
@@ -135,15 +138,15 @@ export default function SettingsPage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Error al actualizar organizacion')
+        throw new Error(errorData.error || 'Error al actualizar organización')
       }
 
       const updated = await response.json()
       setOrganization(updated.data)
-      setSuccess('Organizacion actualizada correctamente')
+      setSuccess('Organización actualizada correctamente')
       toast({ message: 'Organización actualizada exitosamente', variant: 'success' })
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar organizacion'
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar organización'
       setError(errorMsg)
       toast({ message: errorMsg, variant: 'error' })
     } finally {
@@ -247,6 +250,13 @@ export default function SettingsPage() {
       )}
 
       {/* Organization Tab */}
+      {activeTab === 'organization' && !organization && (
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {orgError || 'Cargando información de la empresa...'}
+          </p>
+        </div>
+      )}
       {activeTab === 'organization' && organization && (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
@@ -272,7 +282,7 @@ export default function SettingsPage() {
                 />
               </FormField>
 
-              <FormField label="Telefono" htmlFor="company_phone">
+              <FormField label="Teléfono" htmlFor="company_phone">
                 <Input
                   id="company_phone"
                   name="company_phone"
@@ -287,7 +297,7 @@ export default function SettingsPage() {
             <div className="md:col-span-2 pt-2 border-t border-gray-100 dark:border-gray-800">
               <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3">Marca / Branding</p>
               <div className="grid gap-3 md:grid-cols-2">
-                <FormField label="URL del Logo" htmlFor="logo_url" hint="Se usara en PDFs y cotizaciones">
+                <FormField label="URL del Logo" htmlFor="logo_url" hint="Se usará en PDFs y cotizaciones">
                   <div className="flex items-center gap-3">
                     {organization.settings?.logo_url && (
                       <img
@@ -332,18 +342,18 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <FormField label="Direccion" htmlFor="company_address">
+            <FormField label="Dirección" htmlFor="company_address">
               <Textarea
                 id="company_address"
                 name="company_address"
                 rows={2}
                 defaultValue={organization.settings?.company_address || ''}
-                placeholder="Calle, numero, colonia, ciudad, estado, CP"
+                placeholder="Calle, número, colonia, ciudad, estado, CP"
               />
             </FormField>
 
             <div className="grid gap-3 md:grid-cols-2">
-              <FormField label="Validez de Cotizaciones (dias)" htmlFor="quote_valid_days">
+              <FormField label="Validez de Cotizaciones (días)" htmlFor="quote_valid_days">
                 <Input
                   id="quote_valid_days"
                   name="quote_valid_days"
@@ -367,7 +377,7 @@ export default function SettingsPage() {
               </FormField>
             </div>
 
-            <FormField label="Terminos y Condiciones" htmlFor="quote_terms" hint="Se usaran por defecto en nuevas cotizaciones">
+            <FormField label="Términos y Condiciones" htmlFor="quote_terms" hint="Se usarán por defecto en nuevas cotizaciones">
               <Textarea
                 id="quote_terms"
                 name="quote_terms"
@@ -394,7 +404,7 @@ export default function SettingsPage() {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Preferencias de Notificaciones</h3>
           </div>
           <div className="p-4 space-y-3">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Las notificaciones por email estaran disponibles proximamente.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Las notificaciones por email estarán disponibles próximamente.</p>
 
             {[
               { title: 'Nuevas Cotizaciones', desc: 'Email cuando se crea una cotizacion' },

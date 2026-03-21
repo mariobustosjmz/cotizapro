@@ -79,7 +79,7 @@ export default async function AnalyticsPage() {
     accepted: 'Aceptadas',
     rejected: 'Rechazadas',
     expired: 'Expiradas',
-    en_instalacion: 'En Instalacion',
+    en_instalacion: 'En Instalación',
     completado: 'Completadas',
     cobrado: 'Cobradas',
   }
@@ -327,7 +327,7 @@ export default async function AnalyticsPage() {
               <p className="text-xl font-bold text-purple-700 dark:text-purple-400">
                 ${analytics.quotes.avg_quote_value.toLocaleString('es-MX')}
               </p>
-              <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Por cotizacion</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Por cotización</p>
             </div>
           </div>
         </div>

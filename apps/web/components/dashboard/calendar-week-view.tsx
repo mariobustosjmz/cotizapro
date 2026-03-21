@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Calendar, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -72,8 +72,12 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
     })
   }, [weekStart])
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const [today, setToday] = useState<Date | null>(null)
+  useEffect(() => {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    setToday(d)
+  }, [])
 
   const prevWeek = () => {
     const prev = new Date(weekStart)
@@ -157,7 +161,7 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
                 return eStart < dayEnd && eEnd > dayStart
               })
 
-              const isToday = day.toDateString() === today.toDateString()
+              const isToday = today !== null && day.toDateString() === today.toDateString()
 
               return (
                 <div key={day.toISOString()} className="flex-1 border-r border-gray-200 dark:border-gray-700 relative">

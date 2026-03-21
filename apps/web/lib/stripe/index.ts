@@ -50,9 +50,9 @@ export const PLANS = {
     price: 0,
     priceId: null,
     features: [
-      '3 projects',
-      '100 API calls/day',
-      'Basic support',
+      '3 proyectos',
+      '100 llamadas API/día',
+      'Soporte básico',
     ],
     limits: {
       projects: 3,
@@ -64,10 +64,10 @@ export const PLANS = {
     price: 29,
     priceId: process.env.STRIPE_STARTER_PRICE_ID,
     features: [
-      '10 projects',
-      '10,000 API calls/day',
-      'Email support',
-      'Team collaboration',
+      '10 proyectos',
+      '10,000 llamadas API/día',
+      'Soporte por email',
+      'Colaboración en equipo',
     ],
     limits: {
       projects: 10,
@@ -79,11 +79,11 @@ export const PLANS = {
     price: 99,
     priceId: process.env.STRIPE_PRO_PRICE_ID,
     features: [
-      'Unlimited projects',
-      'Unlimited API calls',
-      'Priority support',
-      'Advanced analytics',
-      'Custom integrations',
+      'Proyectos ilimitados',
+      'Llamadas API ilimitadas',
+      'Soporte prioritario',
+      'Analytics avanzado',
+      'Integraciones personalizadas',
     ],
     limits: {
       projects: -1, // unlimited
@@ -95,11 +95,11 @@ export const PLANS = {
     price: null, // custom pricing
     priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID,
     features: [
-      'Everything in Pro',
-      'Dedicated support',
-      'SLA guarantee',
-      'Custom contracts',
-      'On-premise deployment',
+      'Todo lo de Pro',
+      'Soporte dedicado',
+      'Garantía de SLA',
+      'Contratos personalizados',
+      'Despliegue on-premise',
     ],
     limits: {
       projects: -1,

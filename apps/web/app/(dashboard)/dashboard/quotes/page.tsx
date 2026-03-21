@@ -17,7 +17,7 @@ const STATUS_LABELS: Record<QuoteStatus, string> = {
   accepted: 'Aceptadas',
   rejected: 'Rechazadas',
   expired: 'Expiradas',
-  en_instalacion: 'En Instalaci\u00f3n',
+  en_instalacion: 'En Instalación',
   completado: 'Completadas',
   cobrado: 'Cobradas',
 }
@@ -29,7 +29,7 @@ const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
   accepted: 'Aceptada',
   rejected: 'Rechazada',
   expired: 'Expirada',
-  en_instalacion: 'En Instalaci\u00f3n',
+  en_instalacion: 'En Instalación',
   completado: 'Completada',
   cobrado: 'Cobrada',
 }
@@ -189,14 +189,14 @@ export default async function QuotesPage({
                 {activeStatus ? `No hay cotizaciones ${STATUS_LABELS[activeStatus].toLowerCase()}` : 'No hay cotizaciones'}
               </h3>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {activeStatus ? 'Prueba con otro filtro' : 'Comienza creando tu primera cotizaci\u00f3n'}
+                {activeStatus ? 'Prueba con otro filtro' : 'Comienza creando tu primera cotización'}
               </p>
               {!activeStatus && (
                 <div className="mt-4">
                   <Link href="/dashboard/quotes/new" data-testid="new-quote-empty-btn">
                     <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
                       <Plus className="w-4 h-4 mr-1" />
-                      Nueva Cotizaci\u00f3n
+                      Nueva Cotización
                     </Button>
                   </Link>
                 </div>
@@ -207,7 +207,7 @@ export default async function QuotesPage({
               <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
                 <thead className="bg-gray-50/60 dark:bg-gray-800/50">
                   <tr>
-                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">N\u00famero</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Número</th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
                     <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Fecha</th>
                     <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Total</th>
@@ -224,7 +224,7 @@ export default async function QuotesPage({
                         <span className="text-sm font-medium text-gray-900 dark:text-white">{quote.quote_number}</span>
                       </td>
                       <td className="px-4 py-2.5">
-                        <div className="text-sm text-gray-900 dark:text-white">{client?.name || '\u2014'}</div>
+                        <div className="text-sm text-gray-900 dark:text-white">{client?.name || '—'}</div>
                         {client?.company_name && (
                           <div className="text-xs text-gray-400 dark:text-gray-500">{client.company_name}</div>
                         )}

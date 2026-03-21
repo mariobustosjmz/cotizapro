@@ -60,7 +60,7 @@ interface QuoteTemplate {
 const UNIT_TYPE_LABELS: Record<string, string> = {
   fixed: 'Fijo',
   per_hour: 'Por Hora',
-  per_sqm: 'Por m\u00B2',
+  per_sqm: 'Por m²',
   per_unit: 'Por Unidad',
 }
 
@@ -82,7 +82,7 @@ export default function NewQuotePage() {
   const [customFields, setCustomFields] = useState<CustomFieldValues>({})
   const [validDays, setValidDays] = useState(30)
   const [notes, setNotes] = useState('')
-  const [terms, setTerms] = useState('50% de anticipo al aceptar la cotizaci\u00F3n. 50% restante al completar el trabajo. Garant\u00EDa de 1 a\u00F1o en mano de obra.')
+  const [terms, setTerms] = useState('50% de anticipo al aceptar la cotización. 50% restante al completar el trabajo. Garantía de 1 año en mano de obra.')
   const [showExtras, setShowExtras] = useState(false)
   const [clientSearch, setClientSearch] = useState('')
   const [showClientDropdown, setShowClientDropdown] = useState(false)
@@ -549,7 +549,7 @@ export default function NewQuotePage() {
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
                           required
-                          placeholder="Descripci\u00F3n del item..."
+                          placeholder="Descripción del item..."
                           data-testid={`item-description-${index}`}
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
                         />

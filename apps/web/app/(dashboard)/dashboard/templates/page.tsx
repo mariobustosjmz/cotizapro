@@ -195,7 +195,7 @@ export default function TemplatesPage() {
               <thead>
                 <tr className="border-b border-gray-50 dark:border-gray-800">
                   <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nombre</th>
-                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Descripcion</th>
+                  <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Descripción</th>
                   <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Descuento</th>
                   <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Promo</th>
                   <th className="text-left py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
@@ -213,10 +213,10 @@ export default function TemplatesPage() {
                         ? template.description.length > 60
                           ? `${template.description.slice(0, 60)}...`
                           : template.description
-                        : '\u2014'}
+                        : '—'}
                     </td>
                     <td className="py-2.5 px-4 text-gray-700 dark:text-gray-300 hidden lg:table-cell">
-                      {template.default_discount_rate ? `${Number(template.default_discount_rate)}%` : '\u2014'}
+                      {template.default_discount_rate ? `${Number(template.default_discount_rate)}%` : '—'}
                     </td>
                     <td className="py-2.5 px-4 hidden lg:table-cell">
                       {template.promotional_label ? (
@@ -283,22 +283,22 @@ export default function TemplatesPage() {
                 />
               </FormField>
 
-              <FormField label="Descripcion" htmlFor="modal_description">
+              <FormField label="Descripción" htmlFor="modal_description">
                 <Textarea
                   id="modal_description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Descripcion del template"
+                  placeholder="Descripción del template"
                   rows={2}
                 />
               </FormField>
 
-              <FormField label="Terminos y Condiciones" htmlFor="modal_terms">
+              <FormField label="Términos y Condiciones" htmlFor="modal_terms">
                 <Textarea
                   id="modal_terms"
                   value={formData.default_terms}
                   onChange={(e) => setFormData({ ...formData, default_terms: e.target.value })}
-                  placeholder="Terminos por defecto en cotizaciones"
+                  placeholder="Términos por defecto en cotizaciones"
                   rows={2}
                 />
               </FormField>
