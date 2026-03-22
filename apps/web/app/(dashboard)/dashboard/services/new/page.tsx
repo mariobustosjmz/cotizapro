@@ -200,6 +200,7 @@ export default function NewServicePage() {
                   { value: 'electrical', label: 'Eléctrico' },
                   { value: 'other', label: 'Otros' },
                 ]}
+                defaultValue="hvac"
                 placeholder="Selecciona una categoría..."
                 required
                 disabled={loading}
@@ -217,6 +218,7 @@ export default function NewServicePage() {
                   { value: 'per_sqm', label: 'Por m²' },
                   { value: 'per_unit', label: 'Por Unidad' },
                 ]}
+                defaultValue="fixed"
                 placeholder="Selecciona una unidad..."
                 required
                 disabled={loading}

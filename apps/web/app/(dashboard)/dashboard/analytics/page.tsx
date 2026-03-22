@@ -4,6 +4,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { TrendingUp, Users, FileText, DollarSign, Bell, BarChart3 } from 'lucide-react'
 import { IncomeAnalytics } from '@/components/dashboard/income-analytics'
 import { AnalyticsCharts } from '@/components/dashboard/analytics-charts'
+import Link from 'next/link'
 
 interface AnalyticsData {
   summary: {
@@ -111,41 +112,41 @@ export default async function AnalyticsPage() {
 
       {/* Summary KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+        <Link href="/dashboard/quotes" className="block bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 hover:border-orange-300 dark:hover:border-orange-700 transition-colors">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Cotizaciones</span>
             <FileText className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
           <p className="text-xl font-bold text-gray-900 dark:text-white">{analytics.summary.total_quotes}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.quotes.conversion_rate.toFixed(1)}% conversion</p>
-        </div>
+        </Link>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+        <Link href="/dashboard/clients" className="block bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 hover:border-orange-300 dark:hover:border-orange-700 transition-colors">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Clientes</span>
             <Users className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
           <p className="text-xl font-bold text-gray-900 dark:text-white">{analytics.summary.total_clients}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.recent_activity.new_clients} nuevos ({analytics.recent_activity.period_days}d)</p>
-        </div>
+        </Link>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+        <Link href="/dashboard/quotes?status=cobrado" className="block bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 hover:border-orange-300 dark:hover:border-orange-700 transition-colors">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Ingresos</span>
             <DollarSign className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
           <p className="text-xl font-bold text-green-600 dark:text-green-400">${analytics.revenue.total.toLocaleString('es-MX')}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">${analytics.revenue.this_month.toLocaleString('es-MX')} este mes</p>
-        </div>
+        </Link>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+        <Link href="/dashboard/reminders" className="block bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 hover:border-orange-300 dark:hover:border-orange-700 transition-colors">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Recordatorios</span>
             <Bell className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
           <p className="text-xl font-bold text-yellow-600 dark:text-yellow-400">{analytics.summary.total_reminders}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">{analytics.reminders.overdue} atrasados</p>
-        </div>
+        </Link>
       </div>
 
       {/* Charts — Donut, Funnel, Revenue Bar */}

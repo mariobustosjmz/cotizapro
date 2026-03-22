@@ -117,16 +117,21 @@ export default function SettingsPage() {
 
     const formData = new FormData(e.currentTarget)
 
+    const rawEmail = (formData.get('company_email') as string) || ''
+    const rawPhone = (formData.get('company_phone') as string) || ''
+    const rawLogoUrl = (formData.get('logo_url') as string) || ''
+    const rawBrandColor = (formData.get('brand_color') as string) || ''
+
     const data = {
       name: formData.get('name'),
-      company_address: formData.get('company_address'),
-      company_phone: formData.get('company_phone'),
-      company_email: formData.get('company_email'),
-      quote_terms: formData.get('quote_terms'),
+      company_address: (formData.get('company_address') as string) || null,
+      company_phone: rawPhone || null,
+      company_email: rawEmail || null,
+      quote_terms: (formData.get('quote_terms') as string) || null,
       quote_valid_days: parseInt(formData.get('quote_valid_days') as string) || 30,
       tax_rate: parseFloat(formData.get('tax_rate') as string) || 16,
-      logo_url: formData.get('logo_url') || null,
-      brand_color: formData.get('brand_color') || null,
+      logo_url: rawLogoUrl || null,
+      brand_color: rawBrandColor || null,
     }
 
     try {

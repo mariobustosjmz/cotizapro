@@ -199,13 +199,18 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-0.5 right-0.5 ${colors.bg} border-l-4 ${colors.border} rounded px-2 py-1 text-xs overflow-hidden`}
+                          className={`absolute left-0.5 right-0.5 ${colors.bg} border-l-4 ${colors.border} rounded px-2 py-1 text-xs overflow-hidden cursor-pointer hover:opacity-80 transition-opacity`}
                           style={{
                             top: `${position.topPercent}%`,
                             height: `${position.heightPercent}%`,
                             minHeight: '24px',
+                            zIndex: 10,
                           }}
                           title={`${event.title} - ${clientDisplay}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            window.location.href = `/dashboard/calendar/${event.id}/edit`
+                          }}
                         >
                           <div className={`${colors.text} font-semibold truncate`}>{event.title}</div>
                           <div className={`${colors.text} text-[10px] truncate opacity-75`}>{clientDisplay}</div>

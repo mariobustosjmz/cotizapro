@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,68 @@ import { ArrowLeft, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
+
+interface ComboboxProps {
+  id: string
+  name: string
+  options: { value: string; label: string }[]
+  defaultValue?: string
+  placeholder?: string
+  required?: boolean
+  disabled?: boolean
+}
+
+function Combobox({ id, name, options, defaultValue = '', placeholder, required, disabled }: ComboboxProps) {
+  const defaultOption = options.find((o) => o.value === defaultValue)
+  const [search, setSearch] = useState(defaultOption?.label ?? '')
+  const [selectedValue, setSelectedValue] = useState(defaultValue)
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const filtered = options.filter((o) =>
+    o.label.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const selectOption = (value: string, label: string) => {
+    setSelectedValue(value)
+    setSearch(label)
+    setOpen(false)
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      <input type="hidden" name={name} value={selectedValue} />
+      <input
+        id={id}
+        type="text"
+        value={search}
+        onChange={(e) => { setSearch(e.target.value); setSelectedValue(''); setOpen(true) }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder={placeholder}
+        required={required}
+        disabled={disabled}
+        autoComplete="off"
+        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+      />
+      {open && filtered.length > 0 && (
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-auto rounded-md border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-lg text-sm">
+          {filtered.map((o) => (
+            <li
+              key={o.value}
+              onMouseDown={() => selectOption(o.value, o.label)}
+              className={`px-3 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/20 ${
+                o.value === selectedValue ? 'bg-orange-100 dark:bg-orange-900/30 font-medium' : ''
+              }`}
+            >
+              {o.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 interface Service {
   id: string
@@ -166,8 +228,6 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     per_unit: 'Por Unidad',
   }
 
-  const selectClass = 'w-full px-3 py-2 bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500'
-
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -228,22 +288,36 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
               <div className="grid gap-3 md:grid-cols-2">
                 <FormField label="Categoria" htmlFor="category" required>
-                  <select id="category" name="category" required defaultValue={service.category} className={selectClass}>
-                    <option value="hvac">HVAC</option>
-                    <option value="painting">Pintura</option>
-                    <option value="plumbing">Plomeria</option>
-                    <option value="electrical">Electrico</option>
-                    <option value="other">Otros</option>
-                  </select>
+                  <Combobox
+                    id="category"
+                    name="category"
+                    options={[
+                      { value: 'hvac', label: 'HVAC' },
+                      { value: 'painting', label: 'Pintura' },
+                      { value: 'plumbing', label: 'Plomería' },
+                      { value: 'electrical', label: 'Eléctrico' },
+                      { value: 'other', label: 'Otros' },
+                    ]}
+                    defaultValue={service.category}
+                    required
+                    disabled={loading}
+                  />
                 </FormField>
 
                 <FormField label="Unidad de Medida" htmlFor="unit_type" required>
-                  <select id="unit_type" name="unit_type" required defaultValue={service.unit_type} className={selectClass}>
-                    <option value="fixed">Precio Fijo</option>
-                    <option value="per_hour">Por Hora</option>
-                    <option value="per_sqm">Por Metro Cuadrado (m&#178;)</option>
-                    <option value="per_unit">Por Unidad</option>
-                  </select>
+                  <Combobox
+                    id="unit_type"
+                    name="unit_type"
+                    options={[
+                      { value: 'fixed', label: 'Precio Fijo' },
+                      { value: 'per_hour', label: 'Por Hora' },
+                      { value: 'per_sqm', label: 'Por m²' },
+                      { value: 'per_unit', label: 'Por Unidad' },
+                    ]}
+                    defaultValue={service.unit_type}
+                    required
+                    disabled={loading}
+                  />
                 </FormField>
 
                 <FormField label="Precio Base" htmlFor="unit_price" required error={fieldErrors.unit_price}>
@@ -251,10 +325,17 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 </FormField>
 
                 <FormField label="Estado" htmlFor="is_active" required hint="Los servicios inactivos no aparecen en las cotizaciones">
-                  <select id="is_active" name="is_active" required defaultValue={service.is_active ? 'true' : 'false'} className={selectClass}>
-                    <option value="true">Activo</option>
-                    <option value="false">Inactivo</option>
-                  </select>
+                  <Combobox
+                    id="is_active"
+                    name="is_active"
+                    options={[
+                      { value: 'true', label: 'Activo' },
+                      { value: 'false', label: 'Inactivo' },
+                    ]}
+                    defaultValue={service.is_active ? 'true' : 'false'}
+                    required
+                    disabled={loading}
+                  />
                 </FormField>
               </div>
 

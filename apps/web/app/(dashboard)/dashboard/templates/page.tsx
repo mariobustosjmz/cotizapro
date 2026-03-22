@@ -9,6 +9,25 @@ import { FormField } from '@/components/ui/form-field'
 import { Plus, Trash2, Edit2, FileStack } from 'lucide-react'
 import type { QuoteTemplate } from '@/lib/validations/cotizapro'
 
+interface TemplateItem {
+  description: string
+  quantity: number
+  unit_price: number
+  unit_type: 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
+  service_id: string | null
+}
+
+const UNIT_TYPE_LABELS: Record<string, string> = {
+  fixed: 'Fijo',
+  per_hour: 'Por Hora',
+  per_sqm: 'Por m²',
+  per_unit: 'Por Unidad',
+}
+
+function emptyItem(): TemplateItem {
+  return { description: '', quantity: 1, unit_price: 0, unit_type: 'fixed', service_id: null }
+}
+
 export default function TemplatesPage() {
   const { toast } = useToast()
   const [templates, setTemplates] = useState<QuoteTemplate[]>([])
@@ -28,6 +47,7 @@ export default function TemplatesPage() {
     promotional_label: '',
     promotional_valid_until: '',
   })
+  const [items, setItems] = useState<TemplateItem[]>([])
 
   useEffect(() => {
     fetchTemplates()
@@ -62,6 +82,7 @@ export default function TemplatesPage() {
       promotional_label: '',
       promotional_valid_until: '',
     })
+    setItems([])
     setShowModal(true)
   }
 
@@ -76,7 +97,17 @@ export default function TemplatesPage() {
       promotional_label: template.promotional_label || '',
       promotional_valid_until: template.promotional_valid_until || '',
     })
+    const rawItems = template.default_items as TemplateItem[] | null
+    setItems(Array.isArray(rawItems) ? rawItems : [])
     setShowModal(true)
+  }
+
+  function updateItem(index: number, field: keyof TemplateItem, value: string | number | null) {
+    setItems((prev) => prev.map((item, i) => i === index ? { ...item, [field]: value } : item))
+  }
+
+  function removeItem(index: number) {
+    setItems((prev) => prev.filter((_, i) => i !== index))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -85,6 +116,7 @@ export default function TemplatesPage() {
     setError('')
 
     try {
+      const validItems = items.filter((item) => item.description.trim() && item.unit_price > 0 && item.quantity > 0)
       const payload = {
         name: formData.name,
         description: formData.description || null,
@@ -93,6 +125,7 @@ export default function TemplatesPage() {
         is_active: formData.is_active,
         promotional_label: formData.promotional_label || null,
         promotional_valid_until: formData.promotional_valid_until || null,
+        default_items: validItems.length > 0 ? validItems : null,
       }
 
       const method = editingId ? 'PATCH' : 'POST'
@@ -337,6 +370,72 @@ export default function TemplatesPage() {
                   />
                 </FormField>
               )}
+
+              {/* Default Items */}
+              <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Servicios por defecto</span>
+                  <button
+                    type="button"
+                    onClick={() => setItems((prev) => [...prev, emptyItem()])}
+                    className="text-xs text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Agregar
+                  </button>
+                </div>
+                {items.length === 0 ? (
+                  <p className="text-xs text-gray-400 dark:text-gray-500 italic">Sin servicios pre-configurados</p>
+                ) : (
+                  <div className="space-y-2">
+                    {items.map((item, idx) => (
+                      <div key={idx} className="grid grid-cols-[1fr_56px_80px_80px_28px] gap-1.5 items-start">
+                        <input
+                          type="text"
+                          placeholder="Descripción"
+                          value={item.description}
+                          onChange={(e) => updateItem(idx, 'description', e.target.value)}
+                          className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Cant."
+                          min="0.01"
+                          step="0.01"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(idx, 'quantity', parseFloat(e.target.value) || 0)}
+                          className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Precio"
+                          min="0.01"
+                          step="0.01"
+                          value={item.unit_price}
+                          onChange={(e) => updateItem(idx, 'unit_price', parseFloat(e.target.value) || 0)}
+                          className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                        <select
+                          value={item.unit_type}
+                          onChange={(e) => updateItem(idx, 'unit_type', e.target.value)}
+                          className="px-1 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-500"
+                        >
+                          {Object.entries(UNIT_TYPE_LABELS).map(([val, label]) => (
+                            <option key={val} value={val}>{label}</option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(idx)}
+                          className="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <div className="flex items-center gap-2">
                 <input

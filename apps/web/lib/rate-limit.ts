@@ -135,12 +135,12 @@ export const generousApiLimiter = createRateLimiter({
 })
 
 /**
- * Message limiter: 10 requests per day
+ * Message limiter: 50 requests per day
  * Suitable for email/SMS sending endpoints
  */
 export const messageLimiter = createRateLimiter({
   windowMs: 24 * 60 * 60 * 1000, // 1 day
-  max: 10,
+  max: 50,
   keyGenerator: (request) => extractClientIp(request),
 })
 
