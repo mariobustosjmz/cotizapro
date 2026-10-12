@@ -66,3 +66,4 @@ coverage/
 # Salida generada por los recorridos automatizados (capturas, PDF y credenciales locales)
 docs/handoff/recorrido-*/
 docs/handoff/semana-*/
+docs/handoff/movil-*/

@@ -82,3 +82,19 @@
 - **Montos:** `lib/format/money.ts` (`formatAmount`, 2 decimales) en 43 lugares del panel; la página pública conserva "desde $1,900" sin decimales (decisión del usuario).
 - Verificación: 43 pruebas unitarias (agenda en TZ Monterrey y UTC), build OK, semana completa local sin esos hallazgos; en pantalla: 5/5 eventos a su hora, ingresos $84,378.26, conversión 80 %, saldo $21,530.01, tasa 57 %.
 - Pendiente anotado: `api/export/analytics-report` y `api/analytics/trends` aún suman solo `accepted` (sin consumidores en la UI); 4 avisos de lint preexistentes; rango semanal de la agenda depende de la zona del servidor (en producción UTC, correcto).
+
+## Despliegue a producción — 2026-10-12 19:12 UTC
+
+- Commit `9438184` (rama `feature/plataforma-motor-vitrina`, sin push) en https://cotizapro.mariobustos.io. Código desde `git archive HEAD` (sin PNG sueltas ni credenciales de recorridos).
+- Solo `cotizapro-web` reconstruido y recreado; healthy en 12 s. Sin migraciones; Caddy sin cambios.
+- Smoke 11/11 dominios del servidor idéntico antes y después; `/api/health` healthy; vitrinas públicas 200.
+- Bundle verificado: sin el estado inexistente `installed`, embudo con "Cobradas", formato de 2 decimales presente.
+- Reversa: imagen `cotizapro-web-rollback:20261012-1912` y `/opt/backups/cotizapro-code-20261012-1912-predeploy.tar.gz`.
+
+## Auditoría móvil y correcciones (Gate 1 y Gate 2 aprobados) — 2026-10-12
+
+- Auditoría: 144 vistas (celular 390 y 360 px, tableta 820 y 1180 px) con `scripts/walkthrough/movil/audit.ts`; pasada funcional táctil con `movil/interaccion.ts` (13/13 tras el fix). Páginas públicas de producción sin errores.
+- **Barra fija móvil** (nueva cotización, detalle, edición): `.page-transition` usaba `animation-fill-mode: both`; el `transform` residual hacía de `<main>` el contenedor de los `position: fixed` y la barra tapaba Espesor y Kit de herrajes. Fix: `backwards` en `app/globals.css`.
+- **Rutas públicas:** `/forgot-password` e `/invite` redirigían a `/login` sin sesión. Lista extraída a `packages/auth/src/public-routes.ts` (`isPublicPath`, con pruebas).
+- **Botón flotante "+":** tapaba acciones en formularios y detalles; ahora solo aparece en el inicio y en la portada de cada sección (`lib/navigation/fab-visibility.ts`).
+- Pendientes anotados: el login no regresa a la liga de invitación; acciones cortadas a la derecha en detalle de servicio y recordatorio; textos de ejemplo HVAC en formularios; `select` nativos en cotización e invitación; Facturación con planes que no aplican; cifras de marketing en la página de inicio; agenda semanal poco legible en celular; error de hidratación intermitente solo en desarrollo en `/p/[slug]`.
