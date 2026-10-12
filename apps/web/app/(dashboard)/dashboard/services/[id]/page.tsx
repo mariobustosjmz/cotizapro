@@ -10,6 +10,7 @@ import { ArrowLeft, Trash2, Save } from 'lucide-react'
 import Link from 'next/link'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
+import { formatAmount } from '@/lib/format/money'
 
 interface ComboboxProps {
   id: string
@@ -370,7 +371,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Precio Base</p>
                   <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                    ${Number(service.unit_price).toLocaleString('es-MX')}
+                    ${formatAmount(service.unit_price)}
                   </p>
                 </div>
                 <div>

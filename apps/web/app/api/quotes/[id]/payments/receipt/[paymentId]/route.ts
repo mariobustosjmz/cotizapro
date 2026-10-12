@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+import { formatAmount } from '@/lib/format/money'
 
 // GET /api/quotes/[id]/payments/receipt/[paymentId] - Download payment receipt
 export async function GET(
@@ -67,11 +68,11 @@ export async function GET(
       '',
       'COTIZACIÓN',
       `Número: ${quote.quote_number}`,
-      `Total cotización: $${Number(quote.total).toLocaleString('es-MX')}`,
+      `Total cotización: $${formatAmount(quote.total)}`,
       '',
       'DETALLE DEL PAGO',
       `ID: ${payment.id}`,
-      `Monto: $${Number(payment.amount).toLocaleString('es-MX')}`,
+      `Monto: $${formatAmount(payment.amount)}`,
       `Tipo: ${payment.payment_type}`,
       `Método: ${payment.payment_method}`,
       `Fecha de pago: ${new Date(payment.payment_date).toLocaleDateString('es-MX')}`,

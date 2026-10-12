@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
+import { parseWallClock } from '@/lib/calendar/wall-clock'
 import { ChevronLeft, ChevronRight, Calendar, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -47,8 +48,8 @@ function formatDateISO(date: Date): string {
 }
 
 function getEventPosition(event: CalendarEvent, dayStart: Date, dayEnd: Date) {
-  const eventStart = new Date(event.scheduled_start)
-  const eventEnd = new Date(event.scheduled_end)
+  const eventStart = parseWallClock(event.scheduled_start)
+  const eventEnd = parseWallClock(event.scheduled_end)
 
   if (eventStart >= dayEnd || eventEnd <= dayStart) return null
 
@@ -156,8 +157,8 @@ export function CalendarWeekView({ events, initialDate }: CalendarWeekViewProps)
 
               // Filter events that overlap with the day (not just start time)
               const dayEvents = events.filter((e) => {
-                const eStart = new Date(e.scheduled_start)
-                const eEnd = new Date(e.scheduled_end)
+                const eStart = parseWallClock(e.scheduled_start)
+                const eEnd = parseWallClock(e.scheduled_end)
                 return eStart < dayEnd && eEnd > dayStart
               })
 

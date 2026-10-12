@@ -5,6 +5,7 @@ import { TrendingUp, Users, FileText, DollarSign, Bell, BarChart3 } from 'lucide
 import { IncomeAnalytics } from '@/components/dashboard/income-analytics'
 import { AnalyticsCharts } from '@/components/dashboard/analytics-charts'
 import Link from 'next/link'
+import { formatAmount } from '@/lib/format/money'
 
 interface AnalyticsData {
   summary: {
@@ -135,8 +136,8 @@ export default async function AnalyticsPage() {
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Ingresos</span>
             <DollarSign className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
           </div>
-          <p className="text-xl font-bold text-green-600 dark:text-green-400">${analytics.revenue.total.toLocaleString('es-MX')}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">${analytics.revenue.this_month.toLocaleString('es-MX')} este mes</p>
+          <p className="text-xl font-bold text-green-600 dark:text-green-400">${formatAmount(analytics.revenue.total)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">${formatAmount(analytics.revenue.this_month)} este mes</p>
         </Link>
 
         <Link href="/dashboard/reminders" className="block bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 hover:border-orange-300 dark:hover:border-orange-700 transition-colors">
@@ -208,7 +209,7 @@ export default async function AnalyticsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500 dark:text-gray-400">Valor Promedio</span>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  ${analytics.quotes.avg_quote_value.toLocaleString('es-MX')}
+                  ${formatAmount(analytics.quotes.avg_quote_value)}
                 </span>
               </div>
             </div>
@@ -307,7 +308,7 @@ export default async function AnalyticsPage() {
             <div className="p-4 bg-gradient-to-br from-green-50 dark:from-green-900/20 to-green-100 dark:to-green-900/10 rounded-lg">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Ingresos Totales</p>
               <p className="text-xl font-bold text-green-700 dark:text-green-400">
-                ${analytics.revenue.total.toLocaleString('es-MX')}
+                ${formatAmount(analytics.revenue.total)}
               </p>
               <div className="flex items-center mt-1 text-green-600 dark:text-green-400">
                 <TrendingUp className="w-3.5 h-3.5 mr-1" />
@@ -318,7 +319,7 @@ export default async function AnalyticsPage() {
             <div className="p-4 bg-gradient-to-br from-orange-50 dark:from-orange-900/20 to-orange-100 dark:to-orange-900/10 rounded-lg">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Este Mes</p>
               <p className="text-xl font-bold text-orange-700 dark:text-orange-400">
-                ${analytics.revenue.this_month.toLocaleString('es-MX')}
+                ${formatAmount(analytics.revenue.this_month)}
               </p>
               <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Ingresos del mes actual</p>
             </div>
@@ -326,7 +327,7 @@ export default async function AnalyticsPage() {
             <div className="p-4 bg-gradient-to-br from-purple-50 dark:from-purple-900/20 to-purple-100 dark:to-purple-900/10 rounded-lg">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Valor Promedio</p>
               <p className="text-xl font-bold text-purple-700 dark:text-purple-400">
-                ${analytics.quotes.avg_quote_value.toLocaleString('es-MX')}
+                ${formatAmount(analytics.quotes.avg_quote_value)}
               </p>
               <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Por cotización</p>
             </div>

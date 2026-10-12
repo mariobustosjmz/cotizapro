@@ -4,6 +4,7 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import { z } from 'zod'
+import { pendingBalance } from '@/lib/analytics/quote-stats'
 
 const incomeAnalyticsQuerySchema = z.object({
   period: z.enum(['week', 'month']).default('month'),
@@ -206,26 +207,33 @@ export async function GET(request: NextRequest) {
 
     const pipelineValue = pipelineQuotes?.reduce((sum, q) => sum + Number(q.total), 0) || 0
 
-    // Query pending balance: total of all quotes minus total payments
-    const { data: allQuotes, error: allQuotesError } = await supabase
+    // Saldo pendiente: por cada cotización comprometida, su total menos sus propios pagos
+    const { data: openQuotes, error: openQuotesError } = await supabase
       .from('quotes')
-      .select('total')
+      .select('id, total, status')
       .eq('organization_id', profile.organization_id)
-      .in('status', ['accepted', 'en_instalacion', 'installed'])
+      .in('status', ['accepted', 'en_instalacion', 'completado'])
+      .limit(10000)
 
-    if (allQuotesError) {
-      logger.error('Error fetching all quotes for pending balance', allQuotesError, { orgId: profile.organization_id })
+    if (openQuotesError) {
+      logger.error('Error fetching open quotes for pending balance', openQuotesError, { orgId: profile.organization_id })
     }
 
-    const totalQuoteAmount = allQuotes?.reduce((sum, q) => sum + Number(q.total), 0) || 0
+    const openIds = (openQuotes ?? []).map((q) => q.id)
+    const { data: openPayments, error: openPaymentsError } = openIds.length
+      ? await supabase
+          .from('quote_payments')
+          .select('quote_id, amount')
+          .eq('organization_id', profile.organization_id)
+          .in('quote_id', openIds)
+          .limit(10000)
+      : { data: [], error: null }
 
-    const { data: allTimePayments, error: allTimeError } = await supabase
-      .from('quote_payments')
-      .select('amount')
-      .eq('organization_id', profile.organization_id)
+    if (openPaymentsError) {
+      logger.error('Error fetching payments for pending balance', openPaymentsError, { orgId: profile.organization_id })
+    }
 
-    const allTimePaid = allTimePayments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0
-    const pendingBalance = Math.max(0, totalQuoteAmount - allTimePaid)
+    const pendingBalanceValue = pendingBalance(openQuotes ?? [], openPayments ?? [])
 
     const response: IncomeAnalyticsResponse = {
       current_period: {
@@ -243,7 +251,7 @@ export async function GET(request: NextRequest) {
       }),
       ...(weeklyBreakdown && { weekly_breakdown: weeklyBreakdown }),
       pipeline_value: pipelineValue,
-      pending_balance: pendingBalance,
+      pending_balance: pendingBalanceValue,
     }
 
     logger.info('Income analytics retrieved successfully', {

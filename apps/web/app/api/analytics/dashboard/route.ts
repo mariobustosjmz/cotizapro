@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { collectedSince, conversionRate, countByStatus, responseRate } from '@/lib/analytics/quote-stats'
 
 interface QuoteItemWithService {
   service_id: string
@@ -86,41 +87,23 @@ export async function GET(request: NextRequest) {
       .eq('organization_id', orgId)
       .limit(10000)
 
-    const quoteStats = {
-      draft: quotesByStatus?.filter(q => q.status === 'draft').length || 0,
-      sent: quotesByStatus?.filter(q => q.status === 'sent').length || 0,
-      viewed: quotesByStatus?.filter(q => q.status === 'viewed').length || 0,
-      accepted: quotesByStatus?.filter(q => q.status === 'accepted').length || 0,
-      rejected: quotesByStatus?.filter(q => q.status === 'rejected').length || 0,
-      expired: quotesByStatus?.filter(q => q.status === 'expired').length || 0,
-    }
-
-    // Conversion rate: accepted / (accepted + rejected)
-    const totalDecided = quoteStats.accepted + quoteStats.rejected
-    const conversionRate = totalDecided > 0
-      ? ((quoteStats.accepted / totalDecided) * 100).toFixed(2)
-      : '0.00'
+    const quoteStats = countByStatus(quotesByStatus ?? [])
+    const conversion = conversionRate(quoteStats)
 
     // ========================================
-    // 3. Revenue Metrics
+    // 3. Revenue Metrics (dinero cobrado: pagos registrados)
     // ========================================
 
-    const { data: acceptedQuotes } = await supabase
-      .from('quotes')
-      .select('total, accepted_at')
+    const { data: payments } = await supabase
+      .from('quote_payments')
+      .select('amount, payment_date')
       .eq('organization_id', orgId)
-      .eq('status', 'accepted')
       .limit(10000)
 
-    const totalRevenue = acceptedQuotes?.reduce((sum, q) => sum + Number(q.total || 0), 0) || 0
-
-    // Revenue this month
-    const firstDayOfMonth = new Date()
-    firstDayOfMonth.setDate(1)
-    firstDayOfMonth.setHours(0, 0, 0, 0)
-    const revenueThisMonth = acceptedQuotes?.filter(q =>
-      q.accepted_at && new Date(q.accepted_at) >= firstDayOfMonth
-    ).reduce((sum, q) => sum + Number(q.total || 0), 0) || 0
+    const now = new Date()
+    const firstDayOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+    const totalRevenue = collectedSince(payments ?? [])
+    const revenueThisMonth = collectedSince(payments ?? [], firstDayOfMonth)
 
     // ========================================
     // 4. Reminder Statistics
@@ -237,11 +220,7 @@ export async function GET(request: NextRequest) {
     // 8. Response Rate (viewed / sent)
     // ========================================
 
-    const viewedOrBetter = quoteStats.viewed + quoteStats.accepted + quoteStats.rejected
-    const sentTotal = quoteStats.sent + viewedOrBetter
-    const responseRate = sentTotal > 0
-      ? ((viewedOrBetter / sentTotal) * 100).toFixed(2)
-      : '0.00'
+    const response = responseRate(quoteStats)
 
     // ========================================
     // Compile Response
@@ -256,8 +235,8 @@ export async function GET(request: NextRequest) {
       },
       quotes: {
         by_status: quoteStats,
-        conversion_rate: parseFloat(conversionRate),
-        response_rate: parseFloat(responseRate),
+        conversion_rate: conversion,
+        response_rate: response,
         avg_quote_value: Number(avgQuoteValue.toFixed(2)),
       },
       revenue: {

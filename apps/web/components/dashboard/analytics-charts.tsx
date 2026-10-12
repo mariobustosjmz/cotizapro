@@ -7,6 +7,16 @@ import {
 } from 'recharts'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { conversionFunnel, toStatusCounts, type FunnelStage } from '@/lib/analytics/quote-stats'
+import { formatAmount } from '@/lib/format/money'
+
+const FUNNEL_COLORS: Readonly<Record<FunnelStage['stage'], string>> = {
+  Creadas: '#6B7280',
+  Enviadas: '#3B82F6',
+  Vistas: '#8B5CF6',
+  Aceptadas: '#10B981',
+  Cobradas: '#22C55E',
+}
 
 interface QuoteStatusData {
   status: string
@@ -51,7 +61,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 function formatCurrency(value: number): string {
-  return `$${value.toLocaleString('es-MX')}`
+  return `$${formatAmount(value)}`
 }
 
 interface QuoteStatusChartProps {
@@ -234,18 +244,8 @@ export function AnalyticsCharts() {
         : []
 
       const totalQuotes = quotesStatusArray.reduce((s, q) => s + q.count, 0)
-      const sent = quotesStatusArray.find(q => q.status === 'sent')?.count || 0
-      const viewed = quotesStatusArray.find(q => q.status === 'viewed')?.count || 0
-      const accepted = quotesStatusArray.find(q => q.status === 'accepted')?.count || 0
-      const cobrado = quotesStatusArray.find(q => q.status === 'cobrado')?.count || 0
-
-      const funnel = [
-        { stage: 'Creadas', count: totalQuotes, color: '#6B7280' },
-        { stage: 'Enviadas', count: sent + viewed + accepted + cobrado, color: '#3B82F6' },
-        { stage: 'Vistas', count: viewed + accepted + cobrado, color: '#8B5CF6' },
-        { stage: 'Aceptadas', count: accepted + cobrado, color: '#10B981' },
-        { stage: 'Cobradas', count: cobrado, color: '#22C55E' },
-      ]
+      const counts = toStatusCounts(Object.fromEntries(quotesStatusArray.map((q) => [q.status, q.count])))
+      const funnel = conversionFunnel(counts, totalQuotes).map((f) => ({ ...f, color: FUNNEL_COLORS[f.stage] }))
 
       const weeklyRevenue = (income.data?.weekly_breakdown || []).map((w: WeeklyBreakdown) => ({
         ...w,

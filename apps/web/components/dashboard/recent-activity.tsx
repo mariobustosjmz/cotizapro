@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { formatAmount } from '@/lib/format/money'
 
 interface RecentActivityProps {
   organizationId: string
@@ -59,7 +60,7 @@ export async function RecentActivity({ organizationId }: RecentActivityProps) {
               </div>
               <div className="text-right">
                 <p className="font-semibold text-gray-900">
-                  ${quote.total.toLocaleString('es-MX')}
+                  ${formatAmount(quote.total)}
                 </p>
                 <span
                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${

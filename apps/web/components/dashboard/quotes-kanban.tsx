@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { QuoteStatus } from '@/lib/validations/cotizapro'
+import { formatAmount } from '@/lib/format/money'
 
 export interface KanbanQuote {
   id: string
@@ -111,7 +112,7 @@ export function QuotesKanban({ quotes, onStatusChange }: Props) {
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm font-semibold text-gray-900">
-                      ${Number(quote.total).toLocaleString('es-MX')}
+                      ${formatAmount(quote.total)}
                     </span>
                     <span className="text-xs text-gray-400">
                       {daysSince(quote.updated_at)}d

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus, Trash2, FileDown } from 'lucide-react'
 import type { QuotePayment, PaymentType, PaymentMethod } from '@/lib/validations/cotizapro'
+import { formatAmount } from '@/lib/format/money'
 
 interface PaymentSectionProps {
   quoteId: string
@@ -147,7 +148,7 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
           <div className="flex justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">Pagado</span>
             <span className="font-semibold dark:text-white">
-              ${Number(totalPaid).toLocaleString('es-MX')} / ${Number(quoteTotal).toLocaleString('es-MX')}
+              ${formatAmount(totalPaid)} / ${formatAmount(quoteTotal)}
             </span>
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -210,7 +211,7 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
                       {paymentMethodLabels[payment.payment_method]}
                     </td>
                     <td className="text-right py-3 px-3 font-semibold text-gray-900 dark:text-white">
-                      ${Number(payment.amount).toLocaleString('es-MX')}
+                      ${formatAmount(payment.amount)}
                     </td>
                     <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
                       {payment.received_by ? payment.received_by.slice(-8) : '—'}

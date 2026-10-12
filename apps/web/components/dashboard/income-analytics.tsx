@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react'
+import { formatAmount } from '@/lib/format/money'
 
 interface IncomeAnalyticsResponse {
   data: {
@@ -120,7 +121,7 @@ export function IncomeAnalytics() {
               Cobrado {period === 'week' ? 'esta Semana' : 'este Mes'}
             </p>
             <p className="text-2xl font-bold text-green-700">
-              ${data.current_period.total_paid.toLocaleString('es-MX')}
+              ${formatAmount(data.current_period.total_paid)}
             </p>
             <p className="text-xs text-gray-500 mt-2">
               {data.current_period.start_date} a {data.current_period.end_date}
@@ -144,7 +145,7 @@ export function IncomeAnalytics() {
                 )}
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                Anterior: ${data.previous_period.total_paid.toLocaleString('es-MX')}
+                Anterior: ${formatAmount(data.previous_period.total_paid)}
               </p>
             </div>
           )}
@@ -155,7 +156,7 @@ export function IncomeAnalytics() {
               Saldo Pendiente
             </p>
             <p className="text-2xl font-bold text-orange-700">
-              ${data.pending_balance.toLocaleString('es-MX')}
+              ${formatAmount(data.pending_balance)}
             </p>
             <p className="text-xs text-gray-500 mt-2">Por cobrar</p>
           </div>
@@ -166,7 +167,7 @@ export function IncomeAnalytics() {
               Pipeline Total
             </p>
             <p className="text-2xl font-bold text-purple-700">
-              ${data.pipeline_value.toLocaleString('es-MX')}
+              ${formatAmount(data.pipeline_value)}
             </p>
             <p className="text-xs text-gray-500 mt-2">En trabajo</p>
           </div>
@@ -193,7 +194,7 @@ export function IncomeAnalytics() {
                       </span>
                       <div className="text-right">
                         <span className="text-sm font-bold text-gray-900">
-                          ${week.total_paid.toLocaleString('es-MX')}
+                          ${formatAmount(week.total_paid)}
                         </span>
                         <p className="text-xs text-gray-500">{week.date_range}</p>
                       </div>

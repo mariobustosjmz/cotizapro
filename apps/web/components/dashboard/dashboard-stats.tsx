@@ -1,4 +1,5 @@
 import { StatsCardsGrid, StatsCard } from '@/components/dashboard/stats-cards'
+import { formatAmount } from '@/lib/format/money'
 import {
   FileText,
   Users,
@@ -64,8 +65,8 @@ export function DashboardStats({ data }: DashboardStatsProps) {
     },
     {
       title: 'Ingresos del Mes',
-      value: `$${data.revenue.this_month.toLocaleString('es-MX')}`,
-      description: `Total: $${data.revenue.total.toLocaleString('es-MX')}`,
+      value: `$${formatAmount(data.revenue.this_month)}`,
+      description: `Total: $${formatAmount(data.revenue.total)}`,
       icon: DollarSign,
       trend: data.revenue.this_month > 0
         ? { value: 100, isPositive: true }

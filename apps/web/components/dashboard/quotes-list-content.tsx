@@ -9,6 +9,7 @@ import { Pagination } from '@/components/ui/pagination'
 import { QuoteSearchInput } from '@/app/(dashboard)/dashboard/quotes/search-input'
 import type { QuoteStatus } from '@/lib/validations/cotizapro'
 import { quoteStatusSchema } from '@/lib/validations/cotizapro'
+import { formatAmount } from '@/lib/format/money'
 
 const VALID_STATUSES = quoteStatusSchema.options as readonly QuoteStatus[]
 
@@ -212,7 +213,7 @@ export function QuotesListContent({
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap text-right">
                         <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                          ${Number(quote.total).toLocaleString('es-MX')}
+                          ${formatAmount(quote.total)}
                         </span>
                       </td>
                       <td className="px-4 py-2.5 whitespace-nowrap">

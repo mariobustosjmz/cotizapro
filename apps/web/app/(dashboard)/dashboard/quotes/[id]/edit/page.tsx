@@ -13,6 +13,7 @@ import {
 import Link from 'next/link'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
+import { formatAmount } from '@/lib/format/money'
 
 interface QuoteItem {
   id?: string
@@ -464,7 +465,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                                       className="w-full px-2 py-1.5 text-left hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer"
                                     >
                                       <p className="text-sm text-gray-900 dark:text-white truncate">{service.name}</p>
-                                      <p className="text-[10px] text-gray-400 dark:text-gray-500">${Number(service.unit_price).toLocaleString('es-MX')} / {UNIT_TYPE_LABELS[service.unit_type] || service.unit_type}</p>
+                                      <p className="text-[10px] text-gray-400 dark:text-gray-500">${formatAmount(service.unit_price)} / {UNIT_TYPE_LABELS[service.unit_type] || service.unit_type}</p>
                                     </button>
                                   ))}
                                 </div>
@@ -510,7 +511,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all tabular-nums"
                         />
                         <div className="text-sm font-medium text-right tabular-nums text-gray-700 dark:text-gray-300">
-                          ${lineTotal.toLocaleString('es-MX')}
+                          ${formatAmount(lineTotal)}
                         </div>
                         <button
                           type="button"
@@ -546,7 +547,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           <option value="">Servicio libre</option>
                           {services.map(service => (
                             <option key={service.id} value={service.id}>
-                              {service.name} - ${Number(service.unit_price).toLocaleString('es-MX')}
+                              {service.name} - ${formatAmount(service.unit_price)}
                             </option>
                           ))}
                         </select>
@@ -584,7 +585,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           </div>
                         </div>
                         <div className="text-right text-sm font-semibold tabular-nums text-gray-700 dark:text-gray-300">
-                          ${lineTotal.toLocaleString('es-MX')}
+                          ${formatAmount(lineTotal)}
                         </div>
                       </div>
                     </div>
@@ -690,22 +691,22 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
-                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${subtotal.toLocaleString('es-MX')}</span>
+                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${formatAmount(subtotal)}</span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500 dark:text-gray-400">Descuento ({discountRate}%)</span>
-                        <span className="tabular-nums text-green-600 dark:text-green-400">-${discount.toLocaleString('es-MX')}</span>
+                        <span className="tabular-nums text-green-600 dark:text-green-400">-${formatAmount(discount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500 dark:text-gray-400">IVA (16%)</span>
-                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${tax.toLocaleString('es-MX')}</span>
+                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${formatAmount(tax)}</span>
                     </div>
                     <div className="flex justify-between pt-2.5 border-t border-gray-200 dark:border-gray-700">
                       <span className="font-bold text-gray-900 dark:text-white">Total</span>
                       <span className="font-bold text-lg tabular-nums text-orange-600 dark:text-orange-400">
-                        ${total.toLocaleString('es-MX')}
+                        ${formatAmount(total)}
                       </span>
                     </div>
                   </div>
@@ -785,7 +786,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
             </div>
             <div className="text-right">
               <p className="text-[10px] text-gray-400 dark:text-gray-500">Total</p>
-              <p className="text-base font-bold tabular-nums text-orange-600 dark:text-orange-400">${total.toLocaleString('es-MX')}</p>
+              <p className="text-base font-bold tabular-nums text-orange-600 dark:text-orange-400">${formatAmount(total)}</p>
             </div>
           </div>
           <Button
@@ -793,7 +794,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
             disabled={loading || !hasClient || !hasItems}
             className="w-full h-10 font-semibold cursor-pointer"
           >
-            {loading ? 'Guardando...' : `Guardar ($${total.toLocaleString('es-MX')})`}
+            {loading ? 'Guardando...' : `Guardar ($${formatAmount(total)})`}
           </Button>
         </div>
 
