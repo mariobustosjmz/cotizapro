@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Trash2, FileDown, Send, Calendar, Plus, Pencil } from 'lucide-react'
 import Link from 'next/link'
 import { PaymentSection } from '@/components/dashboard/payment-section'
+import { JobPhotosSection } from '@/components/quotes/job-photos-section'
+import { ReviewRequestCard } from '@/components/quotes/review-request-card'
 import { QuoteShareDialog } from '@/components/dashboard/quote-share-dialog'
+import { parseWallClock } from '@/lib/calendar/wall-clock'
+import { formatAmount } from '@/lib/format/money'
 
 interface QuoteItem {
   id: string
@@ -306,10 +310,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                   <td className="py-2.5 px-4 text-gray-900 dark:text-white">{item.description}</td>
                   <td className="text-right py-2.5 px-4 text-gray-600 dark:text-gray-300">{item.quantity}</td>
                   <td className="text-right py-2.5 px-4 text-gray-600 dark:text-gray-300">
-                    ${Number(item.unit_price).toLocaleString('es-MX')}
+                    ${formatAmount(item.unit_price)}
                   </td>
                   <td className="text-right py-2.5 px-4 font-medium text-gray-900 dark:text-white">
-                    ${Number(item.subtotal).toLocaleString('es-MX')}
+                    ${formatAmount(item.subtotal)}
                   </td>
                 </tr>
               ))}
@@ -321,22 +325,22 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           <div className="space-y-1 ml-auto max-w-xs text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500 dark:text-gray-400">Subtotal:</span>
-              <span className="font-medium dark:text-white">${Number(quote.subtotal).toLocaleString('es-MX')}</span>
+              <span className="font-medium dark:text-white">${formatAmount(quote.subtotal)}</span>
             </div>
             {Number(quote.discount_rate) > 0 && (
               <div className="flex justify-between text-green-600 dark:text-green-400">
                 <span>Descuento ({Number(quote.discount_rate)}%):</span>
-                <span>-${((Number(quote.subtotal) * Number(quote.discount_rate)) / 100).toLocaleString('es-MX')}</span>
+                <span>-${formatAmount((Number(quote.subtotal) * Number(quote.discount_rate)) / 100)}</span>
               </div>
             )}
             <div className="flex justify-between">
               <span className="text-gray-500 dark:text-gray-400">IVA ({Number(quote.tax_rate) || 16}%):</span>
-              <span className="font-medium dark:text-white">${Number(quote.tax_amount).toLocaleString('es-MX')}</span>
+              <span className="font-medium dark:text-white">${formatAmount(quote.tax_amount)}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
               <span className="font-bold text-gray-900 dark:text-white">Total:</span>
               <span className="font-bold text-orange-600 dark:text-orange-400">
-                ${Number(quote.total).toLocaleString('es-MX')}
+                ${formatAmount(quote.total)}
               </span>
             </div>
           </div>
@@ -345,6 +349,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Payments */}
       <PaymentSection quoteId={quote.id} quoteTotal={quote.total} />
+
+      {quote.status === 'cobrado' && <ReviewRequestCard quoteId={quote.id} clientEmail={quote.client?.email ?? null} />}
+
+      <JobPhotosSection quoteId={quote.id} />
 
       {/* Work Events */}
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
@@ -370,7 +378,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{event.title}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(event.scheduled_start).toLocaleDateString('es-MX', {
+                      {parseWallClock(event.scheduled_start).toLocaleDateString('es-MX', {
                         month: 'short',
                         day: 'numeric',
                         hour: '2-digit',

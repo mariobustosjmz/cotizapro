@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,10 @@ import {
   Check, GripVertical
 } from 'lucide-react'
 import Link from 'next/link'
+import type { PriceList } from '@cotizapro/quoting'
+import { ConfigurableItemPanel } from '@/components/quoting/configurable-item-panel'
+import { initialConfigurableItem, patchFromPreview } from '@/lib/pricing/configurable-item'
+import { formatAmount, type ItemInput } from '@/lib/pricing/client-preview'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
 
@@ -19,8 +23,9 @@ interface QuoteItem {
   description: string
   quantity: number
   unit_price: number
-  unit_type: 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
+  unit_type: 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit' | 'per_lm'
   service_id: string | null
+  input?: ItemInput | null
 }
 
 interface Client {
@@ -37,6 +42,7 @@ interface Service {
   description: string | null
   unit_price: number
   unit_type: string
+  pricing_blocks?: unknown
 }
 
 interface TemplateItem {
@@ -67,11 +73,14 @@ const UNIT_TYPE_LABELS: Record<string, string> = {
 export default function NewQuotePage() {
   const router = useRouter()
   const { toast } = useToast()
+  const presetClientId = useSearchParams().get('client_id')
+  const presetAppliedRef = useRef(false)
   const [loading, setLoading] = useState(false)
   const [dataLoading, setDataLoading] = useState(true)
   const [error, setError] = useState('')
   const [clients, setClients] = useState<Client[]>([])
   const [services, setServices] = useState<Service[]>([])
+  const [priceLists, setPriceLists] = useState<readonly PriceList[]>([])
   const [templates, setTemplates] = useState<QuoteTemplate[]>([])
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
   const [selectedClientId, setSelectedClientId] = useState<string>('')
@@ -96,11 +105,17 @@ export default function NewQuotePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [clientsRes, servicesRes, templatesRes] = await Promise.all([
+        const [clientsRes, servicesRes, templatesRes, priceListsRes] = await Promise.all([
           fetch('/api/clients'),
           fetch('/api/services'),
           fetch('/api/templates'),
+          fetch('/api/price-lists'),
         ])
+
+        if (priceListsRes.ok) {
+          const data = await priceListsRes.json()
+          setPriceLists(data.data || [])
+        }
 
         if (clientsRes.ok) {
           const data = await clientsRes.json()
@@ -125,6 +140,28 @@ export default function NewQuotePage() {
 
     fetchData()
   }, [])
+
+  useEffect(() => {
+    if (dataLoading || !presetClientId || presetAppliedRef.current) return
+    presetAppliedRef.current = true
+    const applyPreset = (client: Client) => {
+      setSelectedClientId(client.id)
+      setClientSearch(client.name + (client.company_name ? ` (${client.company_name})` : ''))
+    }
+    const known = clients.find(c => c.id === presetClientId)
+    if (known) {
+      applyPreset(known)
+      return
+    }
+    fetch(`/api/clients/${encodeURIComponent(presetClientId)}`)
+      .then(res => (res.ok ? (res.json() as Promise<{ client: Client }>) : null))
+      .then(body => {
+        if (!body?.client) return
+        setClients(prev => [body.client, ...prev])
+        applyPreset(body.client)
+      })
+      .catch(() => toast({ message: 'No se pudo cargar el cliente seleccionado', variant: 'error' }))
+  }, [dataLoading, presetClientId, clients, toast])
 
   // Keyboard shortcut: Ctrl+Enter to submit
   useEffect(() => {
@@ -169,14 +206,18 @@ export default function NewQuotePage() {
   function selectService(index: number, serviceId: string) {
     const service = services.find(s => s.id === serviceId)
     if (service) {
+      const configurable = service.pricing_blocks ? initialConfigurableItem(service.name, service.pricing_blocks, priceLists) : null
       const newItems = [...items]
-      newItems[index] = {
-        ...newItems[index],
-        service_id: serviceId,
-        description: service.name,
-        unit_price: Number(service.unit_price),
-        unit_type: service.unit_type as 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit'
-      }
+      newItems[index] = configurable
+        ? { ...newItems[index], ...configurable, service_id: serviceId }
+        : {
+            ...newItems[index],
+            service_id: serviceId,
+            description: service.name,
+            unit_price: Number(service.unit_price),
+            unit_type: service.unit_type as QuoteItem['unit_type'],
+            input: null,
+          }
       setItems(newItems)
     }
     setServiceSearchIndex(null)
@@ -231,6 +272,7 @@ export default function NewQuotePage() {
   const hasClient = !!selectedClientId
   const hasItems = itemCount > 0
   const hasValidPrices = items.some(i => i.unit_price > 0)
+  const incompleteConfigurable = items.findIndex(i => i.input && i.unit_price <= 0)
   const completedSteps = [hasClient, hasItems, hasValidPrices].filter(Boolean).length
 
   const filteredClients = clientSearch
@@ -255,6 +297,12 @@ export default function NewQuotePage() {
 
     if (!selectedClientId) {
       setError('Selecciona un cliente')
+      setLoading(false)
+      return
+    }
+
+    if (incompleteConfigurable >= 0) {
+      setError(`Completa las medidas y opciones de la partida ${incompleteConfigurable + 1}`)
       setLoading(false)
       return
     }
@@ -525,7 +573,7 @@ export default function NewQuotePage() {
                                       className="w-full px-2 py-1.5 text-left hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer"
                                     >
                                       <p className="text-sm text-gray-900 dark:text-white truncate">{service.name}</p>
-                                      <p className="text-[10px] text-gray-400 dark:text-gray-500">${Number(service.unit_price).toLocaleString('es-MX')} / {UNIT_TYPE_LABELS[service.unit_type] || service.unit_type}</p>
+                                      <p className="text-[10px] text-gray-400 dark:text-gray-500">${formatAmount(service.unit_price)} / {UNIT_TYPE_LABELS[service.unit_type] || service.unit_type}</p>
                                     </button>
                                   ))}
                                 </div>
@@ -560,6 +608,7 @@ export default function NewQuotePage() {
                           value={item.quantity}
                           onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                           required
+                          readOnly={Boolean(item.input)}
                           data-testid={`item-quantity-${index}`}
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all tabular-nums"
                         />
@@ -570,11 +619,12 @@ export default function NewQuotePage() {
                           value={item.unit_price}
                           onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
                           required
+                          readOnly={Boolean(item.input)}
                           data-testid={`item-unit-price-${index}`}
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all tabular-nums"
                         />
                         <div className="text-sm font-medium text-right tabular-nums text-gray-700 dark:text-gray-300">
-                          ${lineTotal.toLocaleString('es-MX')}
+                          ${formatAmount(lineTotal)}
                         </div>
                         <button
                           type="button"
@@ -610,7 +660,7 @@ export default function NewQuotePage() {
                           <option value="">Servicio libre</option>
                           {services.map(service => (
                             <option key={service.id} value={service.id}>
-                              {service.name} - ${Number(service.unit_price).toLocaleString('es-MX')}
+                              {service.name} - ${formatAmount(service.unit_price)}
                             </option>
                           ))}
                         </select>
@@ -651,9 +701,22 @@ export default function NewQuotePage() {
                           </div>
                         </div>
                         <div className="text-right text-sm font-semibold tabular-nums text-gray-700 dark:text-gray-300">
-                          ${lineTotal.toLocaleString('es-MX')}
+                          ${formatAmount(lineTotal)}
                         </div>
                       </div>
+                      {item.input && item.service_id && (
+                        <ConfigurableItemPanel
+                          fieldPrefix={`item-${index}`}
+                          serviceName={services.find(s => s.id === item.service_id)?.name ?? item.description}
+                          definition={services.find(s => s.id === item.service_id)?.pricing_blocks}
+                          priceLists={priceLists}
+                          value={item.input}
+                          onChange={(input, preview) => {
+                            const name = services.find(s => s.id === item.service_id)?.name ?? item.description
+                            setItems(prev => prev.map((it, i) => (i === index ? { ...it, ...patchFromPreview(name, input, preview) } : it)))
+                          }}
+                        />
+                      )}
                     </div>
                   )
                 })}
@@ -758,22 +821,22 @@ export default function NewQuotePage() {
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
-                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${subtotal.toLocaleString('es-MX')}</span>
+                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${formatAmount(subtotal)}</span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500 dark:text-gray-400">Descuento ({discountRate}%)</span>
-                        <span className="tabular-nums text-green-600 dark:text-green-400">-${discount.toLocaleString('es-MX')}</span>
+                        <span className="tabular-nums text-green-600 dark:text-green-400">-${formatAmount(discount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500 dark:text-gray-400">IVA (16%)</span>
-                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${tax.toLocaleString('es-MX')}</span>
+                      <span className="tabular-nums text-gray-700 dark:text-gray-300">${formatAmount(tax)}</span>
                     </div>
                     <div className="flex justify-between pt-2.5 border-t border-gray-200 dark:border-gray-700">
                       <span className="font-bold text-gray-900 dark:text-white">Total</span>
                       <span className="font-bold text-lg tabular-nums text-orange-600 dark:text-orange-400" data-testid="quote-total">
-                        ${total.toLocaleString('es-MX')}
+                        ${formatAmount(total)}
                       </span>
                     </div>
                   </div>
@@ -870,7 +933,7 @@ export default function NewQuotePage() {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-gray-400 dark:text-gray-500">Total</p>
-              <p className="text-base font-bold tabular-nums text-orange-600 dark:text-orange-400">${total.toLocaleString('es-MX')}</p>
+              <p className="text-base font-bold tabular-nums text-orange-600 dark:text-orange-400">${formatAmount(total)}</p>
             </div>
           </div>
           <Button
@@ -879,7 +942,7 @@ export default function NewQuotePage() {
             data-testid="submit-quote-btn-mobile"
             className="w-full h-10 font-semibold cursor-pointer"
           >
-            {loading ? 'Creando...' : `Crear Cotizaci\u00F3n ($${total.toLocaleString('es-MX')})`}
+            {loading ? 'Creando...' : `Crear Cotizaci\u00F3n ($${formatAmount(total)})`}
           </Button>
         </div>
 

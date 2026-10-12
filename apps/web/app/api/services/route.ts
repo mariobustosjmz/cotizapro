@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     // Construir query
     let query = supabase
       .from('service_catalog')
-      .select('id, name, description, category, unit_price, unit_type, is_active, created_at, organization_id')
+      .select('id, name, description, category, unit_price, unit_type, is_active, created_at, organization_id, pricing_blocks')
       .eq('organization_id', profile.organization_id)
       .order('category')
       .order('name')

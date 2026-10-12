@@ -62,18 +62,18 @@ export function Combobox({
         required={required}
         disabled={disabled}
         autoComplete="off"
-        className={`w-full px-3 py-2 border rounded-md text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 ${
-          hasError ? 'border-red-500 bg-red-50' : 'border-gray-300'
+        className={`w-full px-3 py-2 border rounded-md text-sm text-gray-900 dark:text-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 ${
+          hasError ? 'border-red-500 bg-red-50 dark:bg-red-950/40' : 'border-gray-300 dark:border-gray-700'
         }`}
       />
       {open && filtered.length > 0 && (
-        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg text-sm">
+        <ul className="absolute z-50 mt-1 w-full max-h-52 overflow-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-lg text-sm">
           {filtered.map((o) => (
             <li
               key={o.value}
               onMouseDown={() => selectOption(o.value, o.label)}
-              className={`px-3 py-2 cursor-pointer hover:bg-orange-50 ${
-                o.value === selectedValue ? 'bg-orange-100 font-medium' : ''
+              className={`px-3 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-900/30 ${
+                o.value === selectedValue ? 'bg-orange-100 dark:bg-orange-900/40 font-medium' : ''
               }`}
             >
               {o.label}

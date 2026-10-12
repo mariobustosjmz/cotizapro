@@ -61,7 +61,7 @@ export default function LandingPage() {
       {
         icon: "template",
         title: "Plantillas Personalizables",
-        description: "Configura términos de pago, garantías y condiciones una vez. Reutiliza en todas tus cotizaciones.",
+        description: "Guarda plantillas con servicios, condiciones y etiquetas promocionales. Crea cotizaciones en segundos con un solo clic.",
         color: "purple",
         badge: null
       }
@@ -79,19 +79,19 @@ export default function LandingPage() {
         title: "Recordatorios Automáticos",
         description: "WhatsApp automático para mantenimientos anuales. Nunca vuelvas a perder un cliente por olvido.",
         color: "yellow",
-        badge: "PRÓXIMAMENTE"
+        badge: null
       },
       {
         icon: "calendar",
         title: "Calendario de Servicios",
-        description: "Agenda citas, visualiza tu semana y organiza tus servicios. Sincroniza con Google Calendar.",
+        description: "Agenda citas, visualiza tu semana y organiza los servicios de tu equipo. Vista semanal con arrastrar y soltar.",
         color: "indigo",
-        badge: "PRÓXIMAMENTE"
+        badge: null
       },
       {
-        icon: "history",
-        title: "Historial Completo",
-        description: "Todas las cotizaciones, servicios y pagos por cliente. Acceso instantáneo al historial completo.",
+        icon: "kanban",
+        title: "Tablero Kanban",
+        description: "Mueve tus cotizaciones entre estados: enviada, aprobada, en instalación, completada y cobrada. Visión clara de tu pipeline.",
         color: "teal",
         badge: null
       }
@@ -106,10 +106,10 @@ export default function LandingPage() {
       },
       {
         icon: "creditcard",
-        title: "Link de Pago",
-        description: "Cobra con Stripe (tarjeta o transferencia). Envía link de pago y recibe confirmación automática.",
+        title: "Registro de Cobros",
+        description: "Registra anticipos y liquidaciones por cotización. Visualiza cuánto has cobrado y cuánto falta con barra de progreso.",
         color: "blue",
-        badge: "PRÓXIMAMENTE"
+        badge: null
       },
       {
         icon: "receipt",
@@ -120,8 +120,8 @@ export default function LandingPage() {
       },
       {
         icon: "chart",
-        title: "Dashboard de Ventas",
-        description: "Métricas en tiempo real: conversión, ingresos, tendencias. Toma decisiones basadas en datos.",
+        title: "Analytics de Ingresos",
+        description: "Ingresos por periodo, tasa de conversión y tendencias de cobro. Toma decisiones basadas en datos reales de tu negocio.",
         color: "red",
         badge: null
       }
@@ -152,7 +152,8 @@ export default function LandingPage() {
       users: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
       creditcard: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
       receipt: "M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z",
-      chart: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+      chart: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
+      kanban: "M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
     }
     return icons[iconName] || icons.document
   }
@@ -224,7 +225,7 @@ export default function LandingPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                Nuevo: WhatsApp integrado
+                Nuevo: Pagos, Kanban y Analytics incluidos
               </div>
 
               {/* Heading */}

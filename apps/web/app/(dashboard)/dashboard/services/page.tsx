@@ -1,10 +1,12 @@
 import { redirect } from 'next/navigation'
 import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Plus, Wrench, CheckCircle, Layers } from 'lucide-react'
+import { Plus, Wrench, CheckCircle, Layers, Tags } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { ServiceFilters } from './filters'
+import { TryServiceButton } from '@/components/price-lists/try-service-button'
+import { formatAmount } from '@/lib/format/money'
 
 interface Service {
   id: string
@@ -15,6 +17,7 @@ interface Service {
   unit_type: string
   is_active: boolean
   created_at: string
+  pricing_blocks: unknown
 }
 
 export default async function ServicesPage({
@@ -43,7 +46,7 @@ export default async function ServicesPage({
 
   let servicesQuery = supabase
     .from('service_catalog')
-    .select('id, name, description, category, unit_price, unit_type, is_active, created_at')
+    .select('id, name, description, category, unit_price, unit_type, is_active, created_at, pricing_blocks')
     .eq('organization_id', profile.organization_id)
     .order('category', { ascending: true })
     .order('name', { ascending: true })
@@ -83,6 +86,7 @@ export default async function ServicesPage({
     per_hour: 'Por Hora',
     per_sqm: 'Por m²',
     per_unit: 'Por Unidad',
+    per_lm: 'Por ml',
   }
 
   const activeServices = services?.filter(s => s.is_active) || []
@@ -104,12 +108,20 @@ export default async function ServicesPage({
             </div>
           </div>
         </div>
-        <Link href="/dashboard/services/new" className="w-full sm:w-auto">
-          <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
-            <Plus className="w-4 h-4 mr-1" />
-            Nuevo
-          </Button>
-        </Link>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Link href="/dashboard/price-lists" className="flex-1 sm:flex-none">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <Tags className="w-4 h-4 mr-1" />
+              Listas de precios
+            </Button>
+          </Link>
+          <Link href="/dashboard/services/new" className="flex-1 sm:flex-none">
+            <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-1" />
+              Nuevo
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
@@ -141,12 +153,19 @@ export default async function ServicesPage({
                   <tbody>
                     {categoryServices.map((service) => (
                       <tr key={service.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-orange-50/40 dark:hover:bg-gray-800 cursor-pointer">
-                        <td className="py-2 px-4 text-sm font-medium text-gray-900 dark:text-white">{service.name}</td>
+                        <td className="py-2 px-4 text-sm font-medium text-gray-900 dark:text-white">
+                          {service.name}
+                          {service.pricing_blocks != null && (
+                            <span className="ml-2 align-middle px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-[10px] font-medium text-orange-700 dark:text-orange-400">
+                              Configurable
+                            </span>
+                          )}
+                        </td>
                         <td className="py-2 px-4 text-xs text-gray-500 dark:text-gray-400 max-w-xs truncate hidden md:table-cell">
                           {service.description || '-'}
                         </td>
                         <td className="text-right py-2 px-4 text-sm font-medium text-gray-900 dark:text-white">
-                          ${Number(service.unit_price).toLocaleString('es-MX')}
+                          ${formatAmount(service.unit_price)}
                         </td>
                         <td className="text-center py-2 px-4 text-xs text-gray-500 dark:text-gray-400 hidden sm:table-cell">
                           {unitTypeLabels[service.unit_type] || service.unit_type}
@@ -156,7 +175,10 @@ export default async function ServicesPage({
                             {service.is_active ? 'Activo' : 'Inactivo'}
                           </Badge>
                         </td>
-                        <td className="text-right py-2 px-4">
+                        <td className="text-right py-2 px-4 whitespace-nowrap space-x-1">
+                          {service.pricing_blocks != null && (
+                            <TryServiceButton serviceName={service.name} definition={service.pricing_blocks} />
+                          )}
                           <Link href={`/dashboard/services/${service.id}`}>
                             <Button variant="outline" size="sm" className="h-7 text-xs px-2">
                               Ver

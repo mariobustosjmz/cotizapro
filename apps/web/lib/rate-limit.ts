@@ -75,30 +75,12 @@ export function createRateLimiter(options: {
 }
 
 /**
- * Extract client IP from request
- * Handles proxied requests (X-Forwarded-For, CF-Connecting-IP, etc.)
+ * IP del cliente. De X-Forwarded-For se toma el salto más a la derecha: lo agrega el proxy propio
+ * (Caddy/Traefik) y el cliente no puede falsificarlo; los saltos de la izquierda sí vienen del cliente.
  */
 export function extractClientIp(request: Request): string {
-  const headers = new Headers(request.headers)
-
-  // Check for standard proxy headers
-  const forwardedFor = headers.get("x-forwarded-for")
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0].trim()
-  }
-
-  const cfConnectingIp = headers.get("cf-connecting-ip")
-  if (cfConnectingIp) {
-    return cfConnectingIp
-  }
-
-  const xRealIp = headers.get("x-real-ip")
-  if (xRealIp) {
-    return xRealIp
-  }
-
-  // Fallback to localhost (shouldn't happen in production)
-  return "127.0.0.1"
+  const hops = (request.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean)
+  return hops.at(-1) || request.headers.get('x-real-ip') || request.headers.get('cf-connecting-ip') || '127.0.0.1'
 }
 
 // Pre-configured rate limiters for common scenarios

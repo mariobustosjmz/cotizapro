@@ -24,6 +24,9 @@ import {
   Calendar as CalendarIcon,
   Copy as TemplateIcon,
   CreditCard,
+  Store,
+  Inbox,
+  Tags,
 } from 'lucide-react'
 
 interface ProfileOrganization {
@@ -48,7 +51,13 @@ const principalNav = [
   { name: 'Recordatorios', href: '/dashboard/reminders', icon: Bell, shortcut: 'G R' },
   { name: 'Agenda', href: '/dashboard/calendar', icon: CalendarIcon, shortcut: 'G A' },
   { name: 'Servicios', href: '/dashboard/services', icon: Briefcase, shortcut: 'G S' },
+  { name: 'Listas de precios', href: '/dashboard/price-lists', icon: Tags, shortcut: '' },
   { name: 'Templates', href: '/dashboard/templates', icon: TemplateIcon, shortcut: 'G T' },
+]
+
+const showcaseNav = [
+  { name: 'Mi página', href: '/dashboard/vitrina', icon: Store, shortcut: '' },
+  { name: 'Solicitudes', href: '/dashboard/solicitudes', icon: Inbox, shortcut: '' },
 ]
 
 const analyticsNav = [
@@ -263,6 +272,13 @@ export function DashboardSidebar({ user, profile }: SidebarProps) {
           items={principalNav}
           pathname={pathname}
           isCollapsed={isCollapsed}
+        />
+        <NavSection
+          label="Vitrina"
+          items={showcaseNav}
+          pathname={pathname}
+          isCollapsed={isCollapsed}
+          className="mt-5"
         />
         <NavSection
           label="Análisis"

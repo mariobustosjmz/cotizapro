@@ -26,6 +26,10 @@ const segmentLabels: Record<string, string> = {
   calendar: 'Agenda',
   templates: 'Templates',
   billing: 'Facturación',
+  vitrina: 'Mi página',
+  solicitudes: 'Solicitudes',
+  'price-lists': 'Listas de precios',
+  bienvenida: 'Configura tu cuenta',
   new: 'Nuevo',
 }
 

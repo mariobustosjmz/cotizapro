@@ -22,7 +22,8 @@
       "@/*": ["./*"],
       "@cotizapro/auth": ["../../packages/auth/src/index.ts"],
       "@cotizapro/db": ["../../packages/db/src/index.ts"],
-      "@cotizapro/ui": ["../../packages/ui/src/index.ts"]
+      "@cotizapro/ui": ["../../packages/ui/src/index.ts"],
+      "@cotizapro/quoting": ["../../packages/quoting/src/index.ts"]
     }
   },
   "include": [

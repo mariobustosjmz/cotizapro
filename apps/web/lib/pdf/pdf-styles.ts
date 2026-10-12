@@ -127,6 +127,17 @@ export function createStyles(brandColor: string) {
       marginTop: 12,
       alignItems: 'flex-end',
     },
+    materialRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: 280,
+      borderBottomWidth: 0.5,
+      borderBottomColor: '#E5E7EB',
+      paddingVertical: 2,
+    },
+    materialQty: {
+      textAlign: 'right',
+    },
     totalsRow: {
       flexDirection: 'row',
       marginBottom: 3,

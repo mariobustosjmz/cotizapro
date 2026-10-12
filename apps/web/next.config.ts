@@ -1,11 +1,21 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+// Self-hosted Supabase (VPS) is not under *.supabase.co, so CSP must allow the configured origin.
+const supabaseOrigin = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").origin;
+  } catch {
+    return "";
+  }
+})();
+const supabaseWs = supabaseOrigin.replace(/^http/, "ws");
+
 const nextConfig: NextConfig = {
   // Output standalone for Docker deployment
   output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '../../'),
-  transpilePackages: ['@cotizapro/auth', '@cotizapro/db', '@cotizapro/ui'],
+  transpilePackages: ['@cotizapro/auth', '@cotizapro/db', '@cotizapro/ui', '@cotizapro/quoting'],
 
   // Security headers configuration
   headers: async () => {
@@ -40,9 +50,9 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
+              `img-src 'self' data: https: blob: ${supabaseOrigin}`,
               "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com",
-              "connect-src 'self' https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co",
+              `connect-src 'self' ${supabaseOrigin} ${supabaseWs} https://*.supabase.co https://api.stripe.com https://checkout.stripe.com wss://*.supabase.co`,
               "frame-src 'self' https://checkout.stripe.com",
               "form-action 'self'",
               "base-uri 'self'",
@@ -89,9 +99,9 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
-              "img-src 'self' data: https:",
+              `img-src 'self' data: https: blob: ${supabaseOrigin}`,
               "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com",
-              "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co",
+              `connect-src 'self' ${supabaseOrigin} ${supabaseWs} https://*.supabase.co https://api.stripe.com wss://*.supabase.co`,
               "form-action 'self'",
               "base-uri 'self'",
               "frame-ancestors 'none'",

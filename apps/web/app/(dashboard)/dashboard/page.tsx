@@ -16,6 +16,7 @@ import {
   DollarSign,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { isWon } from '@/lib/analytics/quote-stats'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -86,13 +87,15 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, organizations(name)')
+    .select('*, organizations(name, onboarding_completed_at)')
     .eq('id', user.id)
     .single()
 
   if (!profile) return null
 
   const orgId = profile.organization_id
+  const orgInfo = profile.organizations as unknown as { onboarding_completed_at: string | null } | null
+  const needsSetup = profile.role === 'owner' && !orgInfo?.onboarding_completed_at
   const now = new Date()
   const today = now.toISOString().split('T')[0]
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
@@ -144,7 +147,7 @@ export default async function DashboardPage() {
   }
 
   const totalRevenue = quotes
-    ?.filter(q => q.status === 'accepted')
+    ?.filter(q => isWon(q.status))
     .reduce((sum, q) => sum + Number(q.total ?? 0), 0) ?? 0
 
   const quotesThisMonth = quotes?.filter(q => q.created_at >= thisMonthStart).length ?? 0
@@ -165,7 +168,7 @@ export default async function DashboardPage() {
     : 0
 
   const acceptanceRate = (quotes?.length ?? 0) > 0
-    ? (quoteCounts.accepted / (quotes?.length ?? 1)) * 100
+    ? ((quotes?.filter(q => isWon(q.status)).length ?? 0) / (quotes?.length ?? 1)) * 100
     : 0
 
   const orgName = (profile.organizations as { name?: string } | null)?.name
@@ -174,6 +177,18 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-4">
       <RealtimeRefresh tables={['quotes', 'clients', 'follow_up_reminders']} />
+
+      {needsSetup && (
+        <Link href="/dashboard/bienvenida" data-testid="setup-banner">
+          <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-500 text-white hover:bg-orange-600 transition-colors">
+            <div className="flex-1 min-w-0 text-sm">
+              <span className="font-semibold">Configura tu cuenta en 1 minuto.</span>{' '}
+              <span className="text-white/85">Elige tu giro y obtén productos, precios y tu página pública listos.</span>
+            </div>
+            <ChevronRight className="w-4 h-4 shrink-0" />
+          </div>
+        </Link>
+      )}
 
       {/* Urgent Reminders Banner */}
       {overdueReminders.length > 0 && (

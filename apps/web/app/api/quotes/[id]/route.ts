@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { updateQuoteSchema, type QuoteStatus } from '@/lib/validations/cotizapro'
+import { priceItemsForOrg, sumSubtotals } from '@/lib/pricing/price-items-for-org'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -175,9 +176,11 @@ export async function PATCH(
 
     // Si se actualizan items, recalcular totales
     if (items) {
-      const subtotal = items.reduce((sum, item) => {
-        return sum + (item.quantity * item.unit_price)
-      }, 0)
+      const priced = await priceItemsForOrg({ supabase, organizationId: profile.organization_id }, items)
+      if (!priced.ok) {
+        return NextResponse.json({ error: 'No se pudo calcular una partida', errors: priced.errors }, { status: 422 })
+      }
+      const subtotal = sumSubtotals(priced.value)
 
       const discountRate = discount_rate ?? 0
       const discount_amount = subtotal * (discountRate / 100)
@@ -212,14 +215,9 @@ export async function PATCH(
       logger.database('DELETE', 'quote_items', { quoteId: id })
       await supabase.from('quote_items').delete().eq('quote_id', id)
 
-      const quoteItems = items.map((item, index) => ({
+      const quoteItems = priced.value.map((item, index) => ({
+        ...item,
         quote_id: id,
-        service_id: item.service_id || null,
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        unit_type: item.unit_type,
-        subtotal: Number((item.quantity * item.unit_price).toFixed(2)),
         sort_order: index,
       }))
 

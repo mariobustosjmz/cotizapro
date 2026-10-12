@@ -7,6 +7,7 @@ import {
   Image,
 } from '@react-pdf/renderer'
 import { createStyles, DEFAULT_BRAND_COLOR } from './pdf-styles'
+import { ITEM_UNIT_LABEL, materialsFromItems } from './quote-materials'
 import type { QuoteWithItems } from '@/types/database.types'
 
 export interface OrgSettings {
@@ -23,11 +24,12 @@ interface QuotePDFProps {
   orgSettings: OrgSettings
 }
 
-function BuildingIconFallback() {
-  // Simple text-based fallback since SVG might have limitations
-  return (
-    <Text style={{ fontSize: 20, color: 'white' }}>🏢</Text>
-  )
+function initials(name: string): string {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('') || 'CP'
+}
+
+function LogoFallback({ name }: { readonly name: string }) {
+  return <Text style={{ fontSize: 18, color: 'white', fontFamily: 'Helvetica-Bold' }}>{initials(name)}</Text>
 }
 
 function formatCurrency(value: number): string {
@@ -45,6 +47,7 @@ function formatDate(dateStr: string): string {
 export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
   const brandColor = orgSettings.brand_color ?? DEFAULT_BRAND_COLOR
   const styles = createStyles(brandColor)
+  const materials = materialsFromItems(quote.items as readonly { readonly breakdown?: unknown }[])
 
   const companyLines = [
     orgSettings.company_address,
@@ -64,7 +67,7 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
             />
           ) : (
             <View style={styles.logoIconContainer}>
-              <BuildingIconFallback />
+              <LogoFallback name={orgName} />
             </View>
           )}
           <View style={styles.headerCompanyBlock}>
@@ -115,7 +118,7 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
             >
               <Text style={[styles.tableCell, styles.colDesc]}>{item.description}</Text>
               <Text style={[styles.tableCell, styles.colQty]}>{item.quantity}</Text>
-              <Text style={[styles.tableCell, styles.colUnit]}>{item.unit_type}</Text>
+              <Text style={[styles.tableCell, styles.colUnit]}>{ITEM_UNIT_LABEL[item.unit_type] ?? item.unit_type}</Text>
               <Text style={[styles.tableCell, styles.colPrice]}>{formatCurrency(Number(item.unit_price))}</Text>
               <Text style={[styles.tableCell, styles.colSubtotal]}>{formatCurrency(Number(item.subtotal))}</Text>
             </View>
@@ -142,6 +145,18 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
               <Text style={styles.totalFinalValue}>{formatCurrency(quote.total)}</Text>
             </View>
           </View>
+
+          {materials.length > 0 && (
+            <View style={styles.notesBlock} wrap={false}>
+              <Text style={styles.sectionLabel}>Lista de materiales</Text>
+              {materials.map((m) => (
+                <View key={m.label} style={styles.materialRow}>
+                  <Text style={styles.notesText}>{m.label}</Text>
+                  <Text style={[styles.notesText, styles.materialQty]}>{m.quantity}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Notes */}
           {quote.notes && (

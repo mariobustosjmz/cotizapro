@@ -37,10 +37,17 @@ function checkRequestSize(request: NextRequest): NextResponse | null {
   return null
 }
 
-const ALLOWED_ORIGINS = [
-  'http://localhost:4200',
-  'http://localhost:3000',
-]
+function appOrigin(): string | null {
+  try {
+    return process.env.NEXT_PUBLIC_APP_URL ? new URL(process.env.NEXT_PUBLIC_APP_URL).origin : null
+  } catch {
+    return null
+  }
+}
+
+const ALLOWED_ORIGINS: readonly string[] = [appOrigin(), 'http://localhost:4200', 'http://localhost:3000'].filter(
+  (o): o is string => Boolean(o),
+)
 
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false

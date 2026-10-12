@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { priceItemsForOrg, sumSubtotals } from '@/lib/pricing/price-items-for-org'
 import { NextRequest, NextResponse } from 'next/server'
 import { createQuoteSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
@@ -116,10 +117,12 @@ export async function POST(request: NextRequest) {
 
     const { items, discount_rate, ...quoteData } = validation.data
 
-    // Calcular totales
-    const subtotal = items.reduce((sum, item) => {
-      return sum + (item.quantity * item.unit_price)
-    }, 0)
+    // Partidas configurables se recalculan en servidor; nunca se confía en el precio del cliente
+    const priced = await priceItemsForOrg({ supabase, organizationId: profile.organization_id }, items)
+    if (!priced.ok) {
+      return NextResponse.json({ error: 'No se pudo calcular una partida', errors: priced.errors }, { status: 422 })
+    }
+    const subtotal = sumSubtotals(priced.value)
 
     const discount_amount = subtotal * (discount_rate / 100)
     const subtotal_after_discount = subtotal - discount_amount
@@ -163,14 +166,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Insertar items de cotización
-    const quoteItems = items.map((item, index) => ({
+    const quoteItems = priced.value.map((item, index) => ({
+      ...item,
       quote_id: quote.id,
-      service_id: item.service_id || null,
-      description: item.description,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      unit_type: item.unit_type,
-      subtotal: Number((item.quantity * item.unit_price).toFixed(2)),
       sort_order: index,
     }))
 

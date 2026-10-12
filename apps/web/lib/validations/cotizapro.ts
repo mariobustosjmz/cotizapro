@@ -82,7 +82,7 @@ export type UpdateClientInput = z.infer<typeof updateClientSchema>
 // ========================================
 
 export const serviceCategoryEnum = z.enum(['hvac', 'painting', 'plumbing', 'electrical', 'other'])
-export const unitTypeEnum = z.enum(['fixed', 'per_hour', 'per_sqm', 'per_unit'])
+export const unitTypeEnum = z.enum(['fixed', 'per_hour', 'per_sqm', 'per_unit', 'per_lm'])
 
 export const createServiceSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(200, 'El nombre es muy largo'),
@@ -123,6 +123,8 @@ export const quoteItemSchema = z.object({
     .positive('El precio debe ser mayor a 0')
     .max(999999.99, 'Precio demasiado alto'),
   unit_type: unitTypeEnum,
+  /** Entradas de un producto configurable; si viene, el servidor recalcula descripción y precio. */
+  input: z.record(z.string(), z.union([z.number(), z.string(), z.boolean()])).optional().nullable(),
 })
 
 export type QuoteItemInput = z.infer<typeof quoteItemSchema>
