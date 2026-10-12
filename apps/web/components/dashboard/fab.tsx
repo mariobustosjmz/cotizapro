@@ -1,10 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Plus, X } from 'lucide-react'
 import { QuickActionsList } from './quick-actions'
+import { shouldShowFab } from '@/lib/navigation/fab-visibility'
 
 export function FAB() {
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
   const toggleOpen = () => {
@@ -27,6 +30,8 @@ export function FAB() {
       window.removeEventListener('keydown', handleEscapeKey)
     }
   }, [isOpen])
+
+  if (!shouldShowFab(pathname)) return null
 
   return (
     <div className="lg:hidden fixed bottom-6 right-6 z-50">

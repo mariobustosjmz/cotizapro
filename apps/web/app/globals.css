@@ -348,8 +348,10 @@
   }
 }
 
+/* backwards, no both: un transform residual convierte a <main> en el contenedor de
+   los elementos position:fixed y las barras inferiores se desplazan con el contenido. */
 .page-transition {
-  animation: pageEnter 0.2s ease-out both;
+  animation: pageEnter 0.2s ease-out backwards;
 }
 
 /* ============================================================

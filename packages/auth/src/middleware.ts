@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isPublicPath } from './public-routes'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -35,12 +36,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Public routes that don't require authentication
-  const publicRoutes = ['/', '/login', '/signup', '/auth', '/onboarding', '/terminos', '/privacidad', '/p', '/r']
-  const isPublicRoute = publicRoutes.some(route =>
-    request.nextUrl.pathname === route ||
-    request.nextUrl.pathname.startsWith(`${route}/`)
-  )
+  const isPublicRoute = isPublicPath(request.nextUrl.pathname)
 
   if (!user && !isPublicRoute) {
     // No user, redirect to login
