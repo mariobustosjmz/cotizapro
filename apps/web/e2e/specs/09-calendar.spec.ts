@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { combobox } from '../helpers/combobox'
 import { AuthPage } from '../pages/auth.page'
 import { CalendarPage } from '../pages/calendar.page'
 import { testUsers } from '../fixtures/auth.fixture'
@@ -59,8 +60,8 @@ test.describe('Work Calendar', () => {
 
     // Verify all required form fields are present
     const titleInput = page.locator('input[name="title"]')
-    const clientSelect = page.locator('select[name="client_id"]')
-    const eventTypeSelect = page.locator('select[name="event_type"]')
+    const clientSelect = combobox(page, 'client_id').input
+    const eventTypeSelect = combobox(page, 'event_type').input
     const startInput = page.locator('input[name="scheduled_start"]')
     const endInput = page.locator('input[name="scheduled_end"]')
 
@@ -143,11 +144,12 @@ test.describe('Work Calendar', () => {
     let foundLabels = 0
 
     for (const label of dayLabels) {
-      const exists = await page.locator(`text=${label}`).isVisible().catch(() => false)
+      const exists = await page.getByText(label, { exact: true }).first().isVisible().catch(() => false)
       if (exists) foundLabels++
     }
 
-    // At least some day labels should be visible
-    expect(foundLabels).toBeGreaterThan(0)
+    // The week grid (with day labels) is replaced by an empty state when the week has no events
+    const emptyWeek = await page.getByText('No hay eventos esta semana').isVisible().catch(() => false)
+    expect(foundLabels > 0 || emptyWeek).toBeTruthy()
   })
 })

@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test'
 import { BasePage } from './base.page'
+import { chooseComboboxOption, waitForComboboxOptions } from '../helpers/combobox'
 
 export class RemindersPage extends BasePage {
   constructor(page: Page) {
@@ -12,22 +13,8 @@ export class RemindersPage extends BasePage {
 
   async goToNewReminder() {
     await super.goto('/dashboard/reminders/new')
-
-    // Wait for client dropdown to load options
-    const clientSelect = this.page.locator('select[name="client_id"]')
-
-    // Wait for at least 2 options (placeholder + at least one client)
-    await this.page.waitForFunction(
-      (selector) => {
-        const select = document.querySelector(selector) as HTMLSelectElement
-        return select && select.options.length > 1
-      },
-      'select[name="client_id"]',
-      { timeout: 30000 }
-    )
-
-    const optionCount = await clientSelect.locator('option').count()
-    console.log(`[E2E] Client dropdown loaded with ${optionCount} options (including placeholder)`)
+    const count = await waitForComboboxOptions(this.page, 'client_id')
+    console.log(`[E2E] Client combobox loaded with ${count} options`)
   }
 
   async goToReminderDetails(reminderId: string) {
@@ -70,34 +57,10 @@ export class RemindersPage extends BasePage {
     // Wait a moment for React to process the change
     await this.page.waitForTimeout(100)
 
-    // Client selection - required field
-    // If client_id provided, select that client, otherwise select first available client
-    const clientSelect = this.page.locator('select[name="client_id"]')
-    if (await clientSelect.isVisible()) {
-      if (data.client_id) {
-        await clientSelect.selectOption(data.client_id)
-      } else {
-        // Select first client (index 1, since 0 is placeholder)
-        const options = await clientSelect.locator('option').count()
-        if (options > 1) {
-          await clientSelect.selectOption({ index: 1 })
-        }
-      }
-    }
-
-    if (data.relatedTo) {
-      const typeSelect = this.page.locator('select[name="related_type"]')
-      if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption(data.relatedTo)
-      }
-    }
-
-    if (data.relatedId) {
-      const idSelect = this.page.locator('select[name="related_id"]')
-      if (await idSelect.isVisible()) {
-        await idSelect.selectOption(data.relatedId)
-      }
-    }
+    // Required comboboxes: client, type and priority
+    await chooseComboboxOption(this.page, 'client_id')
+    await chooseComboboxOption(this.page, 'reminder_type', 'Seguimiento')
+    await chooseComboboxOption(this.page, 'priority', 'Normal')
   }
 
   async submitReminderForm() {

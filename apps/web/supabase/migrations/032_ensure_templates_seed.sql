@@ -21,7 +21,7 @@ DELETE FROM quote_templates WHERE id::text LIKE '00000000-0000-0000-000a-%';
 -- ============================================================
 -- TEMPLATES (5 from migration 024)
 -- ============================================================
-INSERT INTO quote_templates (id, organization_id, name, description, default_terms, default_discount_rate, is_active, promotional_label, promotional_valid_until) VALUES
+INSERT INTO quote_templates (id, organization_id, name, description, default_terms_and_conditions, default_discount_rate, is_active, promotional_label, promotional_valid_until) VALUES
   ('00000000-0000-0000-0005-000000000001',
    '00000000-0000-0000-0000-000000000002',
    'Mantenimiento Preventivo AC',
@@ -65,7 +65,7 @@ INSERT INTO quote_templates (id, organization_id, name, description, default_ter
 -- ============================================================
 -- TEMPLATES (3 from migration 026)
 -- ============================================================
-INSERT INTO quote_templates (id, organization_id, name, description, default_terms, default_discount_rate, is_active, promotional_label, promotional_valid_until) VALUES
+INSERT INTO quote_templates (id, organization_id, name, description, default_terms_and_conditions, default_discount_rate, is_active, promotional_label, promotional_valid_until) VALUES
   ('00000000-0000-0000-000a-000000000001',
    '00000000-0000-0000-0000-000000000002',
    'Paquete Residencial Básico',

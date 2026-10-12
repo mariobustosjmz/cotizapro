@@ -24,7 +24,7 @@ async function globalSetup(config: FullConfig) {
 
   try {
     // Wait for the app to be ready
-    const baseURL = 'http://localhost:3000'
+    const baseURL = process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000'
     await page.goto(baseURL, { waitUntil: 'load', timeout: 30000 })
     console.log('✅ Application is ready')
   } catch (error) {

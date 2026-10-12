@@ -52,3 +52,17 @@ next-env.d.ts
 build.log
 build_output.log
 test-output.log
+
+# Artefactos de build y pruebas en cualquier paquete del monorepo
+.next/
+.turbo/
+test-results/
+playwright-report/
+.playwright-mcp/
+node_modules/
+dist/
+coverage/
+
+# Salida generada por los recorridos automatizados (capturas, PDF y credenciales locales)
+docs/handoff/recorrido-*/
+docs/handoff/semana-*/

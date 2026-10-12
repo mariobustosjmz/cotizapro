@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { AuthPage } from '../pages/auth.page'
 import { testUsers } from '../fixtures/auth.fixture'
+import { chooseComboboxOption, combobox, waitForComboboxOptions } from '../helpers/combobox'
 
 // Helper: local datetime string in YYYY-MM-DDTHH:MM format (matches datetime-local input)
 function localDateTimeStr(date: Date): string {
@@ -22,16 +23,8 @@ test.describe('Calendar Event Create/Edit', () => {
     await expect(titleInput).toBeVisible({ timeout: 10000 })
     await titleInput.fill('E2E Test Event - Instalación')
 
-    // Select first real client option (index 1 skips the placeholder)
-    const clientSelect = page.locator('select[name="client_id"]')
-    await expect(clientSelect).toBeVisible()
-    const optionCount = await clientSelect.locator('option').count()
-    if (optionCount > 1) {
-      await clientSelect.selectOption({ index: 1 })
-    }
-
-    const eventTypeSelect = page.locator('select[name="event_type"]')
-    await eventTypeSelect.selectOption('instalacion')
+    await chooseComboboxOption(page, 'client_id')
+    await chooseComboboxOption(page, 'event_type', 'Instalación')
 
     // Set start (tomorrow 10:00) and end (tomorrow 11:00) as local time
     const tomorrow = new Date()
@@ -69,23 +62,16 @@ test.describe('Calendar Event Create/Edit', () => {
   test('Event type select has all expected options', async ({ page }) => {
     await page.goto('/dashboard/calendar/new', { waitUntil: 'domcontentloaded' })
 
-    const eventTypeSelect = page.locator('select[name="event_type"]')
-    await expect(eventTypeSelect).toBeVisible({ timeout: 10000 })
-
-    const options = await eventTypeSelect.locator('option').allTextContents()
-    const optionValues = await eventTypeSelect.locator('option').evaluateAll(
-      (els) => els.map((el) => (el as HTMLOptionElement).value)
-    )
+    const eventType = combobox(page, 'event_type')
+    await expect(eventType.input).toBeVisible({ timeout: 10000 })
+    await eventType.input.fill('')
+    await eventType.options.first().waitFor({ state: 'visible' })
+    const labels = await eventType.options.allTextContents()
 
     // Must include the 5 known event types from WORK_EVENT_TYPE_OPTIONS
-    const expectedTypes = ['instalacion', 'medicion', 'visita_tecnica', 'mantenimiento', 'otro']
-    for (const type of expectedTypes) {
-      expect(optionValues).toContain(type)
+    for (const label of ['Instalación', 'Medición', 'Visita Técnica', 'Mantenimiento', 'Otro']) {
+      expect(labels).toContain(label)
     }
-
-    // At least 5 real options (plus optional placeholder)
-    const realOptions = optionValues.filter((v) => v !== '')
-    expect(realOptions.length).toBeGreaterThanOrEqual(5)
   })
 
   test('Create event form has address and notes optional fields', async ({ page }) => {
@@ -122,11 +108,8 @@ test.describe('Calendar Event Create/Edit', () => {
   test('Client select is populated with seeded clients', async ({ page }) => {
     await page.goto('/dashboard/calendar/new', { waitUntil: 'domcontentloaded' })
 
-    const clientSelect = page.locator('select[name="client_id"]')
-    await expect(clientSelect).toBeVisible({ timeout: 10000 })
-
-    const options = await clientSelect.locator('option').count()
-    // Seed data has 10 clients — select should have at least 1 real option beyond placeholder
-    expect(options).toBeGreaterThan(1)
+    await expect(combobox(page, 'client_id').input).toBeVisible({ timeout: 10000 })
+    const options = await waitForComboboxOptions(page, 'client_id')
+    expect(options).toBeGreaterThan(0)
   })
 })

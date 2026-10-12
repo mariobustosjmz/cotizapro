@@ -4,9 +4,10 @@
  * Order: Edit → Delete → Create (verify record exists after each)
  */
 import { test, expect, Page } from '@playwright/test'
+import { chooseComboboxOption, combobox } from '../helpers/combobox'
 
 const DEMO = { email: 'demo@climasol.mx', password: 'ClimaSol2026!' }
-const BASE = 'http://localhost:3000'
+const BASE = process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000'
 const TIMESTAMP = Date.now()
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -138,9 +139,8 @@ test.describe('CRUD: Services (Catalog)', () => {
     await page.fill('#name', serviceName)
 
     // Category is required
-    const categorySelect = page.locator('#category').first()
-    if (await categorySelect.isVisible()) {
-      await categorySelect.selectOption({ index: 1 })
+    if (await combobox(page, 'category').input.isVisible()) {
+      await chooseComboboxOption(page, 'category')
     }
 
     const desc = page.locator('#description').first()
@@ -149,9 +149,8 @@ test.describe('CRUD: Services (Catalog)', () => {
     }
 
     // unit_type is required — use English enum values (not Spanish display labels)
-    const unitSelect = page.locator('#unit_type').first()
-    if (await unitSelect.isVisible()) {
-      await unitSelect.selectOption('fixed')
+    if (await combobox(page, 'unit_type').input.isVisible()) {
+      await chooseComboboxOption(page, 'unit_type', 'Fijo')
     }
 
     // Price is required
