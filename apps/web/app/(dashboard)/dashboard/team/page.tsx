@@ -82,7 +82,7 @@ export default async function TeamPage() {
   }
 
   const canInvite = ['owner', 'admin'].includes(profile.role)
-  const adminCount = members?.filter(m => ['owner', 'admin'].includes(m.role)).length || 0
+  const adminCount = members?.filter(m => m.role === 'admin').length || 0
 
   return (
     <div className="space-y-4">
@@ -96,7 +96,7 @@ export default async function TeamPage() {
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Equipo</h2>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-sm">
               <span className="text-gray-500 dark:text-gray-400">{countLabel(members?.length ?? 0, 'miembro', 'miembros')}</span>
-              <span className="text-purple-600 dark:text-purple-400">{countLabel(adminCount, 'admin', 'admins')}</span>
+              <span className="text-purple-600 dark:text-purple-400">{countLabel(adminCount, 'administrador', 'administradores')}</span>
               {canInvite && invitations.length > 0 && (
                 <span className="text-orange-600 dark:text-orange-400">{countLabel(invitations.length, 'invitación', 'invitaciones')}</span>
               )}
