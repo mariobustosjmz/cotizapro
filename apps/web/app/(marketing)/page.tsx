@@ -1,5 +1,8 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { EXTRA_USER_MONTHLY_PRICE, PLANS, PLAN_ORDER, PRICES_INCLUDE_VAT } from '@/lib/plans/catalog'
+import { formatMxn } from '@/lib/plans/pricing'
+import { PricingSection } from '@/components/landing/pricing-section'
+import { CaseStudyStats, UsageScenarios } from '@/components/landing/proof-sections'
 
 export default function LandingPage() {
   const jsonLd = {
@@ -8,39 +11,27 @@ export default function LandingPage() {
     "name": "CotizaPro",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "description": "La herramienta perfecta para técnicos de mantenimiento en México. Crea cotizaciones profesionales en PDF, envíalas por WhatsApp y Email en minutos.",
-    "offers": [
-      {
-        "@type": "Offer",
-        "name": "Plan Gratis",
-        "price": "0",
-        "priceCurrency": "MXN"
+    "description": "Cotizaciones profesionales para técnicos y talleres en México: cotiza por medidas, genera el PDF con tu logo y compártelo por WhatsApp.",
+    "offers": PLAN_ORDER.map((id) => ({
+      "@type": "Offer",
+      "name": `Plan ${PLANS[id].name}`,
+      "price": String(PLANS[id].monthlyPrice),
+      "priceCurrency": "MXN",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": String(PLANS[id].monthlyPrice),
+        "priceCurrency": "MXN",
+        "unitText": "MES",
+        "valueAddedTaxIncluded": PRICES_INCLUDE_VAT,
       },
-      {
-        "@type": "Offer",
-        "name": "Plan Pro",
-        "price": "299",
-        "priceCurrency": "MXN"
-      },
-      {
-        "@type": "Offer",
-        "name": "Plan Empresa",
-        "price": "799",
-        "priceCurrency": "MXN"
-      }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "127"
-    }
+    })),
   }
   const features = {
     cotizacion: [
       {
         icon: "document",
-        title: "Cotizaciones en 30 Segundos",
-        description: "Catálogo pre-cargado de servicios con precios. Crea cotizaciones profesionales en menos de 30 segundos.",
+        title: "Cotiza en Minutos",
+        description: "Catálogo con precios y plantillas por giro. Captura medidas y opciones; el total se calcula solo.",
         color: "blue",
         badge: null
       },
@@ -69,22 +60,22 @@ export default function LandingPage() {
     seguimiento: [
       {
         icon: "whatsapp",
-        title: "Envío por WhatsApp/Email",
-        description: "Envía cotizaciones directo al WhatsApp o Email de tus clientes. Rápido, conveniente y profesional.",
+        title: "Envío por WhatsApp",
+        description: "Con un toque se abre tu WhatsApp con el mensaje listo: folio, total y vigencia. El envío por correo llega próximamente.",
         color: "green",
         badge: null
       },
       {
         icon: "bell",
-        title: "Recordatorios Automáticos",
-        description: "WhatsApp automático para mantenimientos anuales. Nunca vuelvas a perder un cliente por olvido.",
+        title: "Recordatorios",
+        description: "Agenda seguimientos, cobros y mantenimientos y míralos en tu panel. El aviso automático al cliente llega próximamente.",
         color: "yellow",
         badge: null
       },
       {
         icon: "calendar",
         title: "Calendario de Servicios",
-        description: "Agenda citas, visualiza tu semana y organiza los servicios de tu equipo. Vista semanal con arrastrar y soltar.",
+        description: "Agenda mediciones e instalaciones con responsable, en una vista semanal para todo tu equipo.",
         color: "indigo",
         badge: null
       },
@@ -114,9 +105,9 @@ export default function LandingPage() {
       {
         icon: "receipt",
         title: "Facturación CFDI 4.0",
-        description: "Facturas electrónicas automáticas cumpliendo con SAT. Integración con PAC certificado.",
+        description: "Emitir la factura electrónica desde la cotización cobrada, a través de un PAC autorizado.",
         color: "green",
-        badge: "PRÓXIMAMENTE"
+        badge: "Próximamente"
       },
       {
         icon: "chart",
@@ -232,12 +223,12 @@ export default function LandingPage() {
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
                 Cotiza como{' '}
                 <span className="gradient-text-animated">profesional</span>
-                <br />en 30 segundos
+                <br />en minutos
               </h1>
 
               {/* Subtitle */}
               <p className="text-lg text-slate-600 leading-relaxed mb-8 max-w-lg animate-fade-in-up-delay-1">
-                La plataforma de cotizaciones para técnicos de HVAC, plomería, electricidad y pintura en México. Profesional, rápido y sin complicaciones.
+                Cotizaciones, cobros y agenda para técnicos y talleres en México: vidrio, aire acondicionado, plomería, electricidad y más. Desde el celular.
               </p>
 
               {/* CTAs */}
@@ -260,19 +251,19 @@ export default function LandingPage() {
                   <svg className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
-                  <span><strong className="text-slate-700">4.8</strong> calificación promedio</span>
+                  <span>Funciona en celular y tableta</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-slate-500">
                   <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
                   </svg>
-                  <span><strong className="text-slate-700">500+</strong> técnicos activos</span>
+                  <span>Precios en pesos, IVA incluido</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-slate-500">
                   <svg className="w-4 h-4 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
-                  <span>SSL certificado</span>
+                  <span>Conexión cifrada y respaldos diarios</span>
                 </div>
               </div>
             </div>
@@ -282,38 +273,38 @@ export default function LandingPage() {
               {/* Quote card */}
               <div className="animate-float absolute top-0 left-8 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-5 z-20">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Cotización #1247</span>
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Ejemplo · COT-2026-002</span>
                   <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">Enviada</span>
                 </div>
-                <p className="text-sm font-semibold text-slate-800 mb-1">Instalación A/C Split 24,000 BTU</p>
-                <p className="text-xs text-slate-500 mb-3">Cliente: Constructora Reyma</p>
+                <p className="text-sm font-semibold text-slate-800 mb-1">Cancel de baño templado 9 mm</p>
+                <p className="text-xs text-slate-500 mb-3">Cliente: Andrea G.</p>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xl font-black text-slate-900">$4,500 <span className="text-sm font-normal text-slate-500">MXN</span></span>
-                  <span className="text-xs text-slate-400">+IVA</span>
+                  <span className="text-xl font-black text-slate-900">$12,238 <span className="text-sm font-normal text-slate-500">MXN</span></span>
+                  <span className="text-xs text-slate-400">IVA incluido</span>
                 </div>
                 {/* Progress bar */}
                 <div className="w-full bg-slate-100 rounded-full h-1.5">
-                  <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: '68%' }} />
+                  <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: '50%' }} />
                 </div>
-                <p className="text-xs text-slate-400 mt-1">Tasa de cierre: 68%</p>
+                <p className="text-xs text-slate-400 mt-1">Anticipo cobrado: 50 %</p>
               </div>
 
               {/* Stats card */}
               <div className="animate-float-slow absolute bottom-8 left-0 w-60 bg-white rounded-2xl shadow-xl border border-slate-100 p-5 z-10">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Este mes</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Proyección · caso de estudio</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-2xl font-black text-blue-800">127</p>
+                    <p className="text-2xl font-black text-blue-800">10</p>
                     <p className="text-xs text-slate-500">Cotizaciones</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-black text-orange-500">68%</p>
-                    <p className="text-xs text-slate-500">Cierre</p>
+                    <p className="text-2xl font-black text-orange-500">6</p>
+                    <p className="text-xs text-slate-500">Ganadas</p>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-100">
-                  <p className="text-sm font-bold text-slate-800">$142,800 MXN</p>
-                  <p className="text-xs text-slate-400">Ingresos del mes</p>
+                  <p className="text-sm font-bold text-slate-800">$174,309 MXN</p>
+                  <p className="text-xs text-slate-400">En trabajos ganados (6 semanas, datos ficticios)</p>
                 </div>
               </div>
 
@@ -327,8 +318,8 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-800">Cliente aprobó cotización</p>
-                    <p className="text-xs text-slate-500 mt-0.5">Constructora Reyma — #1247</p>
-                    <p className="text-xs text-green-600 font-semibold mt-1">hace 2 minutos</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Andrea G. — COT-2026-002</p>
+                    <p className="text-xs text-green-600 font-semibold mt-1">Ejemplo ilustrativo</p>
                   </div>
                 </div>
               </div>
@@ -340,31 +331,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Stats Bar ───────────────────────────────────────────────── */}
-      <section className="bg-slate-900 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <p className="text-3xl sm:text-4xl font-black text-white">500+</p>
-              <p className="text-sm text-slate-400 mt-1">Técnicos Activos</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl sm:text-4xl font-black text-orange-400">30 seg</p>
-              <p className="text-sm text-slate-400 mt-1">Por Cotización</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl sm:text-4xl font-black text-white">4.8
-                <span className="text-yellow-400 text-2xl ml-1">★</span>
-              </p>
-              <p className="text-sm text-slate-400 mt-1">Calificación Promedio</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl sm:text-4xl font-black text-green-400">+40%</p>
-              <p className="text-sm text-slate-400 mt-1">Más Ventas Promedio</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Proyección del caso de estudio ─────────────────────────── */}
+      <CaseStudyStats />
 
       {/* ── Features Section ────────────────────────────────────────── */}
       <section id="caracteristicas" className="py-24 bg-white">
@@ -493,206 +461,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Testimonials ────────────────────────────────────────────── */}
-      <section className="py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
-              Lo que dicen nuestros técnicos
-            </h2>
-            <p className="text-lg text-slate-600">
-              Más de 500 técnicos ya transformaron su negocio con CotizaPro.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Testimonial 1 */}
-            <div className="bg-white rounded-2xl p-7 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-              <div className="flex gap-1 mb-4">
-                {[1,2,3,4,5].map((s) => (
-                  <svg key={s} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-5">
-                "Antes tardaba 2 horas haciendo una cotización en Word. Ahora en 5 minutos tengo el PDF y se lo mando por WhatsApp al cliente. Mis ventas subieron 40%."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                  RM
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Roberto Martínez</p>
-                  <p className="text-xs text-slate-500">Técnico HVAC — Guadalajara</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 2 */}
-            <div className="bg-white rounded-2xl p-7 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-              <div className="flex gap-1 mb-4">
-                {[1,2,3,4,5].map((s) => (
-                  <svg key={s} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-5">
-                "El historial de clientes es increíble. Ya no pierdo clientes por no recordar cuándo fue su último mantenimiento. CotizaPro se paga solo en el primer mes."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                  AG
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Ana González</p>
-                  <p className="text-xs text-slate-500">Plomera — Ciudad de México</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Testimonial 3 */}
-            <div className="bg-white rounded-2xl p-7 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-              <div className="flex gap-1 mb-4">
-                {[1,2,3,4,5].map((s) => (
-                  <svg key={s} className="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-5">
-                "El PDF profesional con mi logo marca la diferencia. Mis clientes me ven como una empresa seria. Ya conseguí contratos con empresas que antes ni me consideraban."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                  CR
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Carlos Ramírez</p>
-                  <p className="text-xs text-slate-500">Electricista — Monterrey</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Escenarios de uso ───────────────────────────────────────── */}
+      <UsageScenarios />
 
       {/* ── Pricing Section ─────────────────────────────────────────── */}
-      <section id="precios" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
-              Planes para cada técnico
-            </h2>
-            <p className="text-lg text-slate-600">
-              Empieza gratis y escala cuando tu negocio crezca.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
-            {/* Plan Gratis */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-7">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Gratis</p>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-4xl font-black text-slate-900">$0</span>
-                <span className="text-slate-500 text-sm">/mes</span>
-              </div>
-              <p className="text-xs text-slate-500 mb-6">Para empezar sin riesgo</p>
-              <Link href="/signup">
-                <button className="w-full border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold py-3 rounded-xl text-sm transition-colors cursor-pointer mb-6">
-                  Empieza Gratis
-                </button>
-              </Link>
-              <ul className="space-y-3">
-                {[
-                  "5 cotizaciones por mes",
-                  "1 plantilla de PDF",
-                  "Envío por Email",
-                  "Historial 30 días",
-                  "Soporte básico"
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
-                    <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Plan Pro */}
-            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-7 relative overflow-hidden shadow-2xl">
-              {/* Most popular badge */}
-              <div className="absolute top-4 right-4">
-                <span className="text-xs font-bold bg-orange-500 text-white px-3 py-1 rounded-full">Más Popular</span>
-              </div>
-              <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-2">Pro</p>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-4xl font-black text-white">$299</span>
-                <span className="text-blue-200 text-sm">/mes</span>
-              </div>
-              <p className="text-xs text-blue-200 mb-6">Para técnicos en crecimiento</p>
-              <Link href="/signup">
-                <button className="btn-glow-orange w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl text-sm transition-colors cursor-pointer mb-6">
-                  Empieza 14 días gratis
-                </button>
-              </Link>
-              <ul className="space-y-3">
-                {[
-                  "Cotizaciones ilimitadas",
-                  "PDF con logo personalizado",
-                  "Envío por WhatsApp y Email",
-                  "Historial completo",
-                  "CRM de clientes",
-                  "Dashboard de ventas",
-                  "Soporte prioritario"
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-white">
-                    <svg className="w-4 h-4 text-blue-200 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Plan Empresa */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-7">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Empresa</p>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-4xl font-black text-slate-900">$799</span>
-                <span className="text-slate-500 text-sm">/mes</span>
-              </div>
-              <p className="text-xs text-slate-500 mb-6">Para equipos y empresas</p>
-              <Link href="/signup">
-                <button className="w-full border border-slate-300 hover:border-slate-400 text-slate-700 font-semibold py-3 rounded-xl text-sm transition-colors cursor-pointer mb-6">
-                  Contactar ventas
-                </button>
-              </Link>
-              <ul className="space-y-3">
-                {[
-                  "Todo lo del plan Pro",
-                  "Hasta 10 técnicos",
-                  "Múltiples logos/plantillas",
-                  "Facturación CFDI 4.0",
-                  "Link de pago integrado",
-                  "API de integración",
-                  "Soporte dedicado 24/7"
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-sm text-slate-600">
-                    <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* ── FAQ Section ─────────────────────────────────────────────── */}
       <section id="faq" className="py-24 bg-slate-50">
@@ -710,27 +483,35 @@ export default function LandingPage() {
               },
               {
                 q: "¿Puedo usar CotizaPro desde mi celular?",
-                a: "Sí. CotizaPro funciona perfectamente en móvil, tablet y computadora. Puedes crear cotizaciones en obra desde tu smartphone y enviarlas al instante."
+                a: "Sí. Funciona en celular, tableta y computadora desde el navegador, sin instalar nada. Puedes cotizar en la obra y compartir la cotización por WhatsApp al momento."
               },
               {
-                q: "¿Cómo funciona el período de prueba?",
-                a: "El plan Pro incluye 14 días gratis sin necesidad de tarjeta de crédito. Exploras todas las funciones premium y decides si se adapta a tu negocio."
+                q: "¿Hay periodo de prueba?",
+                a: "El plan Gratis no vence: úsalo con 5 cotizaciones al mes el tiempo que quieras y cambia de plan cuando lo necesites. No pedimos tarjeta."
+              },
+              {
+                q: "¿Cuánto cuesta agregar a más personas de mi equipo?",
+                a: `Gratis y Solo son para una persona. Taller incluye ${PLANS.pro.includedUsers} usuarios y Empresa ${PLANS.enterprise.includedUsers}; arriba de eso, cada usuario adicional cuesta ${formatMxn(EXTRA_USER_MONTHLY_PRICE)} al mes.`
+              },
+              {
+                q: "¿Cómo se envían las cotizaciones por WhatsApp?",
+                a: "Con un toque se abre tu WhatsApp con el mensaje escrito (folio, total y vigencia) y adjuntas el PDF. El envío automático por la API oficial de WhatsApp llegará próximamente."
               },
               {
                 q: "¿Mis datos y los de mis clientes están seguros?",
-                a: "Sí. Usamos cifrado SSL de nivel bancario y servidores certificados en México. Cumplimos con la Ley Federal de Protección de Datos Personales (LFPDPPP)."
+                a: "La conexión va cifrada (HTTPS), cada negocio solo puede ver su propia información y hacemos respaldos diarios. Consulta nuestro aviso de privacidad para saber cómo tratamos tus datos."
               },
               {
                 q: "¿Puedo cancelar en cualquier momento?",
-                a: "Sí. Sin penalizaciones, sin contratos anuales obligatorios. Cancelas cuando quieras directamente desde tu cuenta en menos de 1 minuto."
+                a: "Sí. No hay contratos forzosos ni penalizaciones. La contratación y cancelación desde tu cuenta estarán disponibles cuando se active el cobro en línea."
               },
               {
                 q: "¿Qué pasa con mis cotizaciones si cancelo?",
-                a: "Puedes exportar todas tus cotizaciones en PDF antes de cancelar. Tus datos son tuyos y siempre tienes acceso a ellos."
+                a: "Puedes descargar el PDF de cada cotización cuando quieras. Tus datos son tuyos."
               },
               {
-                q: "¿Funciona para mi giro? No solo HVAC",
-                a: "Sí. CotizaPro es ideal para HVAC, plomería, electricidad, pintura, albañilería, refrigeración, fumigación y cualquier servicio técnico de mantenimiento."
+                q: "¿Funciona para mi giro?",
+                a: "Incluye plantillas para vidrio y aluminio, aire acondicionado, plomería, electricidad y costura, y un catálogo general que puedes adaptar a cualquier oficio."
               },
               {
                 q: "¿Puedo agregar mi propio catálogo de servicios?",
@@ -762,10 +543,10 @@ export default function LandingPage() {
         </div>
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-5xl font-black text-white mb-4 leading-tight">
-            Únete a más de 500 técnicos que ya crecen con CotizaPro
+            Empieza hoy a cotizar como profesional
           </h2>
           <p className="text-lg text-blue-200 mb-10">
-            Comienza gratis hoy. Sin tarjeta de crédito. Cancela cuando quieras.
+            Plan Gratis sin vencimiento. Sin tarjeta de crédito.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
@@ -837,9 +618,8 @@ export default function LandingPage() {
               &copy; {new Date().getFullYear()} CotizaPro. Hecho con pasión en México.
             </p>
             <div className="flex items-center gap-4">
-              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">SSL Seguro</span>
-              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Stripe</span>
-              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Privacidad LFPDPPP</span>
+              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Conexión cifrada</span>
+                            <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full">Aviso de privacidad</span>
             </div>
           </div>
         </div>

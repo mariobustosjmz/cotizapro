@@ -15,7 +15,8 @@
     "test:e2e:report": "playwright show-report",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "tsx scripts/seed/index.ts"
+    "seed": "tsx scripts/seed/index.ts",
+    "seed:presentacion": "tsx scripts/seed/presentacion/index.ts"
   },
   "dependencies": {
     "@cotizapro/auth": "workspace:*",

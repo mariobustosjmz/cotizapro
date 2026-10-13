@@ -149,10 +149,10 @@ export default async function SignupPage() {
               ✓ Sin tarjeta de crédito
             </p>
             <p className="text-sm text-gray-600">
-              ✓ 14 días de prueba gratis
+              ✓ Plan Gratis sin vencimiento
             </p>
             <p className="text-sm text-gray-600">
-              ✓ Cancelación cuando quieras
+              ✓ Sin contratos forzosos
             </p>
           </div>
         </form>

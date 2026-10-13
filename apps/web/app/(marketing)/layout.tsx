@@ -4,7 +4,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {
   title: 'CotizaPro - Cotizaciones Profesionales en Minutos',
-  description: 'La herramienta perfecta para técnicos de mantenimiento en México. Crea cotizaciones profesionales en PDF, envíalas por WhatsApp y Email en minutos.',
+  description: 'Cotizaciones profesionales para técnicos y talleres en México: cotiza por medidas, genera el PDF con tu logo y compártelo por WhatsApp.',
   keywords: ['cotizaciones', 'técnicos', 'mantenimiento', 'HVAC', 'plomería', 'pintura', 'electricistas', 'WhatsApp', 'México', 'CRM', 'facturación', 'CFDI', 'PDF', 'servicios'],
   authors: [{ name: 'CotizaPro' }],
   creator: 'CotizaPro',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'CotizaPro - Cotizaciones Profesionales en Minutos',
-    description: 'Crea, envía y gestiona cotizaciones por WhatsApp y Email. La herramienta perfecta para técnicos de mantenimiento en México.',
+    description: 'Cotiza, cobra y organiza tu agenda desde el celular. Para técnicos y talleres en México.',
     type: 'website',
     locale: 'es_MX',
     url: siteUrl,
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'CotizaPro - Cotizaciones Profesionales en Minutos',
-    description: 'Crea cotizaciones profesionales en PDF, envíalas por WhatsApp y Email en minutos.',
+    description: 'Cotizaciones profesionales en PDF, listas para compartir por WhatsApp.',
     images: ['/og-image.png'],
     creator: '@CotizaPro',
   },
