@@ -7,6 +7,7 @@ import { PricingSection } from '@/components/landing/pricing-section'
 import { CaseStudyStats, UsageScenarios } from '@/components/landing/proof-sections'
 import { Highlights } from '@/components/landing/highlights'
 import { ProductGallery } from '@/components/landing/product-gallery'
+import { AiPreview } from '@/components/landing/ai-preview'
 
 export default function LandingPage() {
   const jsonLd = {
@@ -177,6 +178,9 @@ export default function LandingPage() {
               <Link href="#como-se-ve" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
                 Cómo se ve
               </Link>
+              <Link href="#ia" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
+                IA
+              </Link>
               <Link href="#caracteristicas" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
                 Características
               </Link>
@@ -330,6 +334,7 @@ export default function LandingPage() {
 
       <Highlights />
       <ProductGallery />
+      <AiPreview />
 
       {/* ── Proyección del caso de estudio ─────────────────────────── */}
       <CaseStudyStats />

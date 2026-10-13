@@ -76,6 +76,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
 
 /** Funciones que aún no existen para ningún plan; se muestran como "Próximamente". */
 export const UPCOMING_FEATURES: readonly string[] = [
+  'Asistente con IA y créditos mensuales incluidos',
   'Envío automático por WhatsApp (API oficial de Meta)',
   'Contratación y pago del plan con tarjeta',
   'Pago anual con descuento',
