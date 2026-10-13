@@ -4,6 +4,9 @@ import { DashboardSidebar } from '@/components/dashboard/sidebar'
 import { DashboardHeader } from '@/components/dashboard/header'
 import { ClientLayout } from '@/components/dashboard/client-layout'
 import { FAB } from '@/components/dashboard/fab'
+import type { CSSProperties } from 'react'
+import { brandCssVars } from '@/lib/branding/color'
+import { orgBranding } from '@/lib/branding/org-branding'
 
 export default async function DashboardLayout({
   children,
@@ -22,7 +25,7 @@ export default async function DashboardLayout({
   // Get user profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, organizations(name)')
+    .select('*, organizations(name, settings)')
     .eq('id', user.id)
     .single()
 
@@ -30,12 +33,16 @@ export default async function DashboardLayout({
     redirect('/onboarding')
   }
 
+  const organization = profile.organizations as unknown as { name: string | null; settings: unknown } | null
+  const branding = orgBranding(organization?.name, organization?.settings)
+
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-gray-950">
+    <div className="flex h-screen bg-slate-50 dark:bg-gray-950" style={brandCssVars(branding.palette) as CSSProperties}>
       {/* Sidebar */}
       <DashboardSidebar
         user={user}
         profile={profile}
+        branding={branding}
       />
 
       {/* Main Content */}

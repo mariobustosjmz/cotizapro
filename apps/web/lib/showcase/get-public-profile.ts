@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/logger'
+import { safeLogoUrl } from '@/lib/branding/org-branding'
 import { publicProfileSchema, type PublicProfileView, type ShowcaseJob } from './types'
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60
@@ -34,6 +35,6 @@ export const getPublicProfile = cache(async (slug: string): Promise<PublicProfil
     return url ? [{ ...p, url }] : []
   })
   const logoPath = parsed.data.profile.logo_path
-  const logoUrl = logoPath ? supabase.storage.from('brand-assets').getPublicUrl(logoPath).data.publicUrl : null
+  const logoUrl = logoPath ? supabase.storage.from('brand-assets').getPublicUrl(logoPath).data.publicUrl : safeLogoUrl(parsed.data.logo_url)
   return { ...parsed.data, jobs: groupByJob(photos), logoUrl }
 })

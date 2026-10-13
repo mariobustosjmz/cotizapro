@@ -1,7 +1,9 @@
+import type { CSSProperties } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPublicProfile } from '@/lib/showcase/get-public-profile'
+import { brandCssVars, brandPalette } from '@/lib/branding/color'
 import { ProfileHeader } from '@/components/showcase/profile-header'
 import { QuoteRequestForm } from '@/components/showcase/quote-request-form'
 import { AboutSection, PortfolioSection, ReviewsSection, ServicesSection } from '@/components/showcase/showcase-sections'
@@ -31,16 +33,17 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const { slug } = await params
   const data = await getPublicProfile(slug)
   if (!data) notFound()
+  const brandStyle = brandCssVars(brandPalette(data.brand_color)) as CSSProperties
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950" style={brandStyle}>
       <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 space-y-4">
         <ProfileHeader data={data} />
         <AboutSection data={data} />
         <ServicesSection data={data} />
         <PortfolioSection data={data} />
         <ReviewsSection data={data} />
-        <section id="pedir-cotizacion" className="bg-white dark:bg-gray-900 rounded-2xl border border-orange-200 dark:border-orange-900/50 p-5 sm:p-7 scroll-mt-4">
+        <section id="pedir-cotizacion" className="bg-white dark:bg-gray-900 rounded-2xl border-2 border-[color-mix(in_srgb,var(--brand)_35%,transparent)] p-5 sm:p-7 scroll-mt-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Pedir cotización</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Sin costo ni compromiso. {data.profile.display_name} recibe tu solicitud al instante.</p>
           <QuoteRequestForm slug={data.slug} businessName={data.profile.display_name} askMeasurements={MEASUREMENT_TRADES.has(data.trade ?? '')} />

@@ -95,7 +95,7 @@ export function ReviewsSection({ data }: { readonly data: PublicProfileView }) {
             </div>
             <RatingStars value={r.rating} />
             {r.comment && <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{r.comment}</p>}
-            {r.owner_reply && <p className="mt-2 ml-3 border-l-2 border-orange-300 pl-3 text-sm text-gray-500 dark:text-gray-400">Respuesta: {r.owner_reply}</p>}
+            {r.owner_reply && <p className="mt-2 ml-3 border-l-2 border-[color-mix(in_srgb,var(--brand)_45%,transparent)] pl-3 text-sm text-gray-500 dark:text-gray-400">Respuesta: {r.owner_reply}</p>}
           </li>
         ))}
       </ul>

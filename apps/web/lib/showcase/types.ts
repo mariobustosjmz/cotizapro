@@ -5,6 +5,8 @@ export const publicProfileSchema = z.object({
   account_type: z.enum(['person', 'group', 'company']),
   trade: z.string().nullable(),
   member_since: z.string(),
+  brand_color: z.string().nullable().optional(),
+  logo_url: z.string().nullable().optional(),
   profile: z.object({
     display_name: z.string(),
     headline: z.string().nullable(),

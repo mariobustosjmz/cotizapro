@@ -5,7 +5,7 @@ import { extraUsersFor, formatMxn, monthlyCost, usersLabel } from './pricing'
 describe('catálogo de planes', () => {
   it('ordena los planes de menor a mayor precio', () => {
     const prices = PLAN_ORDER.map((id) => PLANS[id].monthlyPrice)
-    expect(prices).toEqual([0, 399, 999, 1999])
+    expect(prices).toEqual([0, 399, 999, 1590])
   })
 
   it('cobra 99 por usuario adicional', () => {
@@ -25,7 +25,14 @@ describe('monthlyCost', () => {
 
   it('suma 99 por cada usuario arriba del límite del plan', () => {
     expect(monthlyCost('pro', 6)).toMatchObject({ extraUsers: 3, extraUsersCost: 297, total: 1296 })
-    expect(monthlyCost('enterprise', 40)).toMatchObject({ extraUsers: 30, total: 1999 + 30 * 99 })
+    expect(monthlyCost('enterprise', 40)).toMatchObject({ extraUsers: 30, total: 1590 + 30 * 99 })
+  })
+
+  it('Empresa cuesta menos que Taller desde 9 personas', () => {
+    for (const users of [9, 10, 15, 40]) {
+      expect(monthlyCost('enterprise', users).total).toBeLessThan(monthlyCost('pro', users).total)
+    }
+    expect(monthlyCost('pro', 8).total).toBeLessThan(monthlyCost('enterprise', 8).total)
   })
 
   it('Gratis y Solo son de una persona: el exceso se marca para cambiar de plan', () => {

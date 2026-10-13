@@ -3,7 +3,7 @@
  * mapa URL → ruta y archivo de código, bloques de imagen, estilos e impresión con Chromium.
  */
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { chromium } from '@playwright/test'
 
@@ -76,7 +76,8 @@ export function pdfFirstPage(pdfPath: string): Buffer | null {
   if (!existsSync(pdfPath)) return null
   const png = path.join(path.dirname(pdfPath), `${path.basename(pdfPath, '.pdf')}-p1.png`)
   try {
-    if (!existsSync(png)) execFileSync('swift', [path.join(__dirname, 'pdf2png.swift'), pdfPath, path.dirname(pdfPath), '1'], { stdio: 'ignore' })
+    const stale = !existsSync(png) || statSync(png).mtimeMs < statSync(pdfPath).mtimeMs
+    if (stale) execFileSync('swift', [path.join(__dirname, 'pdf2png.swift'), pdfPath, path.dirname(pdfPath), '1'], { stdio: 'ignore' })
     return existsSync(png) ? readFileSync(png) : null
   } catch {
     return null

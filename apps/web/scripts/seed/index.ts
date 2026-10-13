@@ -12,6 +12,7 @@ import { seedClients } from './steps/clients'
 import { resetOrg } from './steps/org'
 import { seedPayments, seedQuotes } from './steps/quotes'
 import { seedPhotos, seedProfile, seedRequests, seedReviews } from './steps/showcase'
+import { seedBranding } from './steps/branding'
 import { type Admin, adminClient, check, loadEnv, makeRand } from './util'
 
 async function seedAccount(admin: Admin, account: SeedAccount, password: string): Promise<Record<string, number>> {
@@ -21,6 +22,7 @@ async function seedAccount(admin: Admin, account: SeedAccount, password: string)
   const clients = await seedClients(admin, account.id, users.ownerId, rand, Math.max(6, Math.round(account.quoteCount / 2)))
   const quotes = await seedQuotes(admin, account.id, users.ownerId, catalog, clients, rand, account.quoteCount)
   await seedProfile(admin, account.id, account.profile)
+  await seedBranding(admin, account.id, account.brand)
   return {
     usuarios: users.userIds.length,
     listas: catalog.priceLists.length,

@@ -1,8 +1,7 @@
 import { StyleSheet } from '@react-pdf/renderer'
+import type { BrandPalette } from '@/lib/branding/types'
 
-export const DEFAULT_BRAND_COLOR = '#2563EB'
-
-export function createStyles(brandColor: string) {
+export function createStyles(palette: BrandPalette) {
   return StyleSheet.create({
     page: {
       fontFamily: 'Helvetica',
@@ -11,17 +10,26 @@ export function createStyles(brandColor: string) {
       backgroundColor: '#FFFFFF',
     },
     headerBand: {
-      backgroundColor: brandColor,
+      backgroundColor: palette.color,
       padding: 20,
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 20,
     },
+    logoFrame: {
+      width: 56,
+      height: 56,
+      padding: 4,
+      marginRight: 14,
+      borderRadius: 6,
+      backgroundColor: '#FFFFFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     logoImage: {
       width: 48,
       height: 48,
-      marginRight: 14,
-      borderRadius: 4,
+      objectFit: 'contain',
     },
     logoIconContainer: {
       width: 48,
@@ -38,11 +46,12 @@ export function createStyles(brandColor: string) {
     headerCompanyName: {
       fontSize: 16,
       fontFamily: 'Helvetica-Bold',
-      color: '#FFFFFF',
+      color: palette.ink,
     },
     headerCompanyDetail: {
       fontSize: 8,
-      color: 'rgba(255,255,255,0.85)',
+      color: palette.ink,
+      opacity: 0.85,
       marginTop: 2,
     },
     body: {
@@ -96,14 +105,14 @@ export function createStyles(brandColor: string) {
     },
     tableHeader: {
       flexDirection: 'row',
-      backgroundColor: brandColor,
+      backgroundColor: palette.color,
       padding: 8,
       marginBottom: 1,
     },
     tableHeaderCell: {
       fontSize: 8,
       fontFamily: 'Helvetica-Bold',
-      color: '#FFFFFF',
+      color: palette.ink,
     },
     tableRow: {
       flexDirection: 'row',
@@ -157,14 +166,14 @@ export function createStyles(brandColor: string) {
     },
     totalFinalRow: {
       flexDirection: 'row',
-      backgroundColor: brandColor,
+      backgroundColor: palette.color,
       padding: 8,
       marginTop: 4,
     },
     totalFinalLabel: {
       fontSize: 10,
       fontFamily: 'Helvetica-Bold',
-      color: '#FFFFFF',
+      color: palette.ink,
       width: 80,
       textAlign: 'right',
       marginRight: 40,
@@ -172,7 +181,7 @@ export function createStyles(brandColor: string) {
     totalFinalValue: {
       fontSize: 10,
       fontFamily: 'Helvetica-Bold',
-      color: '#FFFFFF',
+      color: palette.ink,
       width: 80,
       textAlign: 'right',
     },

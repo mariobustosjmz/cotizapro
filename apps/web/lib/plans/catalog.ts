@@ -60,7 +60,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
     id: 'enterprise',
     name: 'Empresa',
     tagline: 'Para empresas con varias cuadrillas',
-    monthlyPrice: 1999,
+    monthlyPrice: 1590,
     includedUsers: 10,
     allowsExtraUsers: true,
     highlighted: false,

@@ -18,6 +18,8 @@ export interface SeedAccount {
   readonly quoteCount: number
   readonly seed: number
   readonly users: readonly SeedUser[]
+  /** Logo de ejemplo (scripts/seed/data/logos/<logo>.png) y color de marca #RRGGBB. */
+  readonly brand: { readonly logo: string; readonly color: string }
   readonly profile: {
     readonly displayName: string
     readonly headline: string
@@ -43,6 +45,7 @@ export const SEED_ACCOUNTS: readonly SeedAccount[] = [
       { email: 'ventas@megaglass.demo.cotizapro.mx', fullName: 'Karla Ventas', role: 'admin' },
       { email: 'instalador@megaglass.demo.cotizapro.mx', fullName: 'Ramiro Instalador', role: 'member' },
     ],
+    brand: { logo: 'megaglass', color: '#0E7490' },
     profile: {
       displayName: 'MEGAGLASS',
       headline: 'Vidrio, aluminio y cancelería a la medida en Monterrey',
@@ -64,6 +67,7 @@ export const SEED_ACCOUNTS: readonly SeedAccount[] = [
       { email: 'hector@voltaje.demo.cotizapro.mx', fullName: 'Héctor Garza', role: 'owner' },
       { email: 'luis@voltaje.demo.cotizapro.mx', fullName: 'Luis Treviño', role: 'member' },
     ],
+    brand: { logo: 'voltaje', color: '#F59E0B' },
     profile: {
       displayName: 'Cuadrilla Voltaje',
       headline: 'Electricistas para casa y negocio',
@@ -82,6 +86,7 @@ export const SEED_ACCOUNTS: readonly SeedAccount[] = [
     quoteCount: 12,
     seed: 303,
     users: [{ email: 'beto@plomeria.demo.cotizapro.mx', fullName: 'Alberto Cantú', role: 'owner' }],
+    brand: { logo: 'don-beto', color: '#0369A1' },
     profile: {
       displayName: 'Don Beto Plomero',
       headline: 'Plomería honesta, a tiempo y limpia',
@@ -100,6 +105,7 @@ export const SEED_ACCOUNTS: readonly SeedAccount[] = [
     quoteCount: 12,
     seed: 404,
     users: [{ email: 'lupita@costuras.demo.cotizapro.mx', fullName: 'Guadalupe Salinas', role: 'owner' }],
+    brand: { logo: 'lupita', color: '#BE185D' },
     profile: {
       displayName: 'Costuras Lupita',
       headline: 'Arreglos de ropa, cortinas y uniformes',

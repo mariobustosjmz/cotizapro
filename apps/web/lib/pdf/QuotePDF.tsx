@@ -6,7 +6,8 @@ import {
   View,
   Image,
 } from '@react-pdf/renderer'
-import { createStyles, DEFAULT_BRAND_COLOR } from './pdf-styles'
+import { createStyles } from './pdf-styles'
+import { brandPalette } from '@/lib/branding/color'
 import { ITEM_UNIT_LABEL, materialsFromItems } from './quote-materials'
 import type { QuoteWithItems } from '@/types/database.types'
 
@@ -28,8 +29,8 @@ function initials(name: string): string {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join('') || 'CP'
 }
 
-function LogoFallback({ name }: { readonly name: string }) {
-  return <Text style={{ fontSize: 18, color: 'white', fontFamily: 'Helvetica-Bold' }}>{initials(name)}</Text>
+function LogoFallback({ name, color }: { readonly name: string; readonly color: string }) {
+  return <Text style={{ fontSize: 18, color, fontFamily: 'Helvetica-Bold' }}>{initials(name)}</Text>
 }
 
 function formatCurrency(value: number): string {
@@ -45,8 +46,8 @@ function formatDate(dateStr: string): string {
 }
 
 export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
-  const brandColor = orgSettings.brand_color ?? DEFAULT_BRAND_COLOR
-  const styles = createStyles(brandColor)
+  const palette = brandPalette(orgSettings.brand_color)
+  const styles = createStyles(palette)
   const materials = materialsFromItems(quote.items as readonly { readonly breakdown?: unknown }[])
 
   const companyLines = [
@@ -61,13 +62,12 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
         {/* Header band */}
         <View style={styles.headerBand}>
           {orgSettings.logo_url ? (
-            <Image
-              src={orgSettings.logo_url}
-              style={styles.logoImage}
-            />
+            <View style={styles.logoFrame}>
+              <Image src={orgSettings.logo_url} style={styles.logoImage} />
+            </View>
           ) : (
             <View style={styles.logoIconContainer}>
-              <LogoFallback name={orgName} />
+              <LogoFallback name={orgName} color={palette.ink} />
             </View>
           )}
           <View style={styles.headerCompanyBlock}>
@@ -83,10 +83,10 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
           {/* Quote meta + client */}
           <View style={styles.metaRow}>
             <View>
-              <Text style={styles.metaLabel}>Cotizacion</Text>
+              <Text style={styles.metaLabel}>Cotización</Text>
               <Text style={styles.metaValue}>#{quote.quote_number}</Text>
               <Text style={styles.metaValueSub}>Fecha: {formatDate(quote.created_at)}</Text>
-              <Text style={styles.metaValueSub}>Valida hasta: {formatDate(quote.valid_until)}</Text>
+              <Text style={styles.metaValueSub}>Válida hasta: {formatDate(quote.valid_until)}</Text>
             </View>
             <View style={styles.clientBlock}>
               <Text style={styles.metaLabel}>Cliente</Text>
@@ -104,7 +104,7 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
 
           {/* Items table */}
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.colDesc]}>Descripcion</Text>
+            <Text style={[styles.tableHeaderCell, styles.colDesc]}>Descripción</Text>
             <Text style={[styles.tableHeaderCell, styles.colQty]}>Cant.</Text>
             <Text style={[styles.tableHeaderCell, styles.colUnit]}>Unidad</Text>
             <Text style={[styles.tableHeaderCell, styles.colPrice]}>Precio Unit.</Text>
@@ -169,7 +169,7 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
           {/* Terms */}
           {quote.terms_and_conditions && (
             <View style={styles.notesBlock}>
-              <Text style={styles.sectionLabel}>Terminos y Condiciones</Text>
+              <Text style={styles.sectionLabel}>Términos y Condiciones</Text>
               <Text style={styles.notesText}>{quote.terms_and_conditions}</Text>
             </View>
           )}
@@ -180,7 +180,7 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
           <Text style={styles.footerText}>{orgName} — {quote.quote_number}</Text>
           <Text
             style={styles.footerText}
-            render={({ pageNumber, totalPages }) => `Pag. ${pageNumber} de ${totalPages}`}
+            render={({ pageNumber, totalPages }) => `Pág. ${pageNumber} de ${totalPages}`}
           />
         </View>
       </Page>

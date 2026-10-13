@@ -1,5 +1,7 @@
 'use client'
 
+import { SidebarBrand } from './sidebar-brand'
+import type { OrgBranding } from '@/lib/branding/types'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -42,17 +44,18 @@ interface SidebarProfile {
 interface SidebarProps {
   user: User
   profile: SidebarProfile
+  branding: OrgBranding
 }
 
 const principalNav = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, shortcut: 'G D' },
+  { name: 'Inicio', href: '/dashboard', icon: LayoutDashboard, shortcut: 'G D' },
   { name: 'Clientes', href: '/dashboard/clients', icon: Users, shortcut: 'G C' },
   { name: 'Cotizaciones', href: '/dashboard/quotes', icon: FileText, shortcut: 'G Q' },
   { name: 'Recordatorios', href: '/dashboard/reminders', icon: Bell, shortcut: 'G R' },
   { name: 'Agenda', href: '/dashboard/calendar', icon: CalendarIcon, shortcut: 'G A' },
   { name: 'Servicios', href: '/dashboard/services', icon: Briefcase, shortcut: 'G S' },
   { name: 'Listas de precios', href: '/dashboard/price-lists', icon: Tags, shortcut: '' },
-  { name: 'Templates', href: '/dashboard/templates', icon: TemplateIcon, shortcut: 'G T' },
+  { name: 'Plantillas', href: '/dashboard/templates', icon: TemplateIcon, shortcut: 'G T' },
 ]
 
 const showcaseNav = [
@@ -61,7 +64,7 @@ const showcaseNav = [
 ]
 
 const analyticsNav = [
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3, shortcut: '' },
+  { name: 'Analítica', href: '/dashboard/analytics', icon: BarChart3, shortcut: '' },
 ]
 
 const configNav = [
@@ -98,7 +101,7 @@ function NavItem({ item, isActive, isCollapsed }: NavItemProps) {
       className={cn(
         'group relative flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-all duration-150',
         isActive
-          ? 'bg-orange-500/10 text-orange-400 border-l-2 border-orange-500 pl-[9px]'
+          ? 'bg-[color-mix(in_srgb,var(--brand-on-dark)_12%,transparent)] text-[var(--brand-on-dark)] border-l-2 border-[var(--brand-on-dark)] pl-[9px]'
           : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04] border-l-2 border-transparent pl-[9px]',
         isCollapsed && 'justify-center px-0 pl-0 border-l-0'
       )}
@@ -106,7 +109,7 @@ function NavItem({ item, isActive, isCollapsed }: NavItemProps) {
       <Icon
         className={cn(
           'w-[18px] h-[18px] shrink-0 transition-colors',
-          isActive ? 'text-orange-400' : 'text-white/40 group-hover:text-white/60'
+          isActive ? 'text-[var(--brand-on-dark)]' : 'text-white/40 group-hover:text-white/60'
         )}
       />
       {!isCollapsed && (
@@ -158,7 +161,7 @@ function NavSection({ label, items, pathname, isCollapsed, className }: NavSecti
   )
 }
 
-export function DashboardSidebar({ user, profile }: SidebarProps) {
+export function DashboardSidebar({ user, profile, branding }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -230,22 +233,7 @@ export function DashboardSidebar({ user, profile }: SidebarProps) {
     >
       {/* Logo area */}
       <div className="h-16 flex items-center border-b border-white/[0.06] dark:border-white/[0.06] shrink-0 overflow-hidden">
-        <Link
-          href="/dashboard"
-          className={cn(
-            'flex items-center gap-2.5 px-4 min-w-0',
-            isCollapsed && 'justify-center px-0 w-full'
-          )}
-        >
-          <div className="w-8 h-8 bg-orange-500 dark:bg-orange-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
-            C
-          </div>
-          {!isCollapsed && (
-            <span className="text-[15px] font-semibold text-white tracking-tight truncate">
-              CotizaPro
-            </span>
-          )}
-        </Link>
+        <SidebarBrand branding={branding} isCollapsed={isCollapsed} />
       </div>
 
       {/* Quick action — Nueva Cotización */}
@@ -254,7 +242,7 @@ export function DashboardSidebar({ user, profile }: SidebarProps) {
           href="/dashboard/quotes/new"
           title={isCollapsed ? 'Nueva Cotización' : undefined}
           className={cn(
-            'flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm rounded-lg transition-colors',
+            'flex items-center gap-2 bg-[var(--brand)] hover:brightness-95 text-[var(--brand-ink)] font-medium text-sm rounded-lg transition',
             isCollapsed
               ? 'justify-center w-full h-9'
               : 'px-3 py-2'

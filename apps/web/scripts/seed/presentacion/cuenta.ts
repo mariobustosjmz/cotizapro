@@ -17,6 +17,7 @@ export const PRESENTACION: SeedAccount = {
     { email: 'ventas@megaglass.prueba.cotizapro.mx', fullName: 'Ventas MEGAGLASS', role: 'admin' },
     { email: 'instalacion@megaglass.prueba.cotizapro.mx', fullName: 'Instalación MEGAGLASS', role: 'member' },
   ],
+  brand: { logo: 'megaglass', color: '#0E7490' },
   profile: {
     displayName: 'MEGAGLASS',
     headline: 'Vidrio templado, cancelería y aluminio a la medida en Monterrey',

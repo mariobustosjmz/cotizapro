@@ -11,6 +11,7 @@ import * as dotenv from 'dotenv'
 import { seedCatalog } from '../steps/catalog'
 import { resetOrg } from '../steps/org'
 import { seedProfile } from '../steps/showcase'
+import { seedBranding } from '../steps/branding'
 import { adminClient } from '../util'
 import { CLIENTS, QUOTES, REMINDERS, REQUESTS } from './caso'
 import { insertClients, insertQuotes } from './cotizaciones'
@@ -36,6 +37,7 @@ async function main(): Promise<void> {
   const catalog = await seedCatalog(admin, orgId, PRESENTACION.trade)
   await seedProfile(admin, orgId, PRESENTACION.profile)
   await applySettings(admin, orgId)
+  await seedBranding(admin, orgId, PRESENTACION.brand)
   const clients = await insertClients(admin, orgId, users.ownerId, CLIENTS)
   const quotes = await insertQuotes(admin, orgId, users.userIds, catalog, clients, QUOTES)
   const counts = {
