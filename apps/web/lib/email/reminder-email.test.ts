@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildReminderEmail, type ReminderEmailInput } from './reminder-email'
+import { buildReminderEmail, reminderNoticePreview, type ReminderEmailInput } from './reminder-email'
 import { brandPalette } from '@/lib/branding/color'
 
 const base: ReminderEmailInput = {
@@ -34,5 +34,11 @@ describe('buildReminderEmail', () => {
     const { text } = buildReminderEmail(base)
     expect(text).toContain('responde a este correo')
     expect(text).toContain('Tel. 81 5550 0000')
+  })
+})
+
+describe('reminderNoticePreview', () => {
+  it('muestra la frase que recibirá el cliente, sin notas internas', () => {
+    expect(reminderNoticePreview('maintenance')).toBe('Hola [cliente], te escribimos de [tu negocio] porque se acerca la fecha del mantenimiento de tu instalación: [fecha].')
   })
 })

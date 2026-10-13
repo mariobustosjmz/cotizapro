@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { FormField } from '@/components/ui/form-field'
+import { ClientNoticeToggle } from '@/components/reminders/client-notice-toggle'
+import { clientNoticeFields } from '@/lib/reminders/client-notice'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -20,9 +22,10 @@ interface ComboboxProps {
   required?: boolean
   disabled?: boolean
   fieldError?: string
+  onChange?: (value: string) => void
 }
 
-function Combobox({ id, name, options, defaultValue = '', placeholder, required, disabled, fieldError }: ComboboxProps) {
+function Combobox({ id, name, options, defaultValue = '', placeholder, required, disabled, fieldError, onChange }: ComboboxProps) {
   const defaultOption = options.find((o) => o.value === defaultValue)
   const [search, setSearch] = useState(defaultOption?.label ?? '')
   const [selectedValue, setSelectedValue] = useState(defaultValue)
@@ -37,6 +40,7 @@ function Combobox({ id, name, options, defaultValue = '', placeholder, required,
     setSelectedValue(value)
     setSearch(label)
     setOpen(false)
+    onChange?.(value)
   }
 
   const hasError = Boolean(fieldError)
@@ -103,6 +107,8 @@ export default function NewReminderPage() {
   const [error, setError] = useState('')
   const [clients, setClients] = useState<Client[]>([])
   const [isRecurring, setIsRecurring] = useState(false)
+  const [reminderType, setReminderType] = useState('')
+  const [notifyClient, setNotifyClient] = useState(false)
 
   useEffect(() => {
     async function fetchClients() {
@@ -153,6 +159,7 @@ export default function NewReminderPage() {
       is_recurring: isRecurring,
       recurrence_interval_months: isRecurring ? parseInt(formData.get('recurrence_interval_months') as string) : null,
       related_service_category: formData.get('related_service_category') || null,
+      ...clientNoticeFields(reminderType, notifyClient),
     }
 
     try {
@@ -239,6 +246,7 @@ export default function NewReminderPage() {
                 ]}
                 placeholder="Selecciona un tipo..."
                 required
+                onChange={setReminderType}
               />
             </FormField>
 
@@ -285,14 +293,16 @@ export default function NewReminderPage() {
             </FormField>
           </div>
 
-          <FormField label="Mensaje" htmlFor="description" hint="Se enviará al cliente en la fecha programada">
+          <FormField label="Nota interna" htmlFor="description" hint="Solo la ve tu equipo; no se envía al cliente">
             <Textarea
               id="description"
               name="description"
               rows={2}
-              placeholder="Hola, es momento de programar el mantenimiento anual..."
+              placeholder="Llamar antes de ir; el cancel del baño principal hace ruido..."
             />
           </FormField>
+
+          <ClientNoticeToggle reminderType={reminderType} checked={notifyClient} onChange={setNotifyClient} />
 
           {/* Recurring */}
           <div className="flex items-center gap-4">

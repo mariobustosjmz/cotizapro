@@ -4,6 +4,7 @@ import { createReminderSchema, reminderQuerySchema } from '@/lib/validations/cot
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+import { clientNoticeFields } from '@/lib/reminders/client-notice'
 
 // GET /api/reminders - List reminders with filters
 export async function GET(request: NextRequest) {
@@ -215,6 +216,7 @@ export async function POST(request: NextRequest) {
       .from('follow_up_reminders')
       .insert({
         ...validation.data,
+        ...clientNoticeFields(validation.data.reminder_type, validation.data.auto_send_notification),
         organization_id: profile.organization_id,
         created_by: user.id,
         status: 'pending',

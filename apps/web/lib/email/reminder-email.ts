@@ -46,3 +46,8 @@ ${contactHtml(input.contact)}`
 
   return { subject, html: brandedEmailHtml(input, body), text }
 }
+
+/** Frase que verá quien configura el recordatorio, para saber qué recibirá el cliente. */
+export function reminderNoticePreview(type: ClientReminderType): string {
+  return `Hola [cliente], te escribimos de [tu negocio] porque ${COPY[type].sentence}: [fecha].`
+}

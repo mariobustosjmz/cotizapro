@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { FormField } from '@/components/ui/form-field'
 import { ArrowLeft, Trash2, Save, CheckCircle, XCircle, AlertCircle, Timer } from 'lucide-react'
 import Link from 'next/link'
+import { ClientNoticeToggle } from '@/components/reminders/client-notice-toggle'
+import { clientNoticeFields, isClientNotifiable } from '@/lib/reminders/client-notice'
 
 interface Client {
   id: string
@@ -29,6 +31,7 @@ interface Reminder {
   related_service_category: string | null
   created_at: string
   completed_at: string | null
+  auto_send_notification: boolean
 }
 
 export default function ReminderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -42,11 +45,13 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
   const [isEditing, setIsEditing] = useState(false)
   const [showSnoozeModal, setShowSnoozeModal] = useState(false)
   const [snoozeDate, setSnoozeDate] = useState('')
+  const [editType, setEditType] = useState('')
+  const [editNotify, setEditNotify] = useState(false)
 
   useEffect(() => {
     async function fetchReminder() {
       if (!id || id === 'undefined') {
-        setError('ID de recordatorio invalido')
+        setError('ID de recordatorio inválido')
         return
       }
       try {
@@ -54,6 +59,8 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
         if (response.ok) {
           const data = await response.json()
           setReminder(data.data)
+          setEditType(data.data.reminder_type)
+          setEditNotify(Boolean(data.data.auto_send_notification))
         } else {
           setError('Recordatorio no encontrado')
         }
@@ -79,6 +86,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
       scheduled_date: formData.get('scheduled_date'),
       priority: formData.get('priority'),
       related_service_category: formData.get('related_service_category') || null,
+      ...clientNoticeFields(editType, editNotify),
     }
 
     try {
@@ -382,16 +390,16 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
         <div className="p-4">
           {isEditing ? (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <FormField label="Titulo" htmlFor="title" required>
+              <FormField label="Título" htmlFor="title" required>
                 <Input id="title" name="title" required defaultValue={reminder.title} />
               </FormField>
 
               <div className="grid gap-3 md:grid-cols-2">
                 <FormField label="Tipo de Recordatorio" htmlFor="reminder_type" required>
-                  <select id="reminder_type" name="reminder_type" required defaultValue={reminder.reminder_type} className={selectClass}>
+                  <select id="reminder_type" name="reminder_type" required defaultValue={reminder.reminder_type} onChange={(e) => setEditType(e.target.value)} className={selectClass}>
                     <option value="follow_up">Seguimiento</option>
                     <option value="maintenance">Mantenimiento</option>
-                    <option value="renewal">Renovacion</option>
+                    <option value="renewal">Renovación</option>
                     <option value="custom">Personalizado</option>
                   </select>
                 </FormField>
@@ -414,16 +422,18 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
                     <option value="">Ninguna</option>
                     <option value="hvac">HVAC</option>
                     <option value="painting">Pintura</option>
-                    <option value="plumbing">Plomeria</option>
-                    <option value="electrical">Electrico</option>
+                    <option value="plumbing">Plomería</option>
+                    <option value="electrical">Eléctrico</option>
                     <option value="other">Otro</option>
                   </select>
                 </FormField>
               </div>
 
-              <FormField label="Descripción" htmlFor="description">
+              <FormField label="Nota interna" htmlFor="description" hint="Solo la ve tu equipo; no se envía al cliente">
                 <Textarea id="description" name="description" rows={2} defaultValue={reminder.description || ''} />
               </FormField>
+
+              <ClientNoticeToggle reminderType={editType} checked={editNotify} onChange={setEditNotify} />
 
               <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-700">
                 <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">
@@ -475,8 +485,15 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
 
               {reminder.description && (
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Descripción</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Nota interna</p>
                   <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{reminder.description}</p>
+                </div>
+              )}
+
+              {isClientNotifiable(reminder.reminder_type) && (
+                <div data-testid="client-notice-status">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Aviso al cliente</p>
+                  <p className="text-sm text-gray-900 dark:text-white">{reminder.auto_send_notification ? 'Por correo, a nombre de tu negocio' : 'Desactivado'}</p>
                 </div>
               )}
 

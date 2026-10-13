@@ -1,12 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { orgBranding } from '@/lib/branding/org-branding'
-import { buildReminderEmail, type ClientReminderType } from '@/lib/email/reminder-email'
+import { buildReminderEmail } from '@/lib/email/reminder-email'
+import { CLIENT_NOTIFIABLE_TYPES, isClientNotifiable } from './client-notice'
 import { safeReplyTo } from '@/lib/email/sender'
 import { sendEmail } from '@/lib/integrations/email'
 import { sendWhatsAppMessage } from '@/lib/integrations/twilio'
 import { logger } from '@/lib/logger'
 
-const CLIENT_NOTIFIABLE_TYPES: readonly ClientReminderType[] = ['maintenance', 'renewal']
 const BATCH_LIMIT = 500
 const TIME_ZONE = 'America/Monterrey'
 
@@ -23,10 +23,6 @@ interface DueReminderRow {
   readonly notification_channels: readonly string[] | null
   readonly client: { readonly name: string; readonly email: string | null; readonly phone: string | null; readonly whatsapp_phone: string | null } | null
   readonly organization: { readonly name: string; readonly settings: unknown } | null
-}
-
-export function isClientNotifiable(type: string): type is ClientReminderType {
-  return (CLIENT_NOTIFIABLE_TYPES as readonly string[]).includes(type)
 }
 
 /** Fecha local (Monterrey) de mañana: se avisa lo que vence hoy o mañana. */

@@ -2,8 +2,19 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { updateReminderSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { clientNoticeFields, type ClientNoticeFields } from '@/lib/reminders/client-notice'
 
 // GET /api/reminders/[id] - Get single reminder
+
+type ServerSupabase = Awaited<ReturnType<typeof createServerClient>>
+
+/** El aviso al cliente depende del tipo final del recordatorio (el enviado o el que ya tiene). */
+async function noticeFieldsFor(supabase: ServerSupabase, id: string, type: string | undefined, notify: boolean): Promise<ClientNoticeFields> {
+  if (type) return clientNoticeFields(type, notify)
+  const { data } = await supabase.from('follow_up_reminders').select('reminder_type').eq('id', id).single()
+  return clientNoticeFields(data?.reminder_type ?? '', notify)
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -123,10 +134,14 @@ export async function PATCH(
       }
     }
 
+    const updates = validation.data.auto_send_notification === undefined
+      ? validation.data
+      : { ...validation.data, ...(await noticeFieldsFor(supabase, id, validation.data.reminder_type, validation.data.auto_send_notification)) }
+
     // Update reminder without join (split queries to avoid RLS issues)
     const { data: reminder, error } = await supabase
       .from('follow_up_reminders')
-      .update(validation.data)
+      .update(updates)
       .eq('id', id)
       .select('*')
       .single()
