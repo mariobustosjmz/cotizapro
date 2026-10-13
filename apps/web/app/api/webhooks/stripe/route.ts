@@ -2,7 +2,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripe } from '@/lib/stripe/index'
-import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { planFromPriceIds } from '@/lib/stripe/helpers'
 
 export async function POST(req: Request) {
@@ -32,7 +32,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  const supabase = await createServerClient()
+  // Stripe llama sin sesión de usuario: las escrituras de facturación van con service role.
+  const supabase = createAdminClient()
 
   try {
     // Check for duplicate webhook processing using idempotency

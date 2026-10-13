@@ -4,6 +4,7 @@ import { buildCheckoutItems } from '@/lib/billing/checkout-items'
 import { countOrganizationMembers } from '@/lib/billing/member-count'
 import type { PlanId } from '@/lib/plans/types'
 import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { checkoutSchema } from '@/lib/validations/billing'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 
@@ -99,7 +100,8 @@ export async function POST(request: NextRequest) {
       customerId = customer.id
 
       // Update organization with Stripe customer ID
-      await supabase
+      // stripe_customer_id solo se escribe con service role (trigger guard_org_billing_columns).
+      await createAdminClient()
         .from('organizations')
         .update({ stripe_customer_id: customerId })
         .eq('id', organization.id)

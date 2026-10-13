@@ -58,6 +58,9 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
       redirect(acceptError ? `/invite/${token}` : '/dashboard')
     }
 
+    // Sin sesión (confirmación de correo activa) la empresa se crea en /onboarding al entrar.
+    if (!data.session) redirect('/login?success=check-email&next=/onboarding')
+
     // Create organization slug from name
     const slug = orgName
       .toLowerCase()
