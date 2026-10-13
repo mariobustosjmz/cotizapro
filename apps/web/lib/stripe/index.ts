@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import type { PlanId } from '@/lib/plans/types'
 
 let stripeInstance: Stripe | null = null
 
@@ -16,7 +17,7 @@ function getStripeInstance(): Stripe {
       )
     }
     stripeInstance = new Stripe(apiKey, {
-      apiVersion: '2026-01-28.clover' as any,
+      apiVersion: '2026-02-25.clover',
       typescript: true,
     })
   }
@@ -44,68 +45,31 @@ export const stripe: Stripe = new Proxy({} as Stripe, {
   },
 })
 
-export const PLANS = {
-  free: {
-    name: 'Free',
-    price: 0,
-    priceId: null,
-    features: [
-      '3 proyectos',
-      '100 llamadas API/día',
-      'Soporte básico',
-    ],
-    limits: {
-      projects: 3,
-      apiCalls: 100,
-    },
-  },
-  starter: {
-    name: 'Starter',
-    price: 29,
-    priceId: process.env.STRIPE_STARTER_PRICE_ID,
-    features: [
-      '10 proyectos',
-      '10,000 llamadas API/día',
-      'Soporte por email',
-      'Colaboración en equipo',
-    ],
-    limits: {
-      projects: 10,
-      apiCalls: 10000,
-    },
-  },
-  pro: {
-    name: 'Pro',
-    price: 99,
-    priceId: process.env.STRIPE_PRO_PRICE_ID,
-    features: [
-      'Proyectos ilimitados',
-      'Llamadas API ilimitadas',
-      'Soporte prioritario',
-      'Analytics avanzado',
-      'Integraciones personalizadas',
-    ],
-    limits: {
-      projects: -1, // unlimited
-      apiCalls: -1, // unlimited
-    },
-  },
-  enterprise: {
-    name: 'Enterprise',
-    price: null, // custom pricing
-    priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID,
-    features: [
-      'Todo lo de Pro',
-      'Soporte dedicado',
-      'Garantía de SLA',
-      'Contratos personalizados',
-      'Despliegue on-premise',
-    ],
-    limits: {
-      projects: -1,
-      apiCalls: -1,
-    },
-  },
-} as const
+export type { PlanId } from '@/lib/plans/types'
 
-export type PlanId = keyof typeof PLANS
+/** Precio mensual de Stripe por plan; los planes de pago se configuran por variable de entorno. */
+export function planPriceId(planId: PlanId): string | null {
+  const ids: Readonly<Record<PlanId, string | undefined>> = {
+    free: undefined,
+    starter: process.env.STRIPE_STARTER_PRICE_ID,
+    pro: process.env.STRIPE_PRO_PRICE_ID,
+    enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID,
+  }
+  return ids[planId] || null
+}
+
+/** Precio recurrente de Stripe por usuario adicional; se cobra por cantidad. */
+export function extraUserPriceId(): string | null {
+  return process.env.STRIPE_EXTRA_USER_PRICE_ID || null
+}
+
+/** El cobro en línea solo se ofrece cuando Stripe y todos los precios están configurados. */
+export function isCheckoutConfigured(): boolean {
+  return Boolean(
+    process.env.STRIPE_SECRET_KEY &&
+      planPriceId('starter') &&
+      planPriceId('pro') &&
+      planPriceId('enterprise') &&
+      extraUserPriceId()
+  )
+}

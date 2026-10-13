@@ -91,7 +91,7 @@ export async function dia2(w: Week): Promise<void> {
   const q2 = await submitQuote(s)
   track(w, 'andrea', ANDREA.name, 'Por medidas (página pública)', q2, 'Borrador')
   await downloadPdf(s, path.join(w.out, 'cotizacion-andrea.pdf'))
-  await sendQuote(s, 'Email')
+  await sendQuote(s, 'Correo')
   status(w, 'andrea', 'Enviada')
 }
 
@@ -124,7 +124,7 @@ export async function dia3(w: Week): Promise<void> {
   track(w, 'salinas', SALINAS.company!, 'Compleja (corporativo)', q3, 'Borrador')
   await checkMoneyFormat(w, '/dashboard/quotes/[id]')
   await s.rec.shot(s.page, { id: 'detalle-compleja', title: `${q3.number}: detalle con partidas descritas por el motor`, area: 'Panel del taller · Cotización', what: 'Cada partida configurable guarda su descripción con medidas y opciones, y una copia congelada de los precios usados.', apis: ['GET /api/quotes/[id]'], fullPage: true })
-  await sendQuote(s, 'Email')
+  await sendQuote(s, 'Correo')
   status(w, 'salinas', 'Enviada')
   await createReminder(s, { client: SALINAS.name, title: 'Seguimiento cotización oficinas Salinas', type: 'Seguimiento', priority: 'Alta', date: notBefore(w, day(w, 5)), message: 'Llamar al arquitecto para confirmar si aprueba antes de que venza la vigencia.' })
 

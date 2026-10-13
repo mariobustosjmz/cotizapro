@@ -1,194 +1,113 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { PlanId } from '@/lib/stripe/index'
+import { useSearchParams } from 'next/navigation'
+import { AlertCircle, Check } from 'lucide-react'
+import type { PlanId } from '@/lib/plans/types'
 import { PlanSelector } from '@/components/billing/PlanSelector'
 import { BillingHistory } from '@/components/billing/BillingHistory'
 import { Button } from '@/components/ui/button'
-import { AlertCircle, Check } from 'lucide-react'
 
 interface BillingClientProps {
-  currentPlan: PlanId
-  organizationId: string
-  subscriptionStatus: string
+  readonly currentPlan: PlanId
+  readonly activeUsers: number
+  readonly checkoutEnabled: boolean
+  readonly canManage: boolean
+  readonly hasBillingAccount: boolean
 }
 
-export function BillingClient({
-  currentPlan,
-  organizationId,
-  subscriptionStatus,
-}: BillingClientProps) {
-  const router = useRouter()
+interface Notice {
+  readonly type: 'success' | 'error'
+  readonly text: string
+}
+
+async function postForUrl(endpoint: string, body: Record<string, unknown>): Promise<{ url?: string; error?: string }> {
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  const data: { url?: string | null; error?: string } = await response.json()
+  if (!response.ok || !data.url) return { error: data.error || 'No se pudo continuar. Intenta de nuevo.' }
+  return { url: data.url }
+}
+
+export function BillingClient({ currentPlan, activeUsers, checkoutEnabled, canManage, hasBillingAccount }: BillingClientProps) {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState<{
-    type: 'success' | 'error'
-    text: string
-  } | null>(null)
+  const [notice, setNotice] = useState<Notice | null>(null)
 
-  const successMessage = searchParams.get('success')
-  const canceledMessage = searchParams.get('canceled')
-
-  const handleSelectPlan = useCallback(
-    async (planId: PlanId) => {
-      if (planId === 'free') {
-        setMessage({
-          type: 'error',
-          text: 'El plan gratuito no puede seleccionarse desde esta página',
-        })
-        return
-      }
-
-      setLoading(true)
-      setMessage(null)
-
-      try {
-        const response = await fetch('/api/billing/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ planId }),
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          setMessage({
-            type: 'error',
-            text: data.error || 'Failed to create checkout session',
-          })
-          return
-        }
-
-        if (data.sessionId) {
-          window.location.href = `https://checkout.stripe.com/pay/${data.sessionId}`
-        }
-      } catch (error) {
-        setMessage({
-          type: 'error',
-          text: 'An error occurred. Please try again.',
-        })
-        console.error(error)
-      } finally {
-        setLoading(false)
-      }
-    },
-    []
-  )
-
-  const handleManagePaymentMethods = async () => {
+  const redirectTo = useCallback(async (endpoint: string, body: Record<string, unknown>) => {
     setLoading(true)
-    setMessage(null)
-
+    setNotice(null)
     try {
-      const response = await fetch('/api/billing/portal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          returnUrl: window.location.href,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setMessage({
-          type: 'error',
-          text: data.error || 'Failed to open billing portal',
-        })
+      const result = await postForUrl(endpoint, body)
+      if (result.url) {
+        window.location.href = result.url
         return
       }
-
-      if (data.url) {
-        window.location.href = data.url
-      }
-    } catch (error) {
-      setMessage({
-        type: 'error',
-        text: 'An error occurred. Please try again.',
-      })
-      console.error(error)
+      setNotice({ type: 'error', text: result.error ?? 'No se pudo continuar' })
+    } catch {
+      setNotice({ type: 'error', text: 'Error de conexión. Intenta de nuevo.' })
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  const handleSelectPlan = useCallback(
+    (planId: PlanId) => redirectTo('/api/billing/checkout', { planId }),
+    [redirectTo]
+  )
 
   return (
-    <div className="space-y-8">
-      {successMessage && (
+    <div className="space-y-6">
+      {searchParams.get('success') && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex gap-3">
           <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-green-900">¡Pago exitoso!</h3>
-            <p className="text-sm text-green-700">
-              Tu suscripción ha sido actualizada. Puede tomar un momento en reflejarse.
-            </p>
-          </div>
+          <p className="text-sm text-green-700">Pago recibido. Tu plan se actualiza en unos momentos.</p>
         </div>
       )}
-
-      {canceledMessage && (
+      {searchParams.get('canceled') && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
           <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-semibold text-blue-900">Pago cancelado</h3>
-            <p className="text-sm text-blue-700">
-              Cancelaste el proceso de pago. Selecciona un plan para intentarlo de nuevo.
-            </p>
-          </div>
+          <p className="text-sm text-blue-700">Cancelaste el pago. Puedes elegir un plan cuando quieras.</p>
         </div>
       )}
-
-      {message && (
-        <div
-          className={`rounded-lg p-4 flex gap-3 ${
-            message.type === 'error'
-              ? 'bg-red-50 border border-red-200'
-              : 'bg-green-50 border border-green-200'
-          }`}
-        >
-          {message.type === 'error' ? (
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          ) : (
-            <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          )}
-          <div>
-            <p
-              className={`text-sm ${
-                message.type === 'error'
-                  ? 'text-red-700'
-                  : 'text-green-700'
-              }`}
-            >
-              {message.text}
-            </p>
-          </div>
+      {notice && (
+        <div className={`rounded-lg p-4 flex gap-3 border ${notice.type === 'error' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+          <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${notice.type === 'error' ? 'text-red-600' : 'text-green-600'}`} />
+          <p className={`text-sm ${notice.type === 'error' ? 'text-red-700' : 'text-green-700'}`}>{notice.text}</p>
         </div>
       )}
 
       <div>
-        <h2 className="text-2xl font-bold mb-6">Elige tu Plan</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-1">Planes</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          {checkoutEnabled
+            ? 'El costo se calcula con los usuarios activos de tu cuenta.'
+            : 'La contratación con tarjeta estará disponible próximamente. Mientras tanto tu cuenta conserva su plan actual.'}
+        </p>
         <PlanSelector
           currentPlan={currentPlan}
+          activeUsers={activeUsers}
           onSelectPlan={handleSelectPlan}
+          selectable={checkoutEnabled && canManage}
           loading={loading}
         />
       </div>
 
-      {currentPlan !== 'free' && subscriptionStatus !== 'canceled' && (
-        <div className="bg-white rounded-lg border p-6">
-          <h2 className="text-2xl font-bold mb-4">Métodos de Pago</h2>
-          <p className="text-gray-600 mb-4">
-            Administra tus métodos de pago y datos de facturación en el portal de Stripe
-          </p>
-          <Button onClick={handleManagePaymentMethods} disabled={loading}>
-            Abrir Portal de Facturación
+      {hasBillingAccount && canManage && (
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white mb-2">Métodos de pago</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Tarjetas y datos de facturación en el portal de Stripe.</p>
+          <Button onClick={() => redirectTo('/api/billing/portal', { returnUrl: window.location.href })} disabled={loading}>
+            Abrir portal de pagos
           </Button>
         </div>
       )}
 
-      <div className="bg-white rounded-lg border p-6">
-        <h2 className="text-2xl font-bold mb-6">Historial de Pagos</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+        <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4">Historial de pagos</h2>
         <BillingHistory />
       </div>
     </div>

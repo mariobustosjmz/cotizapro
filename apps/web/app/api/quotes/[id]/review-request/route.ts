@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { whatsappLink } from '@/lib/whatsapp/link'
 import { z } from 'zod'
 import { requireMember } from '@/lib/auth/require-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
@@ -37,9 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin
   const url = `${appUrl}/r/${token as string}`
   const message = `Hola ${client?.name?.split(' ')[0] ?? ''}, gracias por confiar en nosotros. ¿Nos ayudas calificando el trabajo? Solo toma un minuto: ${url}`
-  const phone = (client?.whatsapp_phone ?? client?.phone ?? '').replace(/\D/g, '')
-  const waPhone = phone.length === 10 ? `52${phone}` : phone
   return NextResponse.json({
-    data: { url, message, whatsapp_url: waPhone ? `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}` : null },
+    data: { url, message, whatsapp_url: whatsappLink(client?.whatsapp_phone ?? client?.phone, message) },
   }, { status: 201 })
 }

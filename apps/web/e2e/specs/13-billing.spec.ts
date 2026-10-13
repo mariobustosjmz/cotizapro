@@ -37,7 +37,7 @@ test.describe('Billing', () => {
   test('Billing page has plan comparison or feature list', async ({ page }) => {
     await page.goto('/dashboard/billing', { waitUntil: 'domcontentloaded' })
     // Plans or pricing cards
-    const featureContent = page.locator('text=/starter|pro|enterprise|profesional/i').first()
+    const featureContent = page.getByTestId('plan-card-pro')
     await expect(featureContent).toBeVisible({ timeout: 10000 })
   })
 

@@ -1,126 +1,88 @@
 'use client'
 
-import { useState } from 'react'
-import { PLANS, PlanId } from '@/lib/stripe/index'
-import {
-  formatPrice,
-  formatUsageLimit,
-  isUnlimited,
-} from '@/lib/stripe/helpers'
+import { Check, Clock } from 'lucide-react'
+import { PLANS, PLAN_ORDER } from '@/lib/plans/catalog'
+import { formatMxn, monthlyCost, usersLabel } from '@/lib/plans/pricing'
+import type { PlanId } from '@/lib/plans/types'
 import { Button } from '@/components/ui/button'
-import { Check } from 'lucide-react'
 
 interface PlanSelectorProps {
-  currentPlan: PlanId | null
-  onSelectPlan: (planId: PlanId) => Promise<void>
-  loading?: boolean
+  readonly currentPlan: PlanId
+  readonly activeUsers: number
+  readonly onSelectPlan: (planId: PlanId) => Promise<void>
+  readonly selectable: boolean
+  readonly loading?: boolean
 }
 
-export function PlanSelector({
-  currentPlan,
-  onSelectPlan,
-  loading = false,
-}: PlanSelectorProps) {
-  const [selectedPlan, setSelectedPlan] = useState<PlanId | null>(currentPlan)
-  const [isProcessing, setIsProcessing] = useState(false)
+function buttonLabel(planId: PlanId, isCurrent: boolean, selectable: boolean): string {
+  if (isCurrent) return 'Plan actual'
+  if (planId === 'free') return 'Incluido'
+  return selectable ? 'Elegir plan' : 'Próximamente'
+}
 
-  const handleSelectPlan = async (planId: PlanId) => {
-    if (planId === currentPlan) return
-
-    setIsProcessing(true)
-    try {
-      await onSelectPlan(planId)
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-
-  const planIds: PlanId[] = ['free', 'starter', 'pro', 'enterprise']
-
+export function PlanSelector({ currentPlan, activeUsers, onSelectPlan, selectable, loading = false }: PlanSelectorProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {planIds.map((planId) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+      {PLAN_ORDER.map((planId) => {
         const plan = PLANS[planId]
         const isCurrent = planId === currentPlan
-        const isSelected = planId === selectedPlan
+        const estimate = monthlyCost(planId, activeUsers)
+        const canChoose = selectable && !isCurrent && planId !== 'free'
 
         return (
           <div
             key={planId}
-            className={`relative rounded-lg border-2 p-6 transition-all ${
-              isCurrent
-                ? 'border-blue-500 bg-blue-50'
-                : isSelected
-                  ? 'border-blue-400 bg-white'
-                  : 'border-gray-200 bg-white'
+            data-testid={`plan-card-${planId}`}
+            className={`relative flex flex-col rounded-xl border-2 p-5 bg-white dark:bg-gray-900 ${
+              isCurrent ? 'border-orange-500' : 'border-gray-200 dark:border-gray-700'
             }`}
           >
             {isCurrent && (
-              <div className="absolute -top-3 left-4 bg-blue-500 px-3 py-1 rounded-full text-white text-xs font-semibold">
-                Plan Actual
-              </div>
+              <span className="absolute -top-3 left-4 bg-orange-500 px-3 py-0.5 rounded-full text-white text-xs font-semibold">
+                Plan actual
+              </span>
             )}
+            <h3 className="text-base font-bold text-gray-900 dark:text-white mt-1">{plan.name}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{plan.tagline}</p>
 
-            <h3 className="text-lg font-bold mt-2">{plan.name}</h3>
-
-            <div className="my-4">
-              {plan.price !== null ? (
-                <div>
-                  <div className="text-3xl font-bold">
-                    {formatPrice(plan.price)}
-                  </div>
-                  <div className="text-sm text-gray-600">/mes</div>
-                </div>
-              ) : (
-                <div className="text-2xl font-bold text-gray-700">
-                  Precio personalizado
-                </div>
+            <div className="my-3">
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">{formatMxn(plan.monthlyPrice)}</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">/mes</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{usersLabel(planId)}</p>
+              {estimate.extraUsers > 0 && (
+                <p className="text-xs font-medium text-orange-700 dark:text-orange-400 mt-1">
+                  Con tus {estimate.activeUsers} usuarios: {formatMxn(estimate.total)}/mes
+                </p>
+              )}
+              {estimate.overLimit > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">No alcanza para tus {estimate.activeUsers} usuarios</p>
               )}
             </div>
 
-            <div className="space-y-3 my-6">
-              <div>
-                <h4 className="font-semibold text-sm text-gray-700 mb-2">
-                  Límites
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Proyectos:</span>
-                    <span className="font-medium">
-                      {formatUsageLimit(plan.limits.projects)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">API/día:</span>
-                    <span className="font-medium">
-                      {formatUsageLimit(plan.limits.apiCalls)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-sm text-gray-700 mb-2">
-                  Funciones
-                </h4>
-                <ul className="space-y-2">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <ul className="space-y-1.5 flex-1">
+              {plan.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  {feature}
+                </li>
+              ))}
+              {plan.upcoming.map((feature) => (
+                <li key={feature} className="flex items-start gap-2 text-sm text-gray-400 dark:text-gray-500">
+                  <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>
+                    {feature} <span className="text-[10px] font-semibold uppercase text-orange-600 dark:text-orange-400">Próximamente</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
 
             <Button
-              onClick={planId !== 'free' ? () => handleSelectPlan(planId) : undefined}
-              disabled={isCurrent || isProcessing || loading}
+              onClick={canChoose ? () => onSelectPlan(planId) : undefined}
+              disabled={!canChoose || loading}
               variant={isCurrent ? 'outline' : 'default'}
               className="w-full mt-4"
             >
-              {isCurrent ? 'Plan Actual' : 'Seleccionar Plan'}
+              {buttonLabel(planId, isCurrent, selectable)}
             </Button>
           </div>
         )

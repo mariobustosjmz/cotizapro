@@ -1,10 +1,7 @@
 import { z } from 'zod'
-import { PLANS } from '@/lib/stripe/index'
-
-const planIds = Object.keys(PLANS) as Array<keyof typeof PLANS>
 
 export const checkoutSchema = z.object({
-  planId: z.enum(planIds as [string, ...string[]]),
+  planId: z.enum(['starter', 'pro', 'enterprise']),
 })
 
 export const portalSchema = z.object({

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe, PLANS } from '@/lib/stripe/index'
+import { stripe } from '@/lib/stripe/index'
+import { buildCheckoutItems } from '@/lib/billing/checkout-items'
+import { countOrganizationMembers } from '@/lib/billing/member-count'
+import type { PlanId } from '@/lib/plans/types'
 import { createServerClient } from '@/lib/supabase/server'
 import { checkoutSchema } from '@/lib/validations/billing'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Get user's organization
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('organization_id, email, full_name')
+      .select('organization_id, email, full_name, role')
       .eq('id', user.id)
       .single()
 
@@ -45,6 +48,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Organization not found' },
         { status: 404 }
+      )
+    }
+
+    if (profile.role !== 'owner' && profile.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Solo dirección o administración pueden cambiar el plan' },
+        { status: 403 }
       )
     }
 
@@ -62,21 +72,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Plan is free, no checkout needed
-    if (validated.data.planId === 'free') {
+    const activeUsers = await countOrganizationMembers(supabase)
+    if (activeUsers === null) {
       return NextResponse.json(
-        { error: 'Free plan does not require payment' },
-        { status: 400 }
+        { error: 'No se pudo contar los usuarios de la cuenta' },
+        { status: 500 }
       )
     }
 
-    const planId = validated.data.planId as keyof typeof PLANS
-    const plan = PLANS[planId]
-    if (!plan.priceId) {
-      return NextResponse.json(
-        { error: 'Invalid plan selection' },
-        { status: 400 }
-      )
+    const checkoutItems = buildCheckoutItems(validated.data.planId as PlanId, activeUsers)
+    if (!checkoutItems.ok) {
+      return NextResponse.json({ error: checkoutItems.error }, { status: 400 })
     }
 
     // Create or retrieve Stripe customer
@@ -105,12 +111,7 @@ export async function POST(request: NextRequest) {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: plan.priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: checkoutItems.items.map((item) => ({ ...item })),
       success_url: `${appUrl}/dashboard/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/dashboard/billing?canceled=true`,
       subscription_data: {
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ sessionId: session.id })
+    return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('Checkout error:', error)
     return NextResponse.json(

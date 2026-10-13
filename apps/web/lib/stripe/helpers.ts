@@ -1,78 +1,25 @@
-import { PLANS, PlanId } from '@/lib/stripe/index'
+import { PLAN_ORDER } from '@/lib/plans/catalog'
+import type { PlanId } from '@/lib/plans/types'
+import { planPriceId } from '@/lib/stripe/index'
 
-export function getPlanLimits(planId: PlanId) {
-  const plan = PLANS[planId]
-  return plan.limits
-}
-
-export function getPlanFeatures(planId: PlanId) {
-  const plan = PLANS[planId]
-  return plan.features
-}
-
-export function getPlanPrice(planId: PlanId) {
-  const plan = PLANS[planId]
-  return plan.price
-}
-
-export function formatPrice(amount: number, currency: string = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
+export function formatPrice(amount: number, currency: string = 'MXN'): string {
+  return new Intl.NumberFormat('es-MX', {
     style: 'currency',
-    currency,
+    currency: currency.toUpperCase(),
     minimumFractionDigits: 0,
   }).format(amount)
 }
 
-export function isUnlimited(limit: number): boolean {
-  return limit === -1
-}
-
-export function formatUsageLimit(limit: number): string {
-  if (isUnlimited(limit)) {
-    return 'Unlimited'
-  }
-  return limit.toLocaleString()
-}
-
-export function isUpgradeable(
-  currentPlan: PlanId | null,
-  newPlan: PlanId
-): boolean {
-  if (!currentPlan || currentPlan === 'free') {
-    return true
-  }
-
-  const planOrder = ['free', 'starter', 'pro', 'enterprise'] as const
-  const currentIndex = planOrder.indexOf(currentPlan as any)
-  const newIndex = planOrder.indexOf(newPlan as any)
-
-  return newIndex > currentIndex
-}
-
-export function isDowngradeable(
-  currentPlan: PlanId | null,
-  newPlan: PlanId
-): boolean {
-  if (!currentPlan || currentPlan === 'free') {
-    return false
-  }
-
-  const planOrder = ['free', 'starter', 'pro', 'enterprise'] as const
-  const currentIndex = planOrder.indexOf(currentPlan as any)
-  const newIndex = planOrder.indexOf(newPlan as any)
-
-  return newIndex < currentIndex
+const STATUS_LABELS: Readonly<Record<string, string>> = {
+  trialing: 'Periodo de prueba',
+  active: 'Activa',
+  past_due: 'Pago vencido',
+  canceled: 'Cancelada',
+  unpaid: 'Sin pagar',
 }
 
 export function getSubscriptionStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    trialing: 'Trial Period',
-    active: 'Active',
-    past_due: 'Past Due',
-    canceled: 'Canceled',
-    unpaid: 'Unpaid',
-  }
-  return labels[status] || status
+  return STATUS_LABELS[status] ?? status
 }
 
 export function isSubscriptionActive(status: string): boolean {
@@ -80,32 +27,18 @@ export function isSubscriptionActive(status: string): boolean {
 }
 
 export function calculateTrialDaysRemaining(trialEndsAt: string): number {
-  const now = new Date()
-  const trialEnd = new Date(trialEndsAt)
-  const daysRemaining = Math.ceil(
-    (trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  )
+  const daysRemaining = Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
   return Math.max(0, daysRemaining)
 }
 
-export function getPlanNameByPriceId(
-  priceId: string | null
-): PlanId {
-  for (const [planId, plan] of Object.entries(PLANS)) {
-    if (plan.priceId === priceId) {
-      return planId as PlanId
-    }
+/**
+ * Una suscripción trae el precio base del plan y, si aplica, la línea de usuarios adicionales.
+ * El plan es el primer precio base que se reconozca; sin coincidencia queda en Gratis.
+ */
+export function planFromPriceIds(priceIds: readonly (string | null | undefined)[]): PlanId {
+  for (const planId of PLAN_ORDER) {
+    const id = planPriceId(planId)
+    if (id && priceIds.includes(id)) return planId
   }
   return 'free'
-}
-
-export function getNextPlan(currentPlan: PlanId): PlanId | null {
-  const planOrder = ['free', 'starter', 'pro', 'enterprise'] as const
-  const currentIndex = planOrder.indexOf(currentPlan as any)
-
-  if (currentIndex === -1 || currentIndex === planOrder.length - 1) {
-    return null
-  }
-
-  return planOrder[currentIndex + 1] as PlanId
 }

@@ -3,13 +3,7 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripe } from '@/lib/stripe/index'
 import { createServerClient } from '@/lib/supabase/server'
-import { getPlanNameByPriceId } from '@/lib/stripe/helpers'
-
-// Map Stripe price IDs to plan names
-function getPlanFromPrice(priceId: string | null): string {
-  if (!priceId) return 'free'
-  return getPlanNameByPriceId(priceId)
-}
+import { planFromPriceIds } from '@/lib/stripe/helpers'
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -60,9 +54,7 @@ export async function POST(req: Request) {
         const subscription = event.data.object as Stripe.Subscription
         const customerId = subscription.customer as string
 
-        // Get price ID to determine plan
-        const priceId = subscription.items.data[0]?.price.id || null
-        const plan = getPlanFromPrice(priceId)
+        const plan = planFromPriceIds(subscription.items.data.map((item) => item.price.id))
 
         const { error: updateError } = await supabase
           .from('organizations')

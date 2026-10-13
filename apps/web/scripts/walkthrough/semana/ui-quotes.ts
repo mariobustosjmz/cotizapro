@@ -139,15 +139,17 @@ export async function openQuote(s: Session, id: string): Promise<CreatedQuote> {
   return readQuote(s)
 }
 
-/** "Enviar" → método → "Enviar". Sin proveedores configurados el servidor marca la cotización como enviada. */
-export async function sendQuote(s: Session, via: 'Email' | 'WhatsApp', shot?: { id: string; title: string }): Promise<string> {
+/** "Enviar" → método → "Enviar". WhatsApp deja lista la liga wa.me; el correo requiere la llave de Resend. */
+export async function sendQuote(s: Session, via: 'Correo' | 'WhatsApp', shot?: { id: string; title: string }): Promise<string> {
   await s.pacer.gate()
   await s.page.getByRole('button', { name: 'Enviar', exact: true }).filter({ visible: true }).first().click()
   await s.page.getByText('Enviar Cotizacion').waitFor()
-  await s.page.getByRole('button', { name: via, exact: true }).click()
+  await s.page.getByRole('button', { name: via === 'Correo' ? /^Correo/ : 'WhatsApp' }).click()
   if (shot) await s.rec.shot(s.page, { ...shot, area: 'Panel del taller · Cotización', what: 'Diálogo de envío con vista previa del PDF y elección de canal. En producción aún no hay llave de correo ni de WhatsApp: el envío se registra y la cotización pasa a "Enviada".', apis: ['GET /api/export/quote/[id]', 'POST /api/quotes/[id]/send'] })
   await s.page.getByRole('button', { name: 'Enviar', exact: true }).filter({ visible: true }).last().click()
-  const message = await toast(s.page, /Enviado via|Envio con errores parciales|Error/)
+  const message = via === 'WhatsApp'
+    ? (await s.page.getByText('Mensaje listo').waitFor(), 'Liga de WhatsApp lista')
+    : await toast(s.page, /enviada por correo|No se pudo enviar el correo|Error/)
   await s.page.reload()
   await readQuote(s)
   return message

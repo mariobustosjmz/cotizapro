@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Mail, MessageCircle, Send, Loader2, CheckCircle2, AlertCircle, Clock, FileDown } from 'lucide-react'
+import { X, Mail, MessageCircle, Send, Loader2, CheckCircle2, AlertCircle, Clock, FileDown, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 
@@ -42,6 +42,8 @@ export function QuoteShareDialog({
   const [notifications, setNotifications] = useState<NotificationRecord[]>([])
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [loadingPdf, setLoadingPdf] = useState(false)
+  const [emailReady, setEmailReady] = useState<boolean | null>(null)
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -49,7 +51,13 @@ export function QuoteShareDialog({
     setEmailOverride('')
     setWhatsappOverride('')
     setPdfUrl(null)
+    setWhatsappUrl(null)
     setLoadingPdf(true)
+
+    fetch('/api/messaging/channels')
+      .then(res => res.ok ? res.json() : { data: { email: false } })
+      .then((json: { data?: { email?: boolean } }) => setEmailReady(Boolean(json.data?.email)))
+      .catch(() => setEmailReady(false))
 
     // Fetch notifications
     fetch(`/api/quotes/${quoteId}/notifications`)
@@ -106,18 +114,15 @@ export function QuoteShareDialog({
       }
 
       const emailOk = json.results?.email?.success
-      const whatsappOk = json.results?.whatsapp?.success
-      const parts: string[] = []
-      if (emailOk) parts.push('Email')
-      if (whatsappOk) parts.push('WhatsApp')
-
-      if (parts.length > 0) {
-        toast({ message: `Enviado via ${parts.join(' y ')}`, variant: 'success' })
-      } else {
-        toast({ message: 'Envio con errores parciales', variant: 'warning' })
-      }
+      const link: string | undefined = json.results?.whatsapp?.url
+      if (emailOk) toast({ message: 'Cotización enviada por correo', variant: 'success' })
+      else if (sendVia.has('email')) toast({ message: 'No se pudo enviar el correo', variant: 'warning' })
 
       onSent?.()
+      if (link) {
+        setWhatsappUrl(link)
+        return
+      }
       onClose()
     } catch {
       toast({ message: 'Error de conexion al enviar', variant: 'error' })
@@ -189,14 +194,17 @@ export function QuoteShareDialog({
               <button
                 type="button"
                 onClick={() => toggleMethod('email')}
-                className={`flex items-center gap-2 p-3 rounded-lg border text-sm font-medium transition-colors ${
+                disabled={emailReady === false}
+                className={`flex items-center gap-2 p-3 rounded-lg border text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                   sendVia.has('email')
                     ? 'border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
                     : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 <Mail className="w-4 h-4" />
-                Email
+                {emailReady === false ? (
+                  <span>Correo <span className="text-[10px] font-semibold uppercase text-orange-600 dark:text-orange-400">Próximamente</span></span>
+                ) : 'Correo'}
               </button>
               <button
                 type="button"
@@ -211,7 +219,36 @@ export function QuoteShareDialog({
                 WhatsApp
               </button>
             </div>
+            {sendVia.has('whatsapp') && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">Se abre tu WhatsApp con el mensaje listo; adjunta el PDF en la conversación.</p>
+            )}
           </div>
+
+          {whatsappUrl && (
+            <div className="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-4 space-y-3">
+              <p className="text-sm font-medium text-green-800 dark:text-green-300">Mensaje listo. Ábrelo en WhatsApp y adjunta el PDF.</p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="share-open-whatsapp"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-green-600 hover:bg-green-700 px-4 py-2 text-sm font-semibold text-white"
+                >
+                  <ExternalLink className="w-4 h-4" /> Abrir WhatsApp
+                </a>
+                {pdfUrl && (
+                  <a
+                    href={pdfUrl}
+                    download={`${quoteNumber}.pdf`}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+                  >
+                    <FileDown className="w-4 h-4" /> Descargar PDF
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Email override */}
           {sendVia.has('email') && (
@@ -284,12 +321,12 @@ export function QuoteShareDialog({
         {/* Footer - Fixed */}
         <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-2 shrink-0 bg-white dark:bg-gray-900">
           <Button variant="outline" size="sm" onClick={onClose} disabled={sending}>
-            Cancelar
+            {whatsappUrl ? 'Cerrar' : 'Cancelar'}
           </Button>
           <Button
             size="sm"
             onClick={handleSend}
-            disabled={sending || sendVia.size === 0}
+            disabled={sending || sendVia.size === 0 || whatsappUrl !== null}
             className="bg-orange-500 hover:bg-orange-600 text-white"
           >
             {sending ? (

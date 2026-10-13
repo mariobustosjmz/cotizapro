@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendQuoteSchema } from '@/lib/validations/cotizapro'
 import { generateQuotePDF } from '@/lib/integrations/pdf'
 import { sendEmail, generateQuoteEmailHTML, type EmailResult } from '@/lib/integrations/email'
-import { sendWhatsAppMessage, type WhatsAppResult } from '@/lib/integrations/twilio'
+import { quoteWhatsappMessage, whatsappLink } from '@/lib/whatsapp/link'
 import { messageLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -49,7 +49,8 @@ export async function POST(
       .select(`
         *,
         items:quote_items(*),
-        client:clients(*)
+        client:clients(*),
+        organization:organizations(name)
       `)
       .eq('id', id)
       .single()
@@ -87,7 +88,7 @@ export async function POST(
 
     const results: {
       email: EmailResult | null
-      whatsapp: WhatsAppResult | null
+      whatsapp: { success: true; url: string } | null
     } = {
       email: null,
       whatsapp: null,
@@ -131,40 +132,33 @@ export async function POST(
       }
     }
 
-    // Send via WhatsApp
+    // WhatsApp por liga wa.me: el envío lo hace el usuario desde su propio WhatsApp.
     if (send_via.includes('whatsapp')) {
       const whatsappTo = whatsapp_override || quote.client.whatsapp_phone || quote.client.phone
+      const organization = quote.organization as unknown as { name: string } | null
+      const url = whatsappLink(whatsappTo, quoteWhatsappMessage({
+        clientName: quote.client.name,
+        businessName: organization?.name ?? null,
+        quoteNumber: quote.quote_number,
+        total: quote.total,
+        validUntil: quote.valid_until,
+        pdfUrl: publicUrl || null,
+      }))
 
-      if (!whatsappTo) {
+      if (!url) {
         return NextResponse.json({
-          error: 'El cliente no tiene WhatsApp y no se proporcionó uno alternativo'
+          error: 'El cliente no tiene un WhatsApp válido y no se proporcionó uno alternativo'
         }, { status: 400 })
       }
 
-      const message = `Hola ${quote.client.name},\n\nTe envío la cotización ${quote.quote_number}.\n\nTotal: $${quote.total.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN\nVálida hasta: ${new Date(quote.valid_until).toLocaleDateString('es-MX')}\n\nPuedes ver el PDF aquí: ${publicUrl}\n\n¡Gracias!`
+      results.whatsapp = { success: true, url }
 
-      logger.info('Sending quote via WhatsApp', { recipient: whatsappTo })
-      const whatsappResult = await sendWhatsAppMessage({
-        to: whatsappTo,
-        message,
-        mediaUrl: publicUrl,
-      })
-
-      results.whatsapp = whatsappResult
-
-      // Log notification
       await supabase.from('quote_notifications').insert({
         quote_id: id,
         notification_type: 'whatsapp',
         recipient: whatsappTo,
-        status: whatsappResult.success ? 'sent' : 'failed',
-        provider_message_id: whatsappResult.messageId,
-        error_message: whatsappResult.error,
+        status: 'sent',
       })
-
-      if (!whatsappResult.success) {
-        logger.warn('WhatsApp sending failed for quote', { quoteId: id, recipient: whatsappTo, error: whatsappResult.error })
-      }
     }
 
     // Update quote status to 'sent'
@@ -185,7 +179,7 @@ export async function POST(
       results,
       pdf_url: publicUrl,
     })
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Unexpected error in POST /api/quotes/[id]/send', error)
     return handleApiError(
       ApiErrors.INTERNAL_ERROR('Failed to send quote'),

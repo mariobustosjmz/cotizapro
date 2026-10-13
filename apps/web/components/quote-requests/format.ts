@@ -1,5 +1,6 @@
-const MX_LOCAL_DIGITS = 10
-const MX_COUNTRY_CODE = '52'
+import { normalizeWhatsappPhone } from '@/lib/whatsapp/link'
+
+export { normalizeWhatsappPhone }
 
 const dateFormatter = new Intl.DateTimeFormat('es-MX', {
   day: 'numeric',
@@ -8,11 +9,6 @@ const dateFormatter = new Intl.DateTimeFormat('es-MX', {
   hour: '2-digit',
   minute: '2-digit',
 })
-
-export function normalizeWhatsappPhone(phone: string): string {
-  const digits = phone.replace(/\D/g, '')
-  return digits.length === MX_LOCAL_DIGITS ? `${MX_COUNTRY_CODE}${digits}` : digits
-}
 
 export function whatsappUrl(phone: string, name: string): string {
   const firstName = name.trim().split(/\s+/)[0] ?? ''
