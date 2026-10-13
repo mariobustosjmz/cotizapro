@@ -32,6 +32,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
     highlighted: false,
     features: [
       'Cotizaciones ilimitadas',
+      'Envío por WhatsApp y correo con tu logo',
       'Clientes, agenda y recordatorios',
       'Registro de anticipos y saldos',
       'Plantillas y analítica de ventas',
@@ -76,7 +77,6 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
 /** Funciones que aún no existen para ningún plan; se muestran como "Próximamente". */
 export const UPCOMING_FEATURES: readonly string[] = [
   'Envío automático por WhatsApp (API oficial de Meta)',
-  'Envío de cotizaciones por correo desde la plataforma',
   'Contratación y pago del plan con tarjeta',
   'Pago anual con descuento',
 ]

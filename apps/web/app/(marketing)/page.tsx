@@ -5,6 +5,8 @@ import { EXTRA_USER_MONTHLY_PRICE, PLANS, PLAN_ORDER, PRICES_INCLUDE_VAT } from 
 import { formatMxn } from '@/lib/plans/pricing'
 import { PricingSection } from '@/components/landing/pricing-section'
 import { CaseStudyStats, UsageScenarios } from '@/components/landing/proof-sections'
+import { Highlights } from '@/components/landing/highlights'
+import { ProductGallery } from '@/components/landing/product-gallery'
 
 export default function LandingPage() {
   const jsonLd = {
@@ -40,7 +42,7 @@ export default function LandingPage() {
       {
         icon: "pdf",
         title: "PDF Profesional",
-        description: "PDF con tu logo personalizado, términos y condiciones. Impresiona a tus clientes desde la primera impresión.",
+        description: "PDF con tu logo y tu color, lista de materiales, términos y condiciones. Impresiona desde la primera cotización.",
         color: "red",
         badge: null
       },
@@ -62,8 +64,8 @@ export default function LandingPage() {
     seguimiento: [
       {
         icon: "whatsapp",
-        title: "Envío por WhatsApp",
-        description: "Con un toque se abre tu WhatsApp con el mensaje listo: folio, total y vigencia. El envío por correo llega próximamente.",
+        title: "Envío por WhatsApp y Correo",
+        description: "WhatsApp con el mensaje listo (folio, total y vigencia) o correo a nombre de tu negocio con el PDF adjunto. Las respuestas llegan a tu correo.",
         color: "green",
         badge: null
       },
@@ -172,6 +174,9 @@ export default function LandingPage() {
 
             {/* Nav links */}
             <div className="hidden md:flex items-center gap-8">
+              <Link href="#como-se-ve" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
+                Cómo se ve
+              </Link>
               <Link href="#caracteristicas" className="text-sm font-medium text-slate-600 hover:text-blue-800 transition-colors cursor-pointer">
                 Características
               </Link>
@@ -214,7 +219,7 @@ export default function LandingPage() {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                Nuevo: Pagos, Kanban y Analytics incluidos
+                Nuevo: correo con tu marca, tu página pública y equipo
               </div>
 
               {/* Heading */}
@@ -322,6 +327,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <Highlights />
+      <ProductGallery />
 
       {/* ── Proyección del caso de estudio ─────────────────────────── */}
       <CaseStudyStats />

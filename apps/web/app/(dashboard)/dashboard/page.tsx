@@ -202,7 +202,7 @@ export default async function DashboardPage() {
                 {overdueReminders.length} recordatorio{overdueReminders.length > 1 ? 's' : ''} vencido{overdueReminders.length > 1 ? 's' : ''}
               </span>
               <span className="text-sm text-orange-600/70 dark:text-orange-400/70 ml-2">
-                — requieren atencion inmediata
+                — {overdueReminders.length > 1 ? 'requieren' : 'requiere'} atención inmediata
               </span>
             </div>
             <ChevronRight className="w-4 h-4 text-orange-500 shrink-0" />
