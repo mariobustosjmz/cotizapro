@@ -113,7 +113,7 @@ test.describe('Team Management', () => {
     const teamPage = new TeamPage(page)
     await teamPage.goToInvite()
 
-    const submitButton = page.locator('button[type="submit"]:has-text("Enviar Invitación"), button[type="submit"]:has-text("Invitar"), button[type="submit"]:has-text("Send")')
+    const submitButton = page.locator('button[type="submit"]:has-text("Crear invitación"), button[type="submit"]:has-text("Enviar Invitación"), button[type="submit"]:has-text("Invitar"), button[type="submit"]:has-text("Send")')
     expect(await submitButton.isVisible()).toBeTruthy()
   })
 

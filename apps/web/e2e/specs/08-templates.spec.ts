@@ -15,7 +15,7 @@ test.describe('Quote Templates Management', () => {
     await templatesPage.goto()
 
     expect(page.url()).toContain('/dashboard/templates')
-    const headingVisible = await page.locator('h2:has-text("Templates")').isVisible()
+    const headingVisible = await page.locator('h2:has-text("Plantillas")').isVisible()
     expect(headingVisible).toBeTruthy()
   })
 

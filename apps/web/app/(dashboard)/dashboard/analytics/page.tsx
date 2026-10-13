@@ -107,7 +107,7 @@ export default async function AnalyticsPage() {
         </div>
         <div className="min-w-0">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Analíticas</h2>
-          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Metricas y rendimiento del negocio</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Métricas y rendimiento del negocio</p>
         </div>
       </div>
 
@@ -187,7 +187,7 @@ export default async function AnalyticsPage() {
 
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Metricas de Cotizaciones</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Métricas de Cotizaciones</span>
           </div>
           <div className="p-4 space-y-4">
             <div>
@@ -230,7 +230,7 @@ export default async function AnalyticsPage() {
       <div className="grid gap-3 md:grid-cols-2">
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Analisis de Clientes</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white">Análisis de Clientes</span>
           </div>
           <div className="p-4 space-y-3">
             <div className="grid grid-cols-2 gap-2">
@@ -288,7 +288,7 @@ export default async function AnalyticsPage() {
 
             <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Proximos 7 dias</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Próximos 7 días</span>
                 <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
                   {analytics.reminders.due_next_7_days}
                 </span>
@@ -301,7 +301,7 @@ export default async function AnalyticsPage() {
       {/* Revenue */}
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">Analisis de Ingresos</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Análisis de Ingresos</span>
         </div>
         <div className="p-4">
           <div className="grid gap-3 md:grid-cols-3">

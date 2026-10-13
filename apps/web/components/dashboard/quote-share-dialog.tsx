@@ -88,7 +88,7 @@ export function QuoteShareDialog({
 
   async function handleSend() {
     if (sendVia.size === 0) {
-      toast({ message: 'Selecciona al menos un metodo de envio', variant: 'warning' })
+      toast({ message: 'Selecciona al menos un método de envío', variant: 'warning' })
       return
     }
 
@@ -150,7 +150,7 @@ export function QuoteShareDialog({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Enviar Cotizacion</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Enviar Cotización</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{quoteNumber} - {clientName}</p>
           </div>
           <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -189,7 +189,7 @@ export function QuoteShareDialog({
 
           {/* Method toggles */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Metodo de envio</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Método de envío</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -283,7 +283,7 @@ export function QuoteShareDialog({
                 className="mt-1 w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500/20 dark:focus:ring-green-500/30 focus:border-green-300 dark:focus:border-green-700"
               />
               {!clientPhone && !whatsappOverride && (
-                <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">Cliente sin telefono, ingresa uno</p>
+                <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">Cliente sin teléfono, ingresa uno</p>
               )}
             </div>
           )}

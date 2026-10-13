@@ -63,7 +63,7 @@ const statusLabels: Record<string, string> = {
   accepted: 'Aceptada',
   rejected: 'Rechazada',
   expired: 'Expirada',
-  en_instalacion: 'En Instalacion',
+  en_instalacion: 'En Instalación',
   completado: 'Completado',
   cobrado: 'Cobrado',
 }
@@ -99,10 +99,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           const data = await response.json()
           setQuote(data.data)
         } else {
-          setError('Cotizacion no encontrada')
+          setError('Cotización no encontrada')
         }
       } catch {
-        setError('Error al cargar cotizacion')
+        setError('Error al cargar cotización')
       }
     }
 
@@ -126,7 +126,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
   }, [id])
 
   async function handleDelete() {
-    if (!confirm('Estas seguro de eliminar esta cotizacion? Esta accion no se puede deshacer.')) {
+    if (!confirm('¿Estás seguro de eliminar esta cotización? Esta acción no se puede deshacer.')) {
       return
     }
 
@@ -137,13 +137,13 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       const response = await fetch(`/api/quotes/${id}`, { method: 'DELETE' })
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Error al eliminar cotizacion')
+        throw new Error(errorData.error || 'Error al eliminar cotización')
       }
       toast({ message: 'Cotizació eliminada exitosamente', variant: 'success' })
       router.push('/dashboard/quotes')
       router.refresh()
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al eliminar cotizacion'
+      const errorMsg = err instanceof Error ? err.message : 'Error al eliminar cotización'
       setError(errorMsg)
       toast({ message: errorMsg, variant: 'error' })
       setDeleting(false)
@@ -281,7 +281,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
             )}
             {quote.client?.phone && (
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Telefono</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Teléfono</p>
                 <p className="text-sm text-gray-900 dark:text-white">{quote.client.phone}</p>
               </div>
             )}
@@ -292,13 +292,13 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       {/* Items */}
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">Items de la Cotizacion</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Items de la Cotización</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-700">
-                <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Descripcion</th>
+                <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Descripción</th>
                 <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Cant.</th>
                 <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Precio</th>
                 <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Total</th>
@@ -348,7 +348,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Payments */}
-      <PaymentSection quoteId={quote.id} quoteTotal={quote.total} />
+      <PaymentSection quoteId={quote.id} quoteTotal={quote.total} isCollected={quote.status === 'cobrado'} />
 
       {quote.status === 'cobrado' && <ReviewRequestCard quoteId={quote.id} clientEmail={quote.client?.email ?? null} />}
 
@@ -370,7 +370,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         </div>
         <div className="p-4">
           {workEvents.length === 0 ? (
-            <p className="text-xs text-gray-500 dark:text-gray-400">No hay eventos vinculados a esta cotizacion.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">No hay eventos vinculados a esta cotización.</p>
           ) : (
             <div className="space-y-2">
               {workEvents.map((event) => (
@@ -419,7 +419,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
           {quote.terms_and_conditions && (
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
               <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">Terminos y Condiciones</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">Términos y Condiciones</span>
               </div>
               <div className="p-4">
                 <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{quote.terms_and_conditions}</p>
@@ -447,7 +447,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Valida Hasta</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Válida Hasta</p>
               <p className="text-sm text-gray-900 dark:text-white">
                 {new Date(quote.valid_until).toLocaleDateString('es-MX', {
                   year: 'numeric',
@@ -470,11 +470,11 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                   </>
                 )}
                 {quote.status === 'draft' && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Pendiente de envio</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Pendiente de envío</span>
                 )}
                 {quote.status === 'accepted' && (
                   <Button size="sm" onClick={() => handleStatusChange('en_instalacion')} disabled={loading} className="h-7 text-xs bg-orange-500 hover:bg-orange-600 text-white">
-                    Iniciar Instalacion
+                    Iniciar Instalación
                   </Button>
                 )}
                 {quote.status === 'en_instalacion' && (
@@ -488,10 +488,10 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
                   </Button>
                 )}
                 {quote.status === 'rejected' && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Cotizacion rechazada</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Cotización rechazada</span>
                 )}
                 {quote.status === 'cobrado' && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Cotizacion cobrada</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Cotización cobrada</span>
                 )}
               </div>
             </div>

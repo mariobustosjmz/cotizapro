@@ -68,7 +68,7 @@ export async function dia2(w: Week): Promise<void> {
   status(w, 'laura', 'Aceptada', total)
   await createEvent(s, { title: 'Reposición de vidrios — Laura Méndez', type: 'Instalación', start: at(w, 2, '16:00'), end: at(w, 2, '17:30'), address: LAURA.address, notes: 'Llevar vidrio claro 4 mm cortado.' })
   await openQuote(s, quoteId(w, 'laura'))
-  await setStatus(s, 'Iniciar Instalacion')
+  await setStatus(s, 'Iniciar Instalación')
   await uploadPhoto(s, w.browser, 'Trabajo', 'Vidrio de cocina repuesto', 'work')
   await setStatus(s, 'Marcar Completado')
   await setStatus(s, 'Marcar Cobrado')

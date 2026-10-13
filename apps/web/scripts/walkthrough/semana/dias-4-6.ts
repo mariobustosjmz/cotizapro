@@ -51,7 +51,7 @@ export async function dia5(w: Week): Promise<void> {
   const { s } = w
   s.rec.startDay(5, 'Instalaciones, liquidación y reseña con fotos', 'Se instala lo de Andrea con fotos antes y después que se publican en la página; liquida y deja 5 estrellas. Arranca la obra del despacho. El condominio acepta. Se cotiza el espejo de Roberto y se agenda su seguimiento.')
   await openQuote(s, quoteId(w, 'andrea'))
-  await setStatus(s, 'Iniciar Instalacion')
+  await setStatus(s, 'Iniciar Instalación')
   await uploadPhoto(s, w.browser, 'Antes', 'Antes: regadera sin cancel', 'before')
   await setStatus(s, 'Marcar Completado')
   await uploadPhoto(s, w.browser, 'Después', 'Después: cancel templado 9 mm', 'after')
@@ -75,7 +75,7 @@ export async function dia5(w: Week): Promise<void> {
   await clientReview(s, w.browser, reviewPath, ANDREA.name, 5, 'Midieron el mismo día, el cancel quedó perfecto y el espejo biselado se ve increíble. Muy recomendables.')
 
   await openQuote(s, quoteId(w, 'salinas'))
-  await setStatus(s, 'Iniciar Instalacion')
+  await setStatus(s, 'Iniciar Instalación')
   await uploadPhoto(s, w.browser, 'Trabajo', 'Oficinas: ventanas Serie 3 negras', 'work')
   status(w, 'salinas', 'En instalación')
 

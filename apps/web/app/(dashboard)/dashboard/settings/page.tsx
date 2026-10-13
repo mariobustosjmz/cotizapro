@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FormField } from '@/components/ui/form-field'
 import { PasswordChangeForm } from '@/components/dashboard/PasswordChangeForm'
+import { BrandSettings } from '@/components/settings/brand-settings'
+import { roleLabel } from '@/lib/team/roles'
 import { Save, Building, User, Bell, Shield, Settings2 } from 'lucide-react'
 
 interface Profile {
@@ -230,7 +232,7 @@ export default function SettingsPage() {
               </FormField>
 
               <FormField label="Rol" htmlFor="role">
-                <Input id="role" value={profile.role} disabled className="bg-gray-50 dark:bg-gray-800 dark:text-gray-100 capitalize" />
+                <Input id="role" value={roleLabel(profile.role)} disabled className="bg-gray-50 dark:bg-gray-800 dark:text-gray-100" />
               </FormField>
 
               <FormField label="URL de Avatar" htmlFor="avatar_url">
@@ -301,50 +303,11 @@ export default function SettingsPage() {
             {/* Branding */}
             <div className="md:col-span-2 pt-2 border-t border-gray-100 dark:border-gray-800">
               <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3">Marca / Branding</p>
-              <div className="grid gap-3 md:grid-cols-2">
-                <FormField label="URL del Logo" htmlFor="logo_url" hint="Se usará en PDFs y cotizaciones">
-                  <div className="flex items-center gap-3">
-                    {organization.settings?.logo_url && (
-                      <img
-                        src={organization.settings.logo_url}
-                        alt="Logo"
-                        className="w-10 h-10 rounded-lg object-contain border border-gray-200 dark:border-gray-700 bg-white"
-                      />
-                    )}
-                    <Input
-                      id="logo_url"
-                      name="logo_url"
-                      type="url"
-                      defaultValue={organization.settings?.logo_url || ''}
-                      placeholder="https://ejemplo.com/logo.png"
-                      className="flex-1"
-                    />
-                  </div>
-                </FormField>
-
-                <FormField label="Color de Marca" htmlFor="brand_color" hint="Color principal para PDFs">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      id="brand_color_picker"
-                      defaultValue={organization.settings?.brand_color || '#F97316'}
-                      onChange={(e) => {
-                        const input = document.getElementById('brand_color') as HTMLInputElement
-                        if (input) input.value = e.target.value
-                      }}
-                      className="w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer p-0.5"
-                    />
-                    <Input
-                      id="brand_color"
-                      name="brand_color"
-                      defaultValue={organization.settings?.brand_color || '#F97316'}
-                      placeholder="#F97316"
-                      pattern="^#[0-9A-Fa-f]{6}$"
-                      className="flex-1 font-mono"
-                    />
-                  </div>
-                </FormField>
-              </div>
+              <BrandSettings
+                initialLogoUrl={organization.settings?.logo_url ?? null}
+                initialColor={organization.settings?.brand_color ?? null}
+                companyName={organization.name}
+              />
             </div>
 
             <FormField label="Dirección" htmlFor="company_address">
@@ -388,7 +351,7 @@ export default function SettingsPage() {
                 name="quote_terms"
                 rows={3}
                 defaultValue={organization.settings?.quote_terms || ''}
-                placeholder="50% de anticipo al aceptar la cotizacion. 50% restante al completar el trabajo."
+                placeholder="50% de anticipo al aceptar la cotización. 50% restante al completar el trabajo."
               />
             </FormField>
 
@@ -412,7 +375,7 @@ export default function SettingsPage() {
             <p className="text-xs text-gray-500 dark:text-gray-400">Las notificaciones por email estarán disponibles próximamente.</p>
 
             {[
-              { title: 'Nuevas Cotizaciones', desc: 'Email cuando se crea una cotizacion' },
+              { title: 'Nuevas Cotizaciones', desc: 'Email cuando se crea una cotización' },
               { title: 'Recordatorios Pendientes', desc: 'Email diario con recordatorios del dia' },
               { title: 'Cotizaciones Aceptadas', desc: 'Email cuando un cliente acepta' },
             ].map((item) => (

@@ -4,19 +4,21 @@ import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { safeNextPath } from '@/lib/auth/safe-next'
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; success?: string }>
+  searchParams: Promise<{ error?: string; success?: string; next?: string }>
 }) {
   const params = await searchParams
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // If already logged in, redirect to dashboard
+  const next = safeNextPath(params.next)
+
   if (user) {
-    redirect('/dashboard')
+    redirect(next ?? '/dashboard')
   }
 
   async function login(formData: FormData) {
@@ -24,6 +26,7 @@ export default async function LoginPage({
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const nextPath = safeNextPath(formData.get('next'))
 
     const supabase = await createServerClient()
     const { error } = await supabase.auth.signInWithPassword({
@@ -32,10 +35,10 @@ export default async function LoginPage({
     })
 
     if (error) {
-      redirect('/login?error=invalid-credentials')
+      redirect(`/login?error=invalid-credentials${nextPath ? `&next=${encodeURIComponent(nextPath)}` : ''}`)
     }
 
-    redirect('/dashboard')
+    redirect(nextPath ?? '/dashboard')
   }
 
   return (
@@ -56,6 +59,13 @@ export default async function LoginPage({
           </p>
         </div>
 
+        {params.success === 'check-email' && (
+          <div className="rounded-md bg-green-50 p-4">
+            <p className="text-sm font-medium text-green-800">
+              Cuenta creada. Confirma tu correo y luego inicia sesión para unirte al equipo.
+            </p>
+          </div>
+        )}
         {params.success === 'password-reset' && (
           <div className="rounded-md bg-green-50 p-4">
             <p className="text-sm font-medium text-green-800">
@@ -75,6 +85,7 @@ export default async function LoginPage({
         )}
 
         <form action={login} className="mt-8 space-y-6">
+          {next && <input type="hidden" name="next" value={next} />}
           <div className="space-y-4 rounded-md">
             <div>
               <Label htmlFor="email">Correo electrónico</Label>

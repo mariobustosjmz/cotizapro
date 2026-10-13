@@ -15,7 +15,7 @@ test.describe('Dashboard Navigation', () => {
     await dashboardPage.goto()
 
     const title = await dashboardPage.getPageTitle()
-    expect(title).toContain('Dashboard')
+    expect(title).toContain('Inicio')
   })
 
   test('Dashboard displays welcome message', async ({ page }) => {

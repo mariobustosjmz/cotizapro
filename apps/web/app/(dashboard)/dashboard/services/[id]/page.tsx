@@ -181,7 +181,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
   }
 
   async function handleDelete() {
-    if (!confirm('Estas seguro de eliminar este servicio? Esta accion no se puede deshacer.')) {
+    if (!confirm('¿Estás seguro de eliminar este servicio? Esta acción no se puede deshacer.')) {
       return
     }
 
@@ -288,7 +288,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
               </FormField>
 
               <div className="grid gap-3 md:grid-cols-2">
-                <FormField label="Categoria" htmlFor="category" required>
+                <FormField label="Categoría" htmlFor="category" required>
                   <Combobox
                     id="category"
                     name="category"
@@ -340,7 +340,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                 </FormField>
               </div>
 
-              <FormField label="Descripcion" htmlFor="description">
+              <FormField label="Descripción" htmlFor="description">
                 <Textarea id="description" name="description" rows={2} defaultValue={service.description || ''} />
               </FormField>
 
@@ -365,7 +365,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{service.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Categoria</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Categoría</p>
                   <p className="text-sm text-gray-900 dark:text-white">{categoryLabels[service.category]}</p>
                 </div>
                 <div>
@@ -396,7 +396,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
 
               {service.description && (
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Descripcion</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Descripción</p>
                   <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{service.description}</p>
                 </div>
               )}

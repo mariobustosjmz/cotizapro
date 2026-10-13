@@ -4,10 +4,14 @@ import { z } from 'zod'
 import { sendEmail } from '@/lib/integrations/email'
 import { encode as escapeHtml } from 'html-entities'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
+import { inviteWhatsappLink } from '@/lib/whatsapp/invite'
+import { roleLabel } from '@/lib/team/roles'
 
 const inviteSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.string().trim().toLowerCase().email('Email inválido'),
   role: z.enum(['admin', 'member', 'viewer']),
+  phone: z.string().trim().max(20).optional(),
 })
 
 /**
@@ -113,7 +117,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    const { email, role } = validation.data
+    const { email, role, phone } = validation.data
+
+    if (role === 'admin' && profile.role !== 'owner') {
+      return NextResponse.json({ error: 'Solo el propietario puede invitar administradores' }, { status: 403 })
+    }
 
     // Check if user is already a member
     const { data: existingMember } = await supabase
@@ -216,13 +224,25 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: email,
       subject: `Invitación a unirte a ${escapeHtml(organization?.name || 'CotizaPro')}`,
       html: emailHtml,
     })
+    if (!emailResult.success) logger.warn('invitation email not sent; share link instead', { invitationId: invitation.id })
 
-    return NextResponse.json({ invitation }, { status: 201 })
+    // Sin correo configurado la invitación igual sirve: se comparte la liga (copiar o WhatsApp).
+    const whatsappUrl = inviteWhatsappLink(phone, {
+      organizationName: organization?.name || 'tu equipo',
+      roleLabel: roleLabel(role),
+      inviteUrl,
+    })
+    return NextResponse.json({
+      invitation: { id: invitation.id, email: invitation.email, role: invitation.role, expires_at: invitation.expires_at },
+      invite_url: inviteUrl,
+      whatsapp_url: whatsappUrl,
+      email_sent: emailResult.success,
+    }, { status: 201 })
   } catch (error) {
     console.error('Unexpected error:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })

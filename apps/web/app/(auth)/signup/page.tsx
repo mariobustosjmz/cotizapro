@@ -4,15 +4,20 @@ import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { INVITE_TOKEN_PATTERN } from '@/lib/team/invitation-errors'
 
-export default async function SignupPage() {
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ invite?: string }> }) {
+  const { invite } = await searchParams
+  const inviteToken = invite && INVITE_TOKEN_PATTERN.test(invite) ? invite : null
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // If already logged in, redirect to dashboard
   if (user) {
-    redirect('/dashboard')
+    redirect(inviteToken ? `/invite/${inviteToken}` : '/dashboard')
   }
+
+  const preview = inviteToken ? (await supabase.rpc('get_invitation_preview', { p_token: inviteToken })).data as { organization_name?: string } | null : null
+  const joiningOrganization = preview?.organization_name ?? null
 
   async function signup(formData: FormData) {
     'use server'
@@ -21,6 +26,8 @@ export default async function SignupPage() {
     const password = formData.get('password') as string
     const fullName = formData.get('fullName') as string
     const orgName = formData.get('orgName') as string
+    const rawInvite = formData.get('invite')
+    const token = typeof rawInvite === 'string' && INVITE_TOKEN_PATTERN.test(rawInvite) ? rawInvite : null
 
     const supabase = await createServerClient()
 
@@ -42,6 +49,13 @@ export default async function SignupPage() {
 
     if (!data.user) {
       redirect('/signup?error=no-user')
+    }
+
+    // Con invitación no se crea empresa: se une a la que invitó (accept_invitation valida correo y vigencia).
+    if (token) {
+      if (!data.session) redirect(`/login?success=check-email&next=${encodeURIComponent(`/invite/${token}`)}`)
+      const { error: acceptError } = await supabase.rpc('accept_invitation', { invitation_token: token })
+      redirect(acceptError ? `/invite/${token}` : '/dashboard')
     }
 
     // Create organization slug from name
@@ -75,8 +89,11 @@ export default async function SignupPage() {
             CotizaPro
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Crea tu cuenta gratis
+            {joiningOrganization ? `Únete a ${joiningOrganization}` : 'Crea tu cuenta gratis'}
           </h2>
+          {inviteToken && (
+            <p className="mt-2 text-sm text-gray-600">Usa el mismo correo al que llegó la invitación.</p>
+          )}
           <p className="mt-2 text-sm text-gray-600">
             Ya tienes cuenta?{' '}
             <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
@@ -112,17 +129,21 @@ export default async function SignupPage() {
               />
             </div>
 
-            <div>
-              <Label htmlFor="orgName">Nombre de tu empresa</Label>
-              <Input
-                id="orgName"
-                name="orgName"
-                type="text"
-                required
-                placeholder="HVAC Pro México"
-                className="mt-1"
-              />
-            </div>
+            {inviteToken ? (
+              <input type="hidden" name="invite" value={inviteToken} />
+            ) : (
+              <div>
+                <Label htmlFor="orgName">Nombre de tu empresa</Label>
+                <Input
+                  id="orgName"
+                  name="orgName"
+                  type="text"
+                  required
+                  placeholder="HVAC Pro México"
+                  className="mt-1"
+                />
+              </div>
+            )}
 
             <div>
               <Label htmlFor="password">Contraseña</Label>
@@ -141,7 +162,7 @@ export default async function SignupPage() {
           </div>
 
           <Button type="submit" className="w-full">
-            Crear Cuenta Gratis
+            {inviteToken ? 'Crear cuenta y unirme' : 'Crear Cuenta Gratis'}
           </Button>
 
           <div className="text-center">

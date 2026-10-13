@@ -102,6 +102,8 @@ const nextConfig: NextConfig = {
               `img-src 'self' data: https: blob: ${supabaseOrigin}`,
               "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com",
               `connect-src 'self' ${supabaseOrigin} ${supabaseWs} https://*.supabase.co https://api.stripe.com wss://*.supabase.co`,
+              // La vista previa del PDF al compartir una cotización se muestra en un iframe con una URL blob:.
+              "frame-src 'self' blob:",
               "form-action 'self'",
               "base-uri 'self'",
               "frame-ancestors 'none'",

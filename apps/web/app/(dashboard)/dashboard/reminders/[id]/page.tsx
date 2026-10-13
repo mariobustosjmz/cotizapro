@@ -104,7 +104,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
   }
 
   async function handleDelete() {
-    if (!confirm('Estas seguro de eliminar este recordatorio? Esta accion no se puede deshacer.')) {
+    if (!confirm('¿Estás seguro de eliminar este recordatorio? Esta acción no se puede deshacer.')) {
       return
     }
 
@@ -409,7 +409,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
                   <Input id="scheduled_date" name="scheduled_date" type="date" required defaultValue={reminder.scheduled_date} />
                 </FormField>
 
-                <FormField label="Categoria de Servicio" htmlFor="related_service_category">
+                <FormField label="Categoría de Servicio" htmlFor="related_service_category">
                   <select id="related_service_category" name="related_service_category" defaultValue={reminder.related_service_category || ''} className={selectClass}>
                     <option value="">Ninguna</option>
                     <option value="hvac">HVAC</option>
@@ -421,7 +421,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
                 </FormField>
               </div>
 
-              <FormField label="Descripcion" htmlFor="description">
+              <FormField label="Descripción" htmlFor="description">
                 <Textarea id="description" name="description" rows={2} defaultValue={reminder.description || ''} />
               </FormField>
 
@@ -467,7 +467,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 {reminder.related_service_category && (
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Categoria de Servicio</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Categoría de Servicio</p>
                     <p className="text-sm text-gray-900 dark:text-white">{categoryLabels[reminder.related_service_category] || reminder.related_service_category}</p>
                   </div>
                 )}
@@ -475,7 +475,7 @@ export default function ReminderDetailPage({ params }: { params: Promise<{ id: s
 
               {reminder.description && (
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Descripcion</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Descripción</p>
                   <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{reminder.description}</p>
                 </div>
               )}

@@ -1,4 +1,8 @@
 import { redirect } from 'next/navigation'
+import { countLabel } from '@/lib/format/count-label'
+import { ROLE_LABELS, roleLabel } from '@/lib/team/roles'
+import { inviteWhatsappLink } from '@/lib/whatsapp/invite'
+import { InviteSharePanel } from '@/components/team/invite-share-panel'
 import { createServerClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Plus, Users } from 'lucide-react'
@@ -14,12 +18,13 @@ interface Member {
 }
 
 interface Invitation {
-  id: string
-  email: string
-  role: string
-  expires_at: string
-  accepted_at: string | null
-  created_at: string
+  readonly id: string
+  readonly email: string
+  readonly role: string
+  readonly token: string
+  readonly expires_at: string
+  readonly accepted_at: string | null
+  readonly created_at: string
 }
 
 export default async function TeamPage() {
@@ -32,7 +37,7 @@ export default async function TeamPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('organization_id, role')
+    .select('organization_id, role, organizations(name)')
     .eq('id', user.id)
     .single()
 
@@ -51,7 +56,7 @@ export default async function TeamPage() {
   if (['owner', 'admin'].includes(profile.role)) {
     const { data } = await supabase
       .from('invitations')
-      .select('id, email, role, expires_at, accepted_at, created_at')
+      .select('id, email, role, token, expires_at, accepted_at, created_at')
       .eq('organization_id', profile.organization_id)
       .is('accepted_at', null)
       .gt('expires_at', new Date().toISOString())
@@ -61,11 +66,12 @@ export default async function TeamPage() {
     invitations = data || []
   }
 
-  const roleLabels: Record<string, string> = {
-    owner: 'Propietario',
-    admin: 'Administrador',
-    member: 'Miembro',
-    viewer: 'Visualizador',
+  const roleLabels: Readonly<Record<string, string>> = ROLE_LABELS
+  const organizationName = (profile.organizations as unknown as { name: string } | null)?.name ?? 'tu equipo'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const shareFor = (invitation: Invitation) => {
+    const inviteUrl = `${appUrl}/invite/${invitation.token}`
+    return { inviteUrl, whatsappUrl: inviteWhatsappLink(null, { organizationName, roleLabel: roleLabel(invitation.role), inviteUrl }) }
   }
 
   const roleBadgeColors: Record<string, string> = {
@@ -89,10 +95,10 @@ export default async function TeamPage() {
           <div className="min-w-0">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Equipo</h2>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-sm">
-              <span className="text-gray-500 dark:text-gray-400">{members?.length || 0} miembros</span>
-              <span className="text-purple-600 dark:text-purple-400">{adminCount} admins</span>
+              <span className="text-gray-500 dark:text-gray-400">{countLabel(members?.length ?? 0, 'miembro', 'miembros')}</span>
+              <span className="text-purple-600 dark:text-purple-400">{countLabel(adminCount, 'admin', 'admins')}</span>
               {canInvite && invitations.length > 0 && (
-                <span className="text-orange-600 dark:text-orange-400">{invitations.length} invitaciones</span>
+                <span className="text-orange-600 dark:text-orange-400">{countLabel(invitations.length, 'invitación', 'invitaciones')}</span>
               )}
             </div>
           </div>
@@ -136,8 +142,10 @@ export default async function TeamPage() {
                     <td className="py-2.5 px-4 text-xs text-gray-500 dark:text-gray-400 hidden md:table-cell">
                       {new Date(invitation.expires_at).toLocaleDateString('es-MX', { month: 'short', day: 'numeric' })}
                     </td>
-                    <td className="text-right py-2.5 px-4">
-                      <span className="text-xs text-gray-400 dark:text-gray-600">Pendiente</span>
+                    <td className="py-2.5 px-4">
+                      <div className="flex justify-end">
+                        <InviteSharePanel {...shareFor(invitation)} compact />
+                      </div>
                     </td>
                   </tr>
                 ))}

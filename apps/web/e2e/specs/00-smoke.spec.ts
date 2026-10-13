@@ -12,7 +12,7 @@ test.describe('Smoke Tests - Page Load & Form Rendering', () => {
 
   test('Dashboard loads', async ({ page }) => {
     await expect(page).toHaveURL(/\/dashboard/)
-    await expect(page.locator('header span:has-text("Dashboard"), [role="banner"] span:has-text("Dashboard")').first()).toBeVisible()
+    await expect(page.locator('header span:has-text("Inicio"), [role="banner"] span:has-text("Inicio")').first()).toBeVisible()
   })
 
   test('Clients list loads', async ({ page }) => {

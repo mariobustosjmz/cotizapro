@@ -1,4 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { GettingStarted } from '@/components/dashboard/getting-started'
+import { loadChecklist } from '@/lib/onboarding/load-checklist'
 import Link from 'next/link'
 import { RealtimeRefresh } from '@/components/dashboard/realtime-refresh'
 import {
@@ -21,7 +23,8 @@ import { isWon } from '@/lib/analytics/quote-stats'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-function TrendBadge({ value, suffix = '%' }: { value: number; suffix?: string }) {
+/** Diferencia absoluta contra el mes anterior: con cifras chicas un porcentaje exagera (1 vs 0 = +100 %). */
+function TrendBadge({ value }: { readonly value: number }) {
   if (value === 0) {
     return (
       <span className="inline-flex items-center gap-0.5 text-xs text-slate-400">
@@ -38,7 +41,7 @@ function TrendBadge({ value, suffix = '%' }: { value: number; suffix?: string })
       }`}
     >
       {isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-      {isUp ? '+' : ''}{value.toFixed(0)}{suffix} vs mes anterior
+      {isUp ? '+' : ''}{value} vs mes anterior
     </span>
   )
 }
@@ -96,6 +99,7 @@ export default async function DashboardPage() {
   const orgId = profile.organization_id
   const orgInfo = profile.organizations as unknown as { onboarding_completed_at: string | null } | null
   const needsSetup = profile.role === 'owner' && !orgInfo?.onboarding_completed_at
+  const checklist = profile.role === 'owner' ? await loadChecklist(supabase, orgId) : null
   const now = new Date()
   const today = now.toISOString().split('T')[0]
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
@@ -160,12 +164,8 @@ export default async function DashboardPage() {
   const recentQuotes = quotes?.slice(0, 6) ?? []
 
   // Trend calculation
-  const clientTrend = (clientsLastMonth ?? 0) > 0
-    ? (((clientsThisMonth ?? 0) - (clientsLastMonth ?? 0)) / (clientsLastMonth ?? 1)) * 100
-    : 0
-  const quoteTrend = quotesLastMonth > 0
-    ? ((quotesThisMonth - quotesLastMonth) / quotesLastMonth) * 100
-    : 0
+  const clientTrend = (clientsThisMonth ?? 0) - (clientsLastMonth ?? 0)
+  const quoteTrend = quotesThisMonth - quotesLastMonth
 
   const acceptanceRate = (quotes?.length ?? 0) > 0
     ? ((quotes?.filter(q => isWon(q.status)).length ?? 0) / (quotes?.length ?? 1)) * 100
@@ -189,6 +189,8 @@ export default async function DashboardPage() {
           </div>
         </Link>
       )}
+
+      {checklist && <GettingStarted steps={checklist} />}
 
       {/* Urgent Reminders Banner */}
       {overdueReminders.length > 0 && (
@@ -331,11 +333,11 @@ export default async function DashboardPage() {
             {recentQuotes.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <FileText className="w-7 h-7 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">No hay cotizaciones aun.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">No hay cotizaciones aún.</p>
                 <Link href="/dashboard/quotes/new" className="mt-3 inline-block">
                   <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
                     <Plus className="w-3.5 h-3.5 mr-1.5" />
-                    Nueva Cotizacion
+                    Nueva Cotización
                   </Button>
                 </Link>
               </div>
@@ -392,7 +394,7 @@ export default async function DashboardPage() {
           {/* Quick Actions */}
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
             <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">Acciones Rapidas</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">Acciones Rápidas</span>
             </div>
             <div className="p-3 space-y-2">
               <Link href="/dashboard/quotes/new" className="block">
@@ -401,8 +403,8 @@ export default async function DashboardPage() {
                     <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-orange-700 dark:text-orange-400">Nueva Cotizacion</div>
-                    <div className="text-xs text-orange-600/70 dark:text-orange-400/70">Crea y envia al cliente</div>
+                    <div className="text-sm font-semibold text-orange-700 dark:text-orange-400">Nueva Cotización</div>
+                    <div className="text-xs text-orange-600/70 dark:text-orange-400/70">Crea y envía al cliente</div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-orange-400 ml-auto" />
                 </div>
@@ -411,7 +413,7 @@ export default async function DashboardPage() {
               {[
                 { href: '/dashboard/clients/new', icon: Users, label: 'Nuevo Cliente', desc: 'Agrega a tu cartera' },
                 { href: '/dashboard/reminders/new', icon: Bell, label: 'Nuevo Recordatorio', desc: 'Seguimiento puntual' },
-                { href: '/dashboard/analytics', icon: TrendingUp, label: 'Ver Analytics', desc: 'Metricas del negocio' },
+                { href: '/dashboard/analytics', icon: TrendingUp, label: 'Ver analítica', desc: 'Métricas del negocio' },
               ].map((action) => (
                 <Link key={action.href} href={action.href} className="block">
                   <div className="group flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-150 cursor-pointer">
@@ -433,7 +435,7 @@ export default async function DashboardPage() {
           {reminders && reminders.length > 0 && (
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
               <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">Proximos Recordatorios</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">Próximos Recordatorios</span>
                 <Link href="/dashboard/reminders">
                   <Button variant="ghost" size="sm" className="text-xs text-orange-500 hover:text-orange-400 gap-1 h-7 -mr-2">
                     Ver todos <ChevronRight className="w-3 h-3" />

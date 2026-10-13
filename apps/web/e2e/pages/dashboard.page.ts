@@ -11,9 +11,9 @@ export class DashboardPage extends BasePage {
   }
 
   async getPageTitle(): Promise<string> {
-    // Breadcrumb span contains "Dashboard" after header redesign (Phase 3)
+    // Breadcrumb span contains "Inicio" after header redesign (Phase 3)
     return await this.getText(
-      this.page.locator('header span:has-text("Dashboard"), [role="banner"] span:has-text("Dashboard")').first()
+      this.page.locator('header span:has-text("Inicio"), [role="banner"] span:has-text("Inicio")').first()
     )
   }
 
@@ -81,7 +81,7 @@ export class DashboardPage extends BasePage {
 
   async isDashboardVisible(): Promise<boolean> {
     // Breadcrumb uses <span> not <h1> after header redesign (Phase 3)
-    return await this.page.locator('header span:has-text("Dashboard"), [role="banner"] span:has-text("Dashboard")').first().isVisible()
+    return await this.page.locator('header span:has-text("Inicio"), [role="banner"] span:has-text("Inicio")').first().isVisible()
   }
 
   // Stats

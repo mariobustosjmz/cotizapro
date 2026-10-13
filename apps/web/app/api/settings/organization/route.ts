@@ -75,7 +75,6 @@ export async function PATCH(request: NextRequest) {
       brand_color,
     } = validation.data
 
-    // Build settings object (only include provided values)
     const settings = {
       ...(company_address !== undefined && { company_address }),
       ...(company_phone !== undefined && { company_phone }),
@@ -87,16 +86,11 @@ export async function PATCH(request: NextRequest) {
       ...(brand_color !== undefined && { brand_color }),
     }
 
-    // Update organization
-    const { data: organization, error } = await supabase
-      .from('organizations')
-      .update({
-        name,
-        ...(Object.keys(settings).length > 0 && { settings }),
-      })
-      .eq('id', profile.organization_id)
-      .select('id, name, slug, settings')
-      .single()
+    // update_org_settings fusiona solo claves permitidas y valida owner/admin (migración 039).
+    const { data: organization, error } = await supabase.rpc('update_org_settings', {
+      p_name: name ?? null,
+      p_settings: settings,
+    })
 
     if (error) {
       logger.error('Error updating organization in database', error, {
@@ -107,6 +101,11 @@ export async function PATCH(request: NextRequest) {
         ApiErrors.INTERNAL_ERROR('Failed to update organization'),
         'PATCH /api/settings/organization - update error'
       )
+    }
+
+    if (logo_url === null) {
+      const cleared = await supabase.from('public_profiles').update({ logo_path: null }).eq('organization_id', profile.organization_id)
+      if (cleared.error) logger.warn('public profile logo_path not cleared', { orgId: profile.organization_id, message: cleared.error.message })
     }
 
     logger.api('PATCH', '/api/settings/organization', 200, 0, {

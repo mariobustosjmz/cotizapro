@@ -143,7 +143,7 @@ export async function openQuote(s: Session, id: string): Promise<CreatedQuote> {
 export async function sendQuote(s: Session, via: 'Correo' | 'WhatsApp', shot?: { id: string; title: string }): Promise<string> {
   await s.pacer.gate()
   await s.page.getByRole('button', { name: 'Enviar', exact: true }).filter({ visible: true }).first().click()
-  await s.page.getByText('Enviar Cotizacion').waitFor()
+  await s.page.getByText('Enviar Cotización').waitFor()
   await s.page.getByRole('button', { name: via === 'Correo' ? /^Correo/ : 'WhatsApp' }).click()
   if (shot) await s.rec.shot(s.page, { ...shot, area: 'Panel del taller · Cotización', what: 'Diálogo de envío con vista previa del PDF y elección de canal. En producción aún no hay llave de correo ni de WhatsApp: el envío se registra y la cotización pasa a "Enviada".', apis: ['GET /api/export/quote/[id]', 'POST /api/quotes/[id]/send'] })
   await s.page.getByRole('button', { name: 'Enviar', exact: true }).filter({ visible: true }).last().click()

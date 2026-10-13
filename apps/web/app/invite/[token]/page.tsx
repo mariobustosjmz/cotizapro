@@ -1,130 +1,82 @@
-'use client'
-
-import { use, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { z } from 'zod'
+import { createServerClient } from '@/lib/supabase/server'
+import { BrandMark } from '@/components/brand/brand-mark'
+import { AcceptInviteButton } from '@/components/team/accept-invite-button'
+import { INVITE_TOKEN_PATTERN } from '@/lib/team/invitation-errors'
+import { roleLabel } from '@/lib/team/roles'
 
-export default function AcceptInvitePage({ params }: { params: Promise<{ token: string }> }) {
-  const { token } = use(params)
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
-  const [message, setMessage] = useState('')
+interface PageProps {
+  readonly params: Promise<{ token: string }>
+}
 
-  const handleAccept = async () => {
-    setLoading(true)
-    setStatus('idle')
-    setMessage('')
+const previewSchema = z.object({
+  organization_name: z.string(),
+  role: z.string(),
+  email_hint: z.string(),
+  status: z.enum(['pending', 'accepted', 'expired']),
+})
 
-    try {
-      const response = await fetch('/api/team/invitations/accept', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      })
+function Shell({ children }: { readonly children: React.ReactNode }) {
+  return (
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 space-y-5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <BrandMark size={28} />
+          <span className="font-semibold text-gray-900">CotizaPro</span>
+        </div>
+        {children}
+      </div>
+    </main>
+  )
+}
 
-      const data = await response.json()
+function Notice({ title, text }: { readonly title: string; readonly text: string }) {
+  return (
+    <Shell>
+      <h1 className="text-lg font-bold text-gray-900">{title}</h1>
+      <p className="text-sm text-gray-600">{text}</p>
+      <Link href="/login" className="inline-block text-sm font-medium text-orange-600 hover:underline">Ir a iniciar sesión</Link>
+    </Shell>
+  )
+}
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al aceptar invitación')
-      }
+export default async function InvitePage({ params }: PageProps) {
+  const { token } = await params
+  if (!INVITE_TOKEN_PATTERN.test(token)) return <Notice title="Invitación no válida" text="Revisa que la liga esté completa o pide una nueva a quien te invitó." />
 
-      setStatus('success')
-      setMessage('Invitación aceptada exitosamente. Redirigiendo al dashboard...')
+  const supabase = await createServerClient()
+  const { data } = await supabase.rpc('get_invitation_preview', { p_token: token })
+  const preview = previewSchema.safeParse(data)
+  if (!preview.success) return <Notice title="Invitación no válida" text="Revisa que la liga esté completa o pide una nueva a quien te invitó." />
+  if (preview.data.status === 'accepted') return <Notice title="Invitación ya aceptada" text="Esta invitación ya se usó. Entra con tu cuenta." />
+  if (preview.data.status === 'expired') return <Notice title="Invitación vencida" text="Las invitaciones duran 7 días. Pide una nueva a quien te invitó." />
 
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
-    } catch (err: any) {
-      setStatus('error')
-      setMessage(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { data: { user } } = await supabase.auth.getUser()
+  const { organization_name: organization, email_hint: emailHint } = preview.data
+  const role = roleLabel(preview.data.role)
+  const next = encodeURIComponent(`/invite/${token}`)
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">Invitación a CotizaPro</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center">
-            <p className="text-gray-600">
-              Has sido invitado a unirte a una organización en CotizaPro.
-            </p>
-          </div>
-
-          {status === 'idle' && (
-            <div className="space-y-4">
-              <Button
-                onClick={handleAccept}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Aceptando...
-                  </>
-                ) : (
-                  'Aceptar Invitación'
-                )}
-              </Button>
-
-              <p className="text-xs text-center text-gray-500">
-                Al aceptar, te unirás a la organización con el rol asignado
-              </p>
-            </div>
-          )}
-
-          {status === 'success' && (
-            <div className="text-center space-y-4">
-              <CheckCircle className="w-12 h-12 text-green-500 mx-auto" />
-              <p className="text-green-600 font-medium">{message}</p>
-            </div>
-          )}
-
-          {status === 'error' && (
-            <div className="space-y-4">
-              <div className="text-center space-y-2">
-                <XCircle className="w-12 h-12 text-red-500 mx-auto" />
-                <p className="text-red-600">{message}</p>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Button
-                  onClick={handleAccept}
-                  disabled={loading}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Intentar de Nuevo
-                </Button>
-
-                <Link href="/dashboard">
-                  <Button variant="ghost" className="w-full">
-                    Ir al Dashboard
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          <div className="text-center text-xs text-gray-500">
-            <p>¿No tienes una cuenta?</p>
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Regístrate aquí
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Shell>
+      <div className="space-y-1">
+        <h1 className="text-lg font-bold text-gray-900">Te invitaron a {organization}</h1>
+        <p className="text-sm text-gray-600">Rol: <span className="font-medium text-gray-900">{role}</span></p>
+        <p className="text-sm text-gray-600">Para el correo <span className="font-mono text-gray-900">{emailHint}</span></p>
+      </div>
+      {user ? (
+        <AcceptInviteButton token={token} />
+      ) : (
+        <div className="space-y-2">
+          <Link href={`/signup?invite=${token}`} className="flex w-full items-center justify-center rounded-md bg-orange-500 px-4 h-10 text-sm font-medium text-white hover:bg-orange-600">
+            Crear mi cuenta y unirme
+          </Link>
+          <Link href={`/login?next=${next}`} className="flex w-full items-center justify-center rounded-md border border-gray-300 px-4 h-10 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Ya tengo cuenta
+          </Link>
+          <p className="text-xs text-gray-500">Usa el mismo correo al que llegó la invitación.</p>
+        </div>
+      )}
+    </Shell>
   )
 }

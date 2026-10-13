@@ -19,12 +19,12 @@ const ENTITY_OPTIONS: { label: string; value: EntityType }[] = [
 const FIELD_TYPE_OPTIONS: { label: string; value: FieldType }[] = [
   { label: 'Texto corto', value: 'text' },
   { label: 'Texto largo', value: 'textarea' },
-  { label: 'Numero', value: 'number' },
+  { label: 'Número', value: 'number' },
   { label: 'Fecha', value: 'date' },
   { label: 'Lista de opciones', value: 'select' },
   { label: 'Checkbox', value: 'checkbox' },
   { label: 'URL', value: 'url' },
-  { label: 'Telefono', value: 'phone' },
+  { label: 'Teléfono', value: 'phone' },
   { label: 'Email', value: 'email' },
 ]
 
@@ -204,7 +204,7 @@ export default function NewCustomFieldPage() {
               id="field_label"
               value={fieldLabel}
               onChange={(e) => handleLabelChange(e.target.value)}
-              placeholder="Ej: Numero de Licencia"
+              placeholder="Ej: Número de Licencia"
               required
               className={fieldErrors.field_label ? 'border-red-500' : ''}
             />

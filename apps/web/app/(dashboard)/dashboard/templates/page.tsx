@@ -191,7 +191,7 @@ export default function TemplatesPage() {
             <FileStack className="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Templates</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Plantillas</h2>
             <div className="flex items-center gap-3 text-sm">
               <span className="text-gray-500 dark:text-gray-400">{templates.length} templates</span>
               <span className="text-green-600">{activeCount} activos</span>
@@ -213,7 +213,7 @@ export default function TemplatesPage() {
       ) : templates.length === 0 ? (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 text-center py-10">
           <FileStack className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-700" />
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No hay templates aun</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">No hay plantillas aún</p>
           <div className="mt-4">
             <Button onClick={openCreateModal} size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
               <Plus className="w-4 h-4 mr-1" />

@@ -11,8 +11,9 @@ import type { QuotePayment, PaymentType, PaymentMethod } from '@/lib/validations
 import { formatAmount } from '@/lib/format/money'
 
 interface PaymentSectionProps {
-  quoteId: string
-  quoteTotal: number
+  readonly quoteId: string
+  readonly quoteTotal: number
+  readonly isCollected?: boolean
 }
 
 const paymentTypeLabels: Record<PaymentType, string> = {
@@ -28,7 +29,7 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
   otro: 'Otro',
 }
 
-export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
+export function PaymentSection({ quoteId, quoteTotal, isCollected = false }: PaymentSectionProps) {
   const [payments, setPayments] = useState<QuotePayment[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -168,7 +169,9 @@ export function PaymentSection({ quoteId, quoteTotal }: PaymentSectionProps) {
         {isFullyPaid && (
           <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 text-green-700 dark:text-green-400 px-4 py-3 rounded">
             <p className="font-medium">Cotización pagada completamente</p>
-            <p className="text-sm mt-1">Considera cambiar el estado a "Cobrado" cuando el cliente confirme el pago.</p>
+            {!isCollected && (
+              <p className="text-sm mt-1">Considera cambiar el estado a “Cobrado” cuando el cliente confirme el pago.</p>
+            )}
           </div>
         )}
 

@@ -12,12 +12,12 @@ import type { CustomFieldDefinition, FieldType } from '@/types/custom-fields'
 const FIELD_TYPE_LABELS: Record<FieldType, string> = {
   text: 'Texto corto',
   textarea: 'Texto largo',
-  number: 'Numero',
+  number: 'Número',
   date: 'Fecha',
   select: 'Lista de opciones',
   checkbox: 'Checkbox',
   url: 'URL',
-  phone: 'Telefono',
+  phone: 'Teléfono',
   email: 'Email',
 }
 

@@ -15,12 +15,12 @@ const ENTITY_TABS: { label: string; value: EntityType }[] = [
 const FIELD_TYPE_LABELS: Record<string, string> = {
   text: 'Texto',
   textarea: 'Texto largo',
-  number: 'Numero',
+  number: 'Número',
   date: 'Fecha',
   select: 'Lista',
   checkbox: 'Checkbox',
   url: 'URL',
-  phone: 'Telefono',
+  phone: 'Teléfono',
   email: 'Email',
 }
 

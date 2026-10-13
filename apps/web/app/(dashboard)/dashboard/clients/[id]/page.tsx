@@ -148,7 +148,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
   }
 
   async function handleDelete() {
-    if (!confirm('Estas seguro de eliminar este cliente? Esta accion no se puede deshacer.')) {
+    if (!confirm('¿Estás seguro de eliminar este cliente? Esta acción no se puede deshacer.')) {
       return
     }
 
@@ -256,7 +256,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                   <Input id="email" name="email" type="email" defaultValue={client.email || ''} className={fieldErrors.email ? 'border-red-500' : ''} />
                 </FormField>
 
-                <FormField label="Telefono" htmlFor="phone" required error={fieldErrors.phone}>
+                <FormField label="Teléfono" htmlFor="phone" required error={fieldErrors.phone}>
                   <Input id="phone" name="phone" type="tel" required defaultValue={client.phone || ''} className={fieldErrors.phone ? 'border-red-500' : ''} />
                 </FormField>
 
@@ -337,7 +337,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
                     <p className="text-sm text-gray-900 dark:text-white">{client.email || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Telefono</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Teléfono</p>
                     <p className="text-sm text-gray-900 dark:text-white">{client.phone || '-'}</p>
                   </div>
                   {client.whatsapp_phone && (

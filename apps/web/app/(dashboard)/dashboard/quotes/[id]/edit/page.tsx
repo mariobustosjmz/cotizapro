@@ -85,7 +85,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
         ])
 
         if (!quoteRes.ok) {
-          setError('Cotizacion no encontrada')
+          setError('Cotización no encontrada')
           setDataLoading(false)
           return
         }
@@ -254,7 +254,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
     }
 
     if (data.items.length === 0) {
-      setError('Agrega al menos un item a la cotizacion')
+      setError('Agrega al menos un item a la cotización')
       setLoading(false)
       return
     }
@@ -268,14 +268,14 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Error al actualizar cotizacion')
+        throw new Error(errorData.error || 'Error al actualizar cotización')
       }
 
-      toast({ message: 'Cotizacion actualizada exitosamente', variant: 'success' })
+      toast({ message: 'Cotización actualizada exitosamente', variant: 'success' })
       router.push(`/dashboard/quotes/${id}`)
       router.refresh()
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar cotizacion'
+      const errorMsg = err instanceof Error ? err.message : 'Error al actualizar cotización'
       setError(errorMsg)
       toast({ message: errorMsg, variant: 'error' })
     } finally {
@@ -421,7 +421,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
               {/* Table Header (desktop) */}
               <div className="hidden md:grid grid-cols-[1fr_2fr_70px_100px_90px_32px] gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 <div>Servicio</div>
-                <div>Descripcion</div>
+                <div>Descripción</div>
                 <div className="text-right">Cant.</div>
                 <div className="text-right">P. Unit.</div>
                 <div className="text-right">Subtotal</div>
@@ -489,7 +489,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
                           required
-                          placeholder="Descripcion del item..."
+                          placeholder="Descripción del item..."
                           className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
                         />
                         <input
@@ -555,7 +555,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
                           required
-                          placeholder="Descripcion"
+                          placeholder="Descripción"
                           className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                         />
                         <div className="grid grid-cols-2 gap-2">
@@ -615,7 +615,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
               >
                 <div className="flex items-center gap-2">
                   <Zap className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y Terminos</span>
+                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y Términos</span>
                   {(notes || terms) && (
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
                   )}

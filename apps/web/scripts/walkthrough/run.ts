@@ -142,7 +142,7 @@ async function documentQuote(page: Page, quoteId: string): Promise<void> {
   const pdf = await page.request.get(`${BASE}/api/export/quote/${quoteId}`)
   writeFileSync(path.join(OUT, 'cotizacion.pdf'), await pdf.body())
   await page.getByRole('button', { name: 'Enviar' }).first().click()
-  await page.getByText('Enviar Cotizacion').waitFor()
+  await page.getByText('Enviar Cotización').waitFor()
   await shot(page, 'dialogo-envio', 'Diálogo de envío (correo / WhatsApp)')
   await page.keyboard.press('Escape')
   await page.goto(page.url())

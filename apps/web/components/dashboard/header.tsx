@@ -14,17 +14,17 @@ interface HeaderProps {
 }
 
 const segmentLabels: Record<string, string> = {
-  dashboard: 'Dashboard',
+  dashboard: 'Inicio',
   clients: 'Clientes',
   quotes: 'Cotizaciones',
   reminders: 'Recordatorios',
   services: 'Servicios',
-  analytics: 'Analytics',
+  analytics: 'Analítica',
   team: 'Equipo',
   settings: 'Configuración',
   'custom-fields': 'Campos Extra',
   calendar: 'Agenda',
-  templates: 'Templates',
+  templates: 'Plantillas',
   billing: 'Facturación',
   vitrina: 'Mi página',
   solicitudes: 'Solicitudes',
