@@ -68,7 +68,13 @@ const nextConfig: NextConfig = {
               },
             ]
             : []),
-          // Prevent caching of dynamic pages
+        ],
+      },
+      // Sin caché para páginas y API; los archivos con hash de /_next/static y las imágenes optimizadas
+      // conservan el `immutable` de Next (antes esta regla también los marcaba no-store).
+      {
+        source: "/((?!_next/static|_next/image).*)",
+        headers: [
           {
             key: "Cache-Control",
             value: "no-store, max-age=0",
