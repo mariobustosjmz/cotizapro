@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { sendEmail, generateQuoteEmailHTML } from '@/lib/integrations/email'
+import { sendEmail } from '@/lib/integrations/email'
 import { sendWhatsAppMessage } from '@/lib/integrations/twilio'
 import { encode as escapeHtml } from 'html-entities'
 import { logger } from '@/lib/logger'

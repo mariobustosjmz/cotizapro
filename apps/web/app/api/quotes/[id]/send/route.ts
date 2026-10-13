@@ -2,7 +2,10 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendQuoteSchema } from '@/lib/validations/cotizapro'
 import { generateQuotePDF } from '@/lib/integrations/pdf'
-import { sendEmail, generateQuoteEmailHTML, type EmailResult } from '@/lib/integrations/email'
+import { sendEmail, type EmailResult } from '@/lib/integrations/email'
+import { buildQuoteEmail } from '@/lib/email/quote-email'
+import { safeReplyTo } from '@/lib/email/sender'
+import { orgBranding } from '@/lib/branding/org-branding'
 import { quoteWhatsappMessage, whatsappLink } from '@/lib/whatsapp/link'
 import { messageLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
@@ -50,7 +53,7 @@ export async function POST(
         *,
         items:quote_items(*),
         client:clients(*),
-        organization:organizations(name)
+        organization:organizations(name, settings)
       `)
       .eq('id', id)
       .single()
@@ -86,6 +89,8 @@ export async function POST(
       logger.info('PDF generated and uploaded successfully', { quoteNumber: quote.quote_number, pdfUrl: publicUrl })
     }
 
+    const organization = quote.organization as unknown as { name: string; settings: unknown } | null
+
     const results: {
       email: EmailResult | null
       whatsapp: { success: true; url: string } | null
@@ -104,11 +109,31 @@ export async function POST(
         }, { status: 400 })
       }
 
-      logger.info('Sending quote via email', { recipient: emailTo })
+      const settings = (organization?.settings ?? {}) as Record<string, unknown>
+      const branding = orgBranding(organization?.name, settings)
+      const content = buildQuoteEmail({
+        businessName: branding.name,
+        logoUrl: branding.logoUrl,
+        palette: branding.palette,
+        clientName: quote.client.name,
+        quoteNumber: quote.quote_number,
+        total: quote.total,
+        validUntil: quote.valid_until,
+        contact: {
+          phone: typeof settings.company_phone === 'string' ? settings.company_phone : null,
+          email: safeReplyTo(settings.company_email),
+          address: typeof settings.company_address === 'string' ? settings.company_address : null,
+        },
+      })
+
+      logger.info('Sending quote via email', { quoteId: id })
       const emailResult = await sendEmail({
         to: emailTo,
-        subject: `Cotización ${quote.quote_number}`,
-        html: generateQuoteEmailHTML(quote, publicUrl),
+        subject: content.subject,
+        html: content.html,
+        text: content.text,
+        fromName: branding.name,
+        replyTo: safeReplyTo(settings.company_email) ?? safeReplyTo(user.email),
         attachments: [{
           filename: `${quote.quote_number}.pdf`,
           content: pdfBuffer,
@@ -128,14 +153,16 @@ export async function POST(
       })
 
       if (!emailResult.success) {
-        logger.warn('Email sending failed for quote', { quoteId: id, recipient: emailTo, error: emailResult.error })
+        logger.warn('Email sending failed for quote', { quoteId: id, error: emailResult.error })
+        if (!send_via.includes('whatsapp')) {
+          return NextResponse.json({ error: `No se pudo enviar el correo: ${emailResult.error ?? 'error desconocido'}` }, { status: 502 })
+        }
       }
     }
 
     // WhatsApp por liga wa.me: el envío lo hace el usuario desde su propio WhatsApp.
     if (send_via.includes('whatsapp')) {
       const whatsappTo = whatsapp_override || quote.client.whatsapp_phone || quote.client.phone
-      const organization = quote.organization as unknown as { name: string } | null
       const url = whatsappLink(whatsappTo, quoteWhatsappMessage({
         clientName: quote.client.name,
         businessName: organization?.name ?? null,
