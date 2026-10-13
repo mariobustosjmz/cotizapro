@@ -1,7 +1,42 @@
-# CotizaPro MVP - Feature Tracker
+# CotizaPro - Feature Tracker
 
-**Última Actualización**: 2026-02-17
-**Estado General**: **MVP COMPLETO + DASHBOARD UI** (33/33 tareas)
+**Última actualización**: 2026-10-13
+**Estado general**: plataforma en producción (https://cotizapro.mariobustos.io), rama `feature/plataforma-motor-vitrina`
+
+## Estado al 2026-10-13
+
+### Entregado y desplegado
+
+| Área | Qué incluye | Commit |
+|---|---|---|
+| Motor de precios y vitrina | Motor por bloques, plantillas por giro, página pública con portafolio, reseñas verificadas, pedir cotización y QR | c8bb29d |
+| Correcciones de agenda y analítica | Hora local en la agenda, analítica por estados, montos con 2 decimales | 9a7bbea |
+| Operación | Seed multi-cuenta, E2E, recorridos, Docker y despliegue en el VPS con Supabase propio | 9438184, cf42834, cf925c6 |
+| Planes | Gratis, Solo, Taller (3 usuarios), Empresa (10 usuarios, $1,590); usuario adicional $99; WhatsApp con liga | 27f7427, bdba047 |
+| Página de inicio | Sin cifras inventadas; cuenta de presentación MEGAGLASS | 613d995 |
+| Seguridad multi-empresa | Aislamiento por `profiles` (037), guarda de rol y empresa | cd65694 |
+| Marca de la empresa | Logo, color en panel, PDF, vitrina e ícono | bdba047 |
+| Equipo | Miembros visibles, cambio de rol, invitaciones por liga, WhatsApp o correo, lista de primeros pasos | 8e5989d |
+| Correo | Cotizaciones por Resend con la marca del negocio y el PDF adjunto; correos de acceso por SMTP de Resend | 615751a |
+
+### En curso
+
+| Área | Estado |
+|---|---|
+| Hotfix de seguridad 040 (columnas de facturación, políticas abiertas, `create_organization_with_owner`, funciones internas) | Implementado y verificado en local; pendiente del Gate 2 y del despliegue |
+| Lote D1: cotización pública con "Aceptar" y anticipo | Spec con decisiones (`docs/superpowers/specs/2026-10-13-cotizacion-publica-y-cobro-design.md`); falta el plan |
+| Lote D2: Mercado Pago semi-manual, superadmin `/admin`, avisos y bloqueo al vencer | Mismo spec; falta el plan |
+| IA con créditos mensuales (gemma3:4b) | Spec en revisión (`docs/superpowers/specs/2026-10-13-ia-creditos-y-funciones-design.md`) |
+
+### Pendientes conocidos
+
+- El cron de recordatorios está desactivado en producción y su correo va dirigido al cliente con un texto interno; hay que corregir el destinatario antes de activarlo.
+- `app/api/webhooks/stripe/route.ts` tiene 3 `any` (lint) heredados; Stripe está apagado.
+- Verificar un subdominio propio en Resend (`cotizapro.mariobustos.io`) para no depender de `tokenizate.mariobustos.io`.
+
+---
+
+## Historial: MVP (febrero 2026)
 
 ---
 

@@ -2,37 +2,32 @@
 
 Enterprise-grade SaaS application for HVAC, plumbing, and service professionals to create, send, and track quotes professionally.
 
-Built with Next.js 15, TypeScript, Supabase, and modern best practices.
+Built with Next.js 16, TypeScript, Supabase (self-hosted) and Tailwind CSS 4. Live at https://cotizapro.mariobustos.io.
 
-## ✨ Features
+## Features
 
 ### Core Functionality
-- ✅ **Client Management** - Full CRUD operations with tags and notes
-- ✅ **Quote Builder** - Dynamic quote creation with line items, discounts, and tax calculation
-- ✅ **Service Catalog** - Reusable service templates with pricing
-- ✅ **Multi-Channel Delivery** - Send quotes via Email and WhatsApp with PDF attachments
-- ✅ **Follow-Up Reminders** - Automated reminder system with recurring schedules
-- ✅ **Analytics Dashboard** - Conversion rates, revenue tracking, and trends
-- ✅ **Export System** - CSV and PDF exports for reports
+- **Clients, service catalog and quotes** - Line items, discounts, tax, templates by trade and a block-based pricing engine (`@cotizapro/quoting`)
+- **Quote delivery** - Email via Resend with the business branding (logo, color, reply-to) and the PDF attached; WhatsApp via wa.me links
+- **Public showcase** - Public business page (`/p/[slug]`) with portfolio, verified reviews, "request a quote" and QR
+- **Team** - Roles (owner, admin, member, viewer), invitations by link, WhatsApp or email
+- **Branding** - Logo upload and brand color applied to the dashboard, PDF, emails and public page
+- **Onboarding checklist**, work calendar, payments per quote, Kanban by status, analytics and reminders
 
 ### Technical Features
-- ✅ **Authentication & Authorization** - JWT-based auth with role-based access control (Owner, Admin, Member, Viewer)
-- ✅ **Multi-Tenancy** - Organization-based data isolation with Row-Level Security (RLS)
-- ✅ **Real-time Features** - Supabase Realtime for live updates
-- ✅ **Webhook System** - External integrations support
-- ✅ **Cron Jobs** - Automated daily reminder notifications
-- ✅ **Production Ready** - TypeScript strict mode, E2E testing with Playwright, ECC-powered development
+- **Multi-tenancy with RLS** - Organization isolation hardened in migrations 037-040 (tenant id from `profiles`, guarded privileged and billing columns, no open service policies)
+- **Authentication** - Supabase Auth (GoTrue) with transactional emails through Resend SMTP
+- **Plans** - Gratis, Solo, Taller (3 users) and Empresa (10 users, $1,590 MXN) with extra users at $99
+- **Testing** - Vitest unit tests and Playwright E2E
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 (App Router), React 19, TypeScript 5.x, TailwindCSS 3.x
-- **Backend**: Next.js API Routes, Server Actions
-- **Database**: PostgreSQL (Supabase) with Row-Level Security
-- **Authentication**: Supabase Auth (JWT)
-- **Billing**: Stripe (Subscriptions, Webhooks)
-- **Real-time**: Supabase Realtime, SSE
-- **Testing**: Vitest (Unit), Playwright (E2E)
-- **Development**: Everything Claude Code (ECC) - agents, skills, workflows
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript 5, Tailwind CSS 4
+- **Backend**: Next.js route handlers and server actions
+- **Database / Auth / Storage / Realtime**: Supabase self-hosted (PostgreSQL 17, GoTrue, PostgREST, Storage, Realtime)
+- **Email**: Resend (API for quotes and invitations, SMTP for auth emails)
+- **Monorepo**: pnpm + Turborepo (`apps/web`, `packages/auth`, `packages/db`, `packages/quoting`, `packages/ui`)
+- **Testing**: Vitest, Playwright
 
 ## Quick Start
 
@@ -134,36 +129,15 @@ npm run format              # Format code with Prettier
 
 ## Deployment
 
-### Vercel Deployment (Recommended)
+Production runs on a shared Hostinger VPS behind Caddy, with its own reduced Supabase stack (`cotizapro-db`, `cotizapro-auth`, `cotizapro-rest`, `cotizapro-storage`, `cotizapro-realtime`) and the Next.js app (`cotizapro-web`) in `/opt/cotizapro-deploy`.
 
-1. Push your code to GitHub
-2. Import project to Vercel: https://vercel.com/new
-3. Configure environment variables in Vercel dashboard:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   STRIPE_SECRET_KEY=your_stripe_secret
-   STRIPE_WEBHOOK_SECRET=your_webhook_secret
-   RESEND_API_KEY=your_resend_key
-   TWILIO_ACCOUNT_SID=your_twilio_sid
-   TWILIO_AUTH_TOKEN=your_twilio_token
-   TWILIO_PHONE_NUMBER=your_twilio_phone
-   CRON_SECRET=your_cron_secret
-   ```
-4. Deploy
+1. Back up the code, schema and data; tag the current image as rollback.
+2. Apply new migrations inside `begin; ... commit;` and record them in `supabase_migrations.schema_migrations`.
+3. Sync the committed code (`git archive HEAD` + `rsync --delete`) to `/opt/cotizapro`.
+4. `docker compose build cotizapro-web` and `docker compose up -d --no-deps cotizapro-web`.
+5. Smoke-test every domain on the server before and after (the server is shared with other projects).
 
-### Vercel Cron Jobs
-
-Add to `vercel.json`:
-```json
-{
-  "crons": [{
-    "path": "/api/cron/reminders-check",
-    "schedule": "0 9 * * *"
-  }]
-}
-```
+Secrets live only in `/opt/cotizapro-deploy/.env` (mode 600): Supabase keys, `RESEND_API_KEY`, `EMAIL_FROM`, `CRON_SECRET`, `IP_HASH_SALT`.
 
 ## Contributing
 
@@ -175,6 +149,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 - [Supabase Storage Setup](docs/SUPABASE_STORAGE_SETUP.md) - Storage configuration
 - [Cron Setup](docs/CRON_SETUP.md) - Automated job configuration
 - [MVP Plan](docs/plans/2026-02-12-cotizapro-mvp.md) - Original MVP specification
+- [Public quote and billing design](docs/superpowers/specs/2026-10-13-cotizacion-publica-y-cobro-design.md) - Next: accept quotes from a link, deposits, Mercado Pago and superadmin
+- [AI credits and features design](docs/superpowers/specs/2026-10-13-ia-creditos-y-funciones-design.md) - Next: AI features with a monthly usage meter
 
 ## License
 
