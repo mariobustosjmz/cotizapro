@@ -4,6 +4,7 @@ import { updateQuoteTemplateSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+import { assertWritable } from '@/lib/billing/writable'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +28,9 @@ export async function PATCH(
       logger.security('PATCH /api/templates/[id] - unauthorized access attempt', { templateId: id })
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'PATCH /api/templates/[id]')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     const { data: profile } = await supabase
       .from('profiles')
@@ -170,6 +174,9 @@ export async function DELETE(
       })
       return handleApiError(ApiErrors.FORBIDDEN(), 'DELETE /api/templates/[id]')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Verify template belongs to user's organization
     logger.database('SELECT', 'quote_templates', { templateId: id, orgId: profile.organization_id })

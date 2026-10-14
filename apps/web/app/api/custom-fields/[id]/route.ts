@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { assertWritable } from '@/lib/billing/writable'
 
 const patchFieldSchema = z.object({
   field_label: z.string().min(1).max(200).optional(),
@@ -90,6 +91,9 @@ export async function PATCH(
       }, { status: 403 })
     }
 
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
+
     const body = await request.json()
     const validation = patchFieldSchema.safeParse(body)
     if (!validation.success) {
@@ -156,6 +160,9 @@ export async function DELETE(
         error: 'Permisos insuficientes. Solo administradores pueden gestionar campos personalizados.'
       }, { status: 403 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     const { data: field, error } = await supabase
       .from('custom_field_definitions')

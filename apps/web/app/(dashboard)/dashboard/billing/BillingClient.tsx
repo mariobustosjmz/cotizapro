@@ -4,6 +4,8 @@ import { useCallback, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AlertCircle, Check } from 'lucide-react'
 import type { PlanId } from '@/lib/plans/types'
+import type { PlanCheckoutOption } from '@/lib/billing/types'
+import { plansIntro } from '@/lib/billing/checkout-option'
 import { PlanSelector } from '@/components/billing/PlanSelector'
 import { BillingHistory } from '@/components/billing/BillingHistory'
 import { Button } from '@/components/ui/button'
@@ -11,7 +13,8 @@ import { Button } from '@/components/ui/button'
 interface BillingClientProps {
   readonly currentPlan: PlanId
   readonly activeUsers: number
-  readonly checkoutEnabled: boolean
+  readonly options: Readonly<Record<PlanId, PlanCheckoutOption>>
+  readonly mercadoPagoEnabled: boolean
   readonly canManage: boolean
   readonly hasBillingAccount: boolean
 }
@@ -32,7 +35,7 @@ async function postForUrl(endpoint: string, body: Record<string, unknown>): Prom
   return { url: data.url }
 }
 
-export function BillingClient({ currentPlan, activeUsers, checkoutEnabled, canManage, hasBillingAccount }: BillingClientProps) {
+export function BillingClient({ currentPlan, activeUsers, options, mercadoPagoEnabled, canManage, hasBillingAccount }: BillingClientProps) {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState<Notice | null>(null)
@@ -82,16 +85,13 @@ export function BillingClient({ currentPlan, activeUsers, checkoutEnabled, canMa
 
       <div>
         <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-1">Planes</h2>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-          {checkoutEnabled
-            ? 'El costo se calcula con los usuarios activos de tu cuenta.'
-            : 'La contratación con tarjeta estará disponible próximamente. Mientras tanto tu cuenta conserva su plan actual.'}
-        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">{plansIntro(mercadoPagoEnabled, options)}</p>
         <PlanSelector
           currentPlan={currentPlan}
           activeUsers={activeUsers}
+          options={options}
+          canManage={canManage}
           onSelectPlan={handleSelectPlan}
-          selectable={checkoutEnabled && canManage}
           loading={loading}
         />
       </div>

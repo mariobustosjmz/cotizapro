@@ -7,6 +7,8 @@ import { FAB } from '@/components/dashboard/fab'
 import type { CSSProperties } from 'react'
 import { brandCssVars } from '@/lib/branding/color'
 import { orgBranding } from '@/lib/branding/org-branding'
+import { PlanExpiryBanner } from '@/components/dashboard/plan-expiry-banner'
+import { loadExpiryBanner } from '@/lib/billing/dashboard-banner'
 
 export default async function DashboardLayout({
   children,
@@ -36,6 +38,8 @@ export default async function DashboardLayout({
   const organization = profile.organizations as unknown as { name: string | null; settings: unknown } | null
   const branding = orgBranding(organization?.name, organization?.settings)
 
+  const banner = await loadExpiryBanner(supabase, profile.organization_id)
+
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-gray-950" style={brandCssVars(branding.palette) as CSSProperties}>
       {/* Sidebar */}
@@ -49,6 +53,8 @@ export default async function DashboardLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <DashboardHeader user={user} profile={profile} />
+
+        {banner && <PlanExpiryBanner banner={banner} />}
 
         {/* Page Content — ClientLayout adds: ToastProvider, keyboard shortcuts, page transitions */}
         <ClientLayout>

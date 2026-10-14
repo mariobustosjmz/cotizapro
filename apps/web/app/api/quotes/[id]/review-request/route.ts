@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { whatsappLink } from '@/lib/whatsapp/link'
 import { z } from 'zod'
-import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 
@@ -16,7 +16,7 @@ const ERRORS: Readonly<Record<string, { status: number; message: string }>> = {
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner', 'admin', 'member'])
+  const auth = await requireWritableMember(['owner', 'admin', 'member'])
   if (!auth.ok) return auth.response
   const id = z.string().uuid().safeParse((await params).id)
   if (!id.success) return NextResponse.json({ error: 'ID inválido' }, { status: 400 })

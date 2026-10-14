@@ -7,6 +7,8 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { inviteWhatsappLink } from '@/lib/whatsapp/invite'
 import { roleLabel } from '@/lib/team/roles'
+import { assertWritable } from '@/lib/billing/writable'
+import { enforceSeatLimit } from '@/lib/plans/enforce-limits'
 
 const inviteSchema = z.object({
   email: z.string().trim().toLowerCase().email('Email inválido'),
@@ -123,6 +125,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Solo el propietario puede invitar administradores' }, { status: 403 })
     }
 
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
+
     // Check if user is already a member
     const { data: existingMember } = await supabase
       .from('profiles')
@@ -152,6 +157,9 @@ export async function POST(request: NextRequest) {
         error: 'Ya existe una invitación pendiente para este email'
       }, { status: 400 })
     }
+
+    const noSeat = await enforceSeatLimit(supabase, profile.organization_id)
+    if (noSeat) return noSeat
 
     // Create invitation (RLS will enforce organization_id)
     const { data: invitation, error } = await supabase

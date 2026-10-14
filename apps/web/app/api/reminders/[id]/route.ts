@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { updateReminderSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { clientNoticeFields, type ClientNoticeFields } from '@/lib/reminders/client-notice'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/reminders/[id] - Get single reminder
 
@@ -105,6 +106,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
+
     // Parse and validate request body
     const body = await request.json()
     const validation = updateReminderSchema.safeParse(body)
@@ -194,6 +198,9 @@ export async function DELETE(
     if (authError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Delete reminder (RLS will enforce organization filter)
     const { error } = await supabase

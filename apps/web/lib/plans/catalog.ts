@@ -35,6 +35,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
       'Envío por WhatsApp y correo con tu logo',
       'Clientes, agenda y recordatorios',
       'Registro de anticipos y saldos',
+      'Liga para que tu cliente acepte y pague el anticipo',
       'Plantillas y analítica de ventas',
       'Reseñas verificadas y solicitudes desde tu página',
     ],
@@ -55,7 +56,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
       'Fotos de obra antes y después',
       'Tablero de cotizaciones por etapa',
     ],
-    upcoming: ['Link de pago para anticipos'],
+    upcoming: [],
   },
   enterprise: {
     id: 'enterprise',

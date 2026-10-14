@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner', 'admin'])
+  const auth = await requireWritableMember(['owner', 'admin'])
   if (!auth.ok) return auth.response
   const parsed = publicProfileUpdateSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return validationErrorResponse(parsed.error)

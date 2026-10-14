@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import crypto from 'crypto'
+import { assertWritable } from '@/lib/billing/writable'
 
 const createWebhookSchema = z.object({
   url: z.string().url('URL inválida').regex(/^https?:\/\//, 'URL debe comenzar con http:// o https://'),
@@ -80,6 +81,9 @@ export async function POST(request: NextRequest) {
     if (!profile || !['owner', 'admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Permisos insuficientes' }, { status: 403 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     const body = await request.json()
     const validation = createWebhookSchema.safeParse(body)

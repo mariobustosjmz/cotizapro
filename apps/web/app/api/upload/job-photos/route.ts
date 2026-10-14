@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { PHOTO_MAX_BYTES, PHOTO_TYPES } from '@/lib/showcase/job-photos'
@@ -16,7 +16,7 @@ const fieldsSchema = z.object({
 export async function POST(request: NextRequest) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner', 'admin', 'member'])
+  const auth = await requireWritableMember(['owner', 'admin', 'member'])
   if (!auth.ok) return auth.response
   const form = await request.formData().catch(() => null)
   const file = form?.get('file')

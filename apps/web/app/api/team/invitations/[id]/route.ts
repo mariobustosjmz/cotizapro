@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { assertWritable } from '@/lib/billing/writable'
 
 /**
  * DELETE /api/team/invitations/[id]
@@ -41,6 +42,9 @@ export async function DELETE(
     if (!['owner', 'admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Permisos insuficientes' }, { status: 403 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Delete invitation (RLS will enforce organization filter)
     const { error } = await supabase

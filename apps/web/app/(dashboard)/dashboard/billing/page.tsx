@@ -1,11 +1,17 @@
 import { redirect } from 'next/navigation'
 import { CreditCard } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
-import { EXTRA_USER_MONTHLY_PRICE, PLANS, isPlanId } from '@/lib/plans/catalog'
-import { formatMxn, monthlyCost } from '@/lib/plans/pricing'
+import { PLANS } from '@/lib/plans/catalog'
+import { monthlyCost } from '@/lib/plans/pricing'
+import { planLimitsEnforced } from '@/lib/plans/limits'
 import { isCheckoutConfigured } from '@/lib/stripe/index'
 import { countOrganizationMembers } from '@/lib/billing/member-count'
-import { calculateTrialDaysRemaining, getSubscriptionStatusLabel } from '@/lib/stripe/helpers'
+import { billingState, snapshotFromRow } from '@/lib/billing/expiry'
+import { planStatusLine } from '@/lib/billing/expiry-copy'
+import { billingBadge } from '@/lib/billing/badge'
+import { checkoutEnvFrom, checkoutOptionsFor, hasMercadoPagoLinks } from '@/lib/billing/checkout-option'
+import { BillingSummaryCards } from '@/components/billing/billing-summary-cards'
+import { PlanLimitsTable } from '@/components/billing/plan-limits-table'
 import { BillingClient } from './BillingClient'
 
 export const metadata = {
@@ -13,14 +19,8 @@ export const metadata = {
   description: 'Tu plan, usuarios y pagos',
 }
 
-const STATUS_STYLE: Readonly<Record<string, string>> = {
-  active: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-  trialing: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-}
-
 export default async function BillingPage() {
   const supabase = await createServerClient()
-
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -34,19 +34,25 @@ export default async function BillingPage() {
   const [{ data: organization, error: orgError }, activeUsers] = await Promise.all([
     supabase
       .from('organizations')
-      .select('id, plan, subscription_status, stripe_customer_id, trial_ends_at')
+      .select('id, name, plan, subscription_status, stripe_customer_id, current_period_end')
       .eq('id', profile.organization_id)
       .single(),
     countOrganizationMembers(supabase),
   ])
   if (orgError || !organization) redirect('/dashboard')
 
-  const currentPlan = organization.plan && isPlanId(organization.plan) ? organization.plan : 'free'
-  const plan = PLANS[currentPlan]
-  const cost = monthlyCost(currentPlan, activeUsers ?? 1)
-  const status = organization.subscription_status || 'trialing'
-  const trialDays = organization.trial_ends_at ? calculateTrialDaysRemaining(organization.trial_ends_at) : null
-  const canManage = profile.role === 'owner' || profile.role === 'admin'
+  const snapshot = snapshotFromRow(organization)
+  const state = billingState(snapshot, new Date())
+  const cost = monthlyCost(snapshot.planId, activeUsers ?? 1)
+  const env = checkoutEnvFrom(process.env)
+  const options = checkoutOptionsFor({
+    currentPlan: snapshot.planId,
+    state,
+    activeUsers: cost.activeUsers,
+    stripeEnabled: isCheckoutConfigured(),
+    businessName: String(organization.name ?? ''),
+    env,
+  })
 
   return (
     <div className="space-y-4">
@@ -60,49 +66,23 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Plan actual</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</p>
-          <div className="mt-1 flex items-center gap-2">
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLE[status] ?? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
-              {getSubscriptionStatusLabel(status)}
-            </span>
-            {trialDays !== null && status === 'trialing' && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">{trialDays} días restantes</span>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Usuarios</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">
-            {cost.activeUsers} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">de {plan.includedUsers} incluidos</span>
-          </p>
-          {cost.extraUsers > 0 && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{cost.extraUsers} adicionales × {formatMxn(EXTRA_USER_MONTHLY_PRICE)}</p>
-          )}
-          {cost.overLimit > 0 && (
-            <p className="text-xs text-red-600 dark:text-red-400 mt-1">El plan {plan.name} es para 1 persona: cambia a Taller para sumar equipo</p>
-          )}
-        </div>
-
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-1">Total mensual estimado</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white">{formatMxn(cost.total)}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Plan {formatMxn(cost.basePrice)}{cost.extraUsers > 0 ? ` + usuarios ${formatMxn(cost.extraUsersCost)}` : ''}
-          </p>
-        </div>
-      </div>
+      <BillingSummaryCards
+        planName={PLANS[snapshot.planId].name}
+        statusLine={planStatusLine(state)}
+        badge={billingBadge(state, organization.subscription_status)}
+        cost={cost}
+      />
 
       <BillingClient
-        currentPlan={currentPlan}
+        currentPlan={snapshot.planId}
         activeUsers={cost.activeUsers}
-        checkoutEnabled={isCheckoutConfigured()}
-        canManage={canManage}
+        options={options}
+        mercadoPagoEnabled={hasMercadoPagoLinks(env)}
+        canManage={profile.role === 'owner' || profile.role === 'admin'}
         hasBillingAccount={Boolean(organization.stripe_customer_id)}
       />
+
+      <PlanLimitsTable enforced={planLimitsEnforced()} />
     </div>
   )
 }

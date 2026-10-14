@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -25,7 +25,7 @@ function adjustRows(rows: readonly Row[], percent: number): readonly Row[] {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner', 'admin'])
+  const auth = await requireWritableMember(['owner', 'admin'])
   if (!auth.ok) return auth.response
   const id = idSchema.safeParse((await params).id)
   if (!id.success) return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
@@ -61,7 +61,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner', 'admin'])
+  const auth = await requireWritableMember(['owner', 'admin'])
   if (!auth.ok) return auth.response
   const id = idSchema.safeParse((await params).id)
   if (!id.success) return NextResponse.json({ error: 'ID inválido' }, { status: 400 })

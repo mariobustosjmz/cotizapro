@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { assertWritable } from '@/lib/billing/writable'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
@@ -51,6 +52,9 @@ export async function DELETE(
       })
       return handleApiError(ApiErrors.FORBIDDEN(), 'DELETE /api/quotes/[id]/payments/[paymentId]')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Verify quote belongs to user's organization
     logger.database('SELECT', 'quotes', { quoteId: id, orgId: profile.organization_id })

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner', 'admin'])
+  const auth = await requireWritableMember(['owner', 'admin'])
   if (!auth.ok) return auth.response
 
   const parsed = createPriceListSchema.safeParse(await request.json().catch(() => null))

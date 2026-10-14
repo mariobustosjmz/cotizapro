@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { updateClientSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/clients/[id] - Get single client
 export async function GET(
@@ -63,6 +64,9 @@ export async function PATCH(
     if (authError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Parse and validate request body
     const body = await request.json()
@@ -129,6 +133,9 @@ export async function DELETE(
     if (authError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Check if client has quotes
     const { data: quotes, error: quotesError } = await supabase

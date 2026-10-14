@@ -25,3 +25,20 @@ export interface MonthlyCost {
   /** Usuarios por encima de lo que el plan permite (solo planes sin usuarios adicionales). */
   readonly overLimit: number
 }
+
+export type PlanFeature = 'templates' | 'analytics' | 'reminders' | 'team_roles' | 'job_photos' | 'kanban_board'
+
+export interface PlanLimits {
+  readonly planId: PlanId
+  readonly includedUsers: number
+  readonly allowsExtraUsers: boolean
+  /** null: cotizaciones ilimitadas. */
+  readonly monthlyQuotes: number | null
+  readonly features: readonly PlanFeature[]
+}
+
+export type LimitCode = 'SEAT_LIMIT' | 'MONTHLY_QUOTES'
+
+export type LimitCheck =
+  | { readonly allowed: true }
+  | { readonly allowed: false; readonly code: LimitCode; readonly message: string; readonly upgradeTo: PlanId }

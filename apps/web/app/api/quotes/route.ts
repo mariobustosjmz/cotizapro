@@ -1,4 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { assertWritable } from '@/lib/billing/writable'
+import { enforceMonthlyQuoteLimit } from '@/lib/plans/enforce-limits'
 import { priceItemsForOrg, sumSubtotals } from '@/lib/pricing/price-items-for-org'
 import { NextRequest, NextResponse } from 'next/server'
 import { createQuoteSchema } from '@/lib/validations/cotizapro'
@@ -93,6 +95,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
 
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
+
     // Obtener organización del usuario
     const { data: profile } = await supabase
       .from('profiles')
@@ -103,6 +108,9 @@ export async function POST(request: NextRequest) {
     if (!profile) {
       return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 404 })
     }
+
+    const overLimit = await enforceMonthlyQuoteLimit(supabase, profile.organization_id)
+    if (overLimit) return overLimit
 
     // Validar datos
     const body = await request.json()

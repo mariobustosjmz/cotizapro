@@ -5,6 +5,7 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import { clientNoticeFields } from '@/lib/reminders/client-notice'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/reminders - List reminders with filters
 export async function GET(request: NextRequest) {
@@ -166,6 +167,9 @@ export async function POST(request: NextRequest) {
       logger.security('POST /api/reminders - unauthorized access attempt')
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/reminders')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase

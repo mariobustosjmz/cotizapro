@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { assertWritable } from '@/lib/billing/writable'
 
 // POST /api/reminders/[id]/complete - Mark reminder as completed
 export async function POST(
@@ -22,6 +23,9 @@ export async function POST(
     if (authError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Fetch reminder to check if it's recurring
     const { data: reminder, error: fetchError } = await supabase

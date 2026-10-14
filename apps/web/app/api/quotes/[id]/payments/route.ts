@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { assertWritable } from '@/lib/billing/writable'
 import { NextRequest, NextResponse } from 'next/server'
 import { createQuotePaymentSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
@@ -123,6 +124,9 @@ export async function POST(
       logger.security('POST /api/quotes/[id]/payments - unauthorized access attempt', { quoteId: id })
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/quotes/[id]/payments')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase

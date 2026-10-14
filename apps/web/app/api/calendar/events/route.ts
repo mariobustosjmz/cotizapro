@@ -5,6 +5,7 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors, validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import type { WorkEvent } from '@/lib/validations/cotizapro'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/calendar/events - List work events with filters
 export async function GET(request: NextRequest) {
@@ -122,6 +123,9 @@ export async function POST(request: NextRequest) {
       logger.security('POST /api/calendar/events - unauthorized access attempt')
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/calendar/events')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase

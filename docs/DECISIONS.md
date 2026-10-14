@@ -76,3 +76,14 @@
 - Target market is Spanish-speaking HVAC businesses in Mexico
 - English identifiers maintain compatibility with libraries, tools, and AI assistance
 - DB constraint values are English (`fixed`, `per_hour`) — Spanish only in display labels
+
+---
+
+## ADR-008: Cobro semi-manual con Mercado Pago y solo lectura al vencer
+
+**Decisión:** Ligas de suscripción de Mercado Pago por plan (variables `MP_LINK_*`); el operador activa y renueva desde `/admin` con RPCs `admin_*` que validan `is_platform_admin()` y auditan en `plan_activations`. Al vencer `current_period_end`, la cuenta queda en solo lectura de inmediato (402 en las rutas que escriben). Gratis y los planes pagados sin periodo no vencen. Los límites por plan están programados pero apagados (`PLAN_LIMITS_ENFORCED=false`) durante el piloto.
+
+**Rationale:**
+- Se arranca sin webhook ni credenciales de Mercado Pago en la app; las mismas RPC sirven después para un webhook.
+- El navegador nunca decide el monto ni el plan: lo calcula el servidor y lo escribe una RPC; el trigger `guard_org_billing_columns` bloquea los cambios directos.
+- El cron se autentica con el hash de `CRON_SECRET` porque el contenedor de producción no tiene service role.

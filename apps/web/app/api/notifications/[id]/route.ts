@@ -1,6 +1,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { handleApiError, ApiError, ApiErrors } from '@/lib/error-handler'
+import { assertWritable } from '@/lib/billing/writable'
 
 export async function PATCH(
   request: NextRequest,
@@ -18,6 +19,10 @@ export async function PATCH(
     const body = await request.json()
 
     if (body.type === 'reminder') {
+      // Completar un recordatorio es una edición del negocio; marcar avisos como leídos sigue permitido.
+      const blocked = await assertWritable(supabase)
+      if (blocked) return blocked
+
       const { error } = await supabase
         .from('follow_up_reminders')
         .update({ status: 'completed', completed_at: new Date().toISOString() })

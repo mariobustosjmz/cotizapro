@@ -317,3 +317,114 @@ curl -X POST \
 - [Twilio Integration](./TWILIO_SETUP.md)
 - [Resend Email Setup](./EMAIL_SETUP.md)
 - [Deployment Guide](./DEPLOYMENT_GUIDE.md)
+
+---
+
+## Cron: avisos de vencimiento del plan (D2)
+
+**Endpoint:** `POST /api/cron/billing-notices` (también acepta `GET`)
+**Horario:** diario a las 14:00 UTC (08:00 en Monterrey)
+**Qué hace:** busca planes pagados que vencen en los próximos 7 días o vencieron en los últimos 3, y manda al propietario el aviso que toca (7, 3 o 1 días antes, o el día del vencimiento). Cada aviso sale una sola vez por periodo; si Resend falla, se reintenta en la siguiente corrida.
+**Tope:** la función `billing_notices_due` devuelve como máximo 500 cuentas por corrida. Si se alcanza, la ruta registra una advertencia en el log y el resto se procesa en la corrida siguiente.
+
+### Autenticación y secreto
+
+Ambos crons (`/api/cron/billing-notices` y `/api/cron/reminders-check`) se llaman con `Authorization: Bearer <CRON_SECRET>`. No requieren service role: el contenedor web de producción no tiene `SUPABASE_SERVICE_ROLE_KEY`. La base valida el mismo secreto contra `platform_settings.cron_key_sha256`.
+
+- `CRON_SECRET` debe tener **32 caracteres o más**.
+- Alta o rotación del hash (una vez por entorno). El secreto se pasa como variable de psql, nunca escrito en el comando, para que no quede en el historial del shell ni se imprima:
+
+```bash
+psql "$DB" -v key="$CRON_SECRET" <<'SQL'
+INSERT INTO platform_settings (key, value)
+VALUES ('cron_key_sha256', encode(extensions.digest(:'key', 'sha256'), 'hex'))
+ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now();
+SQL
+```
+
+Si se rota `CRON_SECRET`, repetir este paso con el valor nuevo.
+
+### Cron de recordatorios (`/api/cron/reminders-check`)
+
+Desde la Task 12b ya no necesita service role. Activarlo en producción requiere **aprobación explícita y propia** del usuario, independiente de la del cron de avisos.
+
+Los recordatorios con más de 3 días de atraso respecto al límite de la corrida (mañana, hora de Monterrey; en la práctica, con fecha anterior a antier) no se envían automáticamente: se quedan pendientes y visibles en el panel. Tampoco se envían los de cuentas vencidas mientras no se renueven.
+
+### VPS (`/etc/cron.d/cotizapro`)
+
+```
+0 14 * * * root /opt/bin/cotizapro-billing-notices.sh >> /var/log/cotizapro-billing-notices.log 2>&1
+```
+
+El script `/opt/bin/cotizapro-billing-notices.sh` (permisos 700) sigue la forma de `/opt/bin/cotizapro-reminders.sh`:
+
+```sh
+#!/bin/sh
+set -eu
+CRON_SECRET=$(grep '^CRON_SECRET=' /opt/cotizapro-deploy/.env | cut -d= -f2-)
+curl -fsS -m 120 -X POST -H "Authorization: Bearer ${CRON_SECRET}" https://cotizapro.mariobustos.io/api/cron/billing-notices
+echo
+```
+
+---
+
+## Cobro D2: variables y superadmin
+
+| Variable | Efecto |
+|---|---|
+| `MP_LINK_STARTER`, `MP_LINK_PRO`, `MP_LINK_ENTERPRISE` | Liga de suscripción de Mercado Pago por plan. Debe ser `https`; cualquier otro valor se ignora y el plan se muestra como "Próximamente". |
+| `SUPPORT_WHATSAPP_PHONE` | WhatsApp de soporte para cuentas con más usuarios que los incluidos (10 dígitos o con 52). |
+| `PLAN_LIMITS_ENFORCED` | Solo el valor `true` enciende los límites por plan. Durante el piloto queda en `false`. |
+
+### Alta y baja del superadmin
+
+Sustituir `<correo>` por el correo del operador (solo con aprobación del usuario):
+
+```sql
+INSERT INTO platform_admins (user_id) SELECT id FROM auth.users WHERE email = '<correo>';
+DELETE FROM platform_admins WHERE user_id = (SELECT id FROM auth.users WHERE email = '<correo>');
+```
+
+La primera sentencia da de alta; la segunda revoca.
+
+---
+
+## Puesta en producción de D2 (guía, no ejecutada)
+
+> **Cada paso de esta sección se ejecuta solo con aprobación explícita del usuario, paso por paso.** El servidor es compartido: seguir la skill `hostinger-vps` §0 (coexistencia) y el inventario del VPS. Leer el estado real, editar solo lo propio, conservar el inode, aplicar con reload y nunca subir una copia del repo encima de archivos compartidos. Los valores reales (secretos, ligas) los da el usuario; en este repo, que es público, solo hay marcadores.
+
+1. **Antes de tocar nada** (solo con aprobación explícita del usuario): smoke de todos los dominios de todos los proyectos del VPS y anotar el resultado.
+2. **Respaldos con fecha** (solo con aprobación explícita del usuario): `pg_dump` de esquema y datos de `cotizapro-db` (`/opt/backups/cotizapro-schema-<fecha>-pre042.sql.gz` y `cotizapro-data-<fecha>-pre042.sql.gz`), respaldo del código y etiqueta de imagen de reversa `cotizapro-web-rollback:<fecha>`.
+3. **Revisión previa, solo lectura** (solo con aprobación explícita del usuario). No cambia nada: los límites siguen apagados.
+
+```sql
+SELECT o.plan, count(*) AS orgs,
+       count(*) FILTER (WHERE m.users > CASE o.plan WHEN 'pro' THEN 3 WHEN 'enterprise' THEN 10 ELSE 1 END) AS exceden_usuarios,
+       count(*) FILTER (WHERE o.plan = 'free' AND q.this_month > 5) AS exceden_cotizaciones
+FROM organizations o
+CROSS JOIN LATERAL (SELECT count(*) AS users FROM profiles p WHERE p.organization_id = o.id) m
+CROSS JOIN LATERAL (SELECT count(*) AS this_month FROM quotes x WHERE x.organization_id = o.id
+                    AND x.created_at >= date_trunc('month', now() AT TIME ZONE 'America/Monterrey') AT TIME ZONE 'America/Monterrey') q
+GROUP BY o.plan ORDER BY o.plan;
+```
+
+   Confirmar también que las cuentas pagadas tienen `current_period_end` vacío (siguen escribiendo).
+4. **Migración 042** (solo con aprobación explícita del usuario; si D1/041 está lista, aplicar 041 antes). Se aplica dentro del contenedor `cotizapro-deploy-cotizapro-db-1`, en una transacción, registrando la versión:
+
+```bash
+(echo 'BEGIN;'
+ cat apps/web/supabase/migrations/042_billing_superadmin.sql
+ echo "INSERT INTO supabase_migrations.schema_migrations (version, name) VALUES ('042', '042_billing_superadmin');"
+ echo 'COMMIT;'
+ echo "NOTIFY pgrst, 'reload schema';") \
+ | ssh <usuario>@<servidor> 'docker exec -i cotizapro-deploy-cotizapro-db-1 psql -U postgres -v ON_ERROR_STOP=1'
+```
+
+5. **Pruebas SQL en producción** (solo con aprobación explícita del usuario): correr `apps/web/supabase/tests/billing_superadmin.sql` y `billing_notices.sql` (terminan en `ROLLBACK`; usan las cuentas demo `00c0`). Esperado: `failed = 0`.
+6. **Alta del superadmin** (solo con aprobación explícita del usuario): preguntar el correo del operador y ejecutar el `INSERT INTO platform_admins` de la sección anterior. Anotarlo en el inventario.
+7. **Hash del cron** (solo con aprobación explícita del usuario): leer `CRON_SECRET` de `/opt/cotizapro-deploy/.env` sin imprimirlo y registrar `cron_key_sha256` con el bloque de "Autenticación y secreto" (variable de psql, nunca en el historial).
+8. **Variables de `cotizapro-web`** (solo con aprobación explícita del usuario): agregar `MP_LINK_*` (las ligas reales las da el usuario), `SUPPORT_WHATSAPP_PHONE` y `PLAN_LIMITS_ENFORCED=false` a `/opt/cotizapro-deploy/.env` y al bloque `environment` de `cotizapro-web` en el compose, con respaldo `.bak-<fecha>-d2` y conservando el inode.
+9. **Deploy de la app** (solo con aprobación explícita del usuario): `git archive HEAD` y `rsync --delete` a `/opt/cotizapro`; luego `docker compose build cotizapro-web && docker compose up -d --no-deps cotizapro-web` (con `setsid nohup`), como indica el inventario.
+10. **Script y crons** (solo con aprobación explícita del usuario): crear `/opt/bin/cotizapro-billing-notices.sh`, respaldar `/etc/cron.d/cotizapro` con fecha y agregar la línea de la sección "VPS". Descomentar la de recordatorios (`0 15 * * * root /opt/bin/cotizapro-reminders.sh`) requiere **su propia aprobación explícita**.
+11. **Después** (solo con aprobación explícita del usuario): smoke de todos los dominios (idéntico al del punto 1); `curl` al cron con secreto incorrecto (debe dar 401); una corrida manual del script (JSON con `success: true`); con la cuenta del operador, abrir `/admin` y confirmar la lista. Si cualquier dominio de otro proyecto cambia, revertir de inmediato y avisar.
+12. **Inventario** (solo con aprobación explícita del usuario): agregar la entrada fechada al inventario del VPS (migración, respaldos, imagen de reversa, cron nuevo, superadmin dado de alta).

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { createQuoteShareLink } from '@/lib/quotes/share-link'
 import { logger } from '@/lib/logger'
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest, context: RouteContext): Promise<
 export async function POST(request: NextRequest, context: RouteContext): Promise<Response> {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(WORKERS)
+  const auth = await requireWritableMember(WORKERS)
   if (!auth.ok) return auth.response
   const id = await quoteIdFrom(context)
   if (!id) return invalidId()
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
 export async function DELETE(request: NextRequest, context: RouteContext): Promise<Response> {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(WORKERS)
+  const auth = await requireWritableMember(WORKERS)
   if (!auth.ok) return auth.response
   const id = await quoteIdFrom(context)
   if (!id) return invalidId()

@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { assertWritable } from '@/lib/billing/writable'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendQuoteSchema } from '@/lib/validations/cotizapro'
 import { generateQuotePDF } from '@/lib/integrations/pdf'
@@ -129,6 +130,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       logger.security('POST /api/quotes/[id]/send - unauthorized access attempt')
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/quotes/[id]/send')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     const validation = sendQuoteSchema.safeParse({ ...(await request.json()), quote_id: id })
     if (!validation.success) {

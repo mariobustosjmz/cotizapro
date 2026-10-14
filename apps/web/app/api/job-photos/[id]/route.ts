@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
 
@@ -14,7 +14,7 @@ const patchSchema = z.object({
 async function guard(request: NextRequest, params: Promise<{ id: string }>) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return { error: applyRateLimit(limited) } as const
-  const auth = await requireMember(['owner', 'admin', 'member'])
+  const auth = await requireWritableMember(['owner', 'admin', 'member'])
   if (!auth.ok) return { error: auth.response } as const
   const id = z.string().uuid().safeParse((await params).id)
   if (!id.success) return { error: NextResponse.json({ error: 'ID inválido' }, { status: 400 }) } as const

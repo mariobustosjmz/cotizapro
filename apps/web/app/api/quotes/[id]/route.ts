@@ -1,4 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { assertWritable } from '@/lib/billing/writable'
 import { NextRequest, NextResponse } from 'next/server'
 import { updateQuoteSchema, type QuoteStatus } from '@/lib/validations/cotizapro'
 import { priceItemsForOrg, sumSubtotals } from '@/lib/pricing/price-items-for-org'
@@ -104,6 +105,9 @@ export async function PATCH(
       logger.security('PATCH /api/quotes/[id] - unauthorized access attempt', { quoteId: id })
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'PATCH /api/quotes/[id]')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase
@@ -303,6 +307,9 @@ export async function DELETE(
       logger.security('DELETE /api/quotes/[id] - unauthorized access attempt', { quoteId: id })
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'DELETE /api/quotes/[id]')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase

@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { updateServiceSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/services/[id] - Obtener servicio individual
 export async function GET(
@@ -73,6 +74,9 @@ export async function PATCH(
       }, { status: 403 })
     }
 
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
+
     // Validar datos
     const body = await request.json()
     const validation = updateServiceSchema.safeParse(body)
@@ -136,6 +140,9 @@ export async function DELETE(
         error: 'Permisos insuficientes. Solo administradores pueden eliminar servicios.'
       }, { status: 403 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Eliminar servicio
     const { error } = await supabase

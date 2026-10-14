@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
+import { assertWritable } from '@/lib/billing/writable'
 
 const snoozeSchema = z.object({
   snooze_until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha inválido (YYYY-MM-DD)')
@@ -29,6 +30,9 @@ export async function POST(
     if (authError || !user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Parse and validate request body
     const body = await request.json()

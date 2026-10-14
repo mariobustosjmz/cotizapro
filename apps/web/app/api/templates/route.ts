@@ -4,6 +4,7 @@ import { createQuoteTemplateSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+import { assertWritable } from '@/lib/billing/writable'
 
 export const dynamic = 'force-dynamic'
 
@@ -88,6 +89,9 @@ export async function POST(request: NextRequest) {
       logger.security('POST /api/templates - unauthorized access attempt')
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/templates')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     const { data: profile } = await supabase
       .from('profiles')

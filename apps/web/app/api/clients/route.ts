@@ -6,6 +6,7 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors, validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import { sanitizeSearchInput } from '@/lib/search-sanitizer'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/clients - List clients with pagination and search
 export async function GET(request: NextRequest) {
@@ -124,6 +125,9 @@ export async function POST(request: NextRequest) {
       logger.security('POST /api/clients - unauthorized access attempt')
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'POST /api/clients')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase

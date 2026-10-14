@@ -5,6 +5,7 @@ import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
 import type { WorkEvent } from '@/lib/validations/cotizapro'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/calendar/events/[id] - Get single work event
 export async function GET(
@@ -89,6 +90,9 @@ export async function PATCH(
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'PATCH /api/calendar/events/[id]')
     }
 
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
+
     // Get user's organization
     const { data: profile } = await supabase
       .from('profiles')
@@ -168,6 +172,9 @@ export async function DELETE(
       logger.security('DELETE /api/calendar/events/[id] - unauthorized access attempt')
       return handleApiError(ApiErrors.UNAUTHORIZED(), 'DELETE /api/calendar/events/[id]')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Get user's organization
     const { data: profile } = await supabase

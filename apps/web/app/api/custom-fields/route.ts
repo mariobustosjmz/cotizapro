@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import type { EntityType } from '@/types/custom-fields'
+import { assertWritable } from '@/lib/billing/writable'
 
 const entityTypeEnum = z.enum(['client', 'service', 'quote'])
 
@@ -107,6 +108,9 @@ export async function POST(request: NextRequest) {
         error: 'Permisos insuficientes. Solo administradores pueden gestionar campos personalizados.'
       }, { status: 403 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     const body = await request.json()
     const validation = createFieldSchema.safeParse(body)

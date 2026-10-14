@@ -4,6 +4,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { memberRpcError } from '@/lib/team/member-errors'
+import { assertWritable } from '@/lib/billing/writable'
 
 const updateMemberSchema = z.object({
   role: z.enum(['admin', 'member', 'viewer']),
@@ -29,6 +30,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
+  const blocked = await assertWritable(supabase)
+  if (blocked) return blocked
+
   const { data: member, error } = await supabase.rpc('set_member_role', { p_member: id, p_role: validation.data.role })
   if (error) {
     const mapped = memberRpcError(error.message)
@@ -49,6 +53,9 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
+  const blocked = await assertWritable(supabase)
+  if (blocked) return blocked
 
   const { error } = await supabase.rpc('remove_member', { p_member: id })
   if (error) {

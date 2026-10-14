@@ -4,6 +4,7 @@ import { updateOrganizationSchema } from '@/lib/validations/settings'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { handleApiError, ApiErrors, validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+import { assertWritable } from '@/lib/billing/writable'
 
 const DEPOSIT_ERRORS: Readonly<Record<string, string>> = {
   invalid_deposit_percent: 'El anticipo debe ser un número entero de 0 a 100.',
@@ -55,6 +56,9 @@ export async function PATCH(request: NextRequest) {
       })
       return handleApiError(ApiErrors.FORBIDDEN(), 'PATCH /api/settings/organization')
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Parse request body
     const body = await request.json()

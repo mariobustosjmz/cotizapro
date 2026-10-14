@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceSchema } from '@/lib/validations/cotizapro'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
+import { assertWritable } from '@/lib/billing/writable'
 
 // GET /api/services - Lista de servicios con filtros
 export async function GET(request: NextRequest) {
@@ -100,6 +101,9 @@ export async function POST(request: NextRequest) {
         error: 'Permisos insuficientes. Solo administradores pueden crear servicios.'
       }, { status: 403 })
     }
+
+    const blocked = await assertWritable(supabase)
+    if (blocked) return blocked
 
     // Validar datos
     const body = await request.json()

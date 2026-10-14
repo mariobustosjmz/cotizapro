@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, uploadLimiter } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 import { checkLogoFile, logoStoragePath } from '@/lib/branding/logo'
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   const limited = uploadLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
 
-  const auth = await requireMember(['owner', 'admin'])
+  const auth = await requireWritableMember(['owner', 'admin'])
   if (!auth.ok) return auth.response
 
   const form = await request.formData().catch(() => null)

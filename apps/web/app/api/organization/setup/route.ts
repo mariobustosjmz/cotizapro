@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireMember } from '@/lib/auth/require-member'
+import { requireWritableMember } from '@/lib/billing/require-writable-member'
 import { applyRateLimit, defaultApiLimiter } from '@/lib/rate-limit'
 import { validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
@@ -9,7 +9,7 @@ import { applyAccountSetup } from '@/lib/onboarding/apply-account-setup'
 export async function POST(request: NextRequest) {
   const limited = defaultApiLimiter(request)
   if (limited.limited) return applyRateLimit(limited)
-  const auth = await requireMember(['owner'])
+  const auth = await requireWritableMember(['owner'])
   if (!auth.ok) return auth.response
   const parsed = accountSetupSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return validationErrorResponse(parsed.error)
