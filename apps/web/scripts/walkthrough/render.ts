@@ -29,6 +29,8 @@ const ROUTE_FILES: readonly (readonly [RegExp, string, string])[] = [
   [/^\/signup$/, '/signup', 'app/(auth)/signup/page.tsx'],
   [/^\/p\/[^/]+$/, '/p/[slug]', 'app/p/[slug]/page.tsx'],
   [/^\/r\/[^/]+$/, '/r/[token]', 'app/r/[token]/page.tsx'],
+  [/^\/c\/[^/]+$/, '/c/[token]', 'app/c/[token]/page.tsx'],
+  [/^\/admin$/, '/admin', 'app/admin/page.tsx'],
   [/^\/dashboard\/quotes\/new$/, '/dashboard/quotes/new', 'app/(dashboard)/dashboard/quotes/new/page.tsx'],
   [/^\/dashboard\/quotes\/[0-9a-f-]{36}$/, '/dashboard/quotes/[id]', 'app/(dashboard)/dashboard/quotes/[id]/page.tsx'],
   [/^\/dashboard\/quotes\/[0-9a-f-]{36}\/edit$/, '/dashboard/quotes/[id]/edit', 'app/(dashboard)/dashboard/quotes/[id]/edit/page.tsx'],
