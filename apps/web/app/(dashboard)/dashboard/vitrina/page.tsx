@@ -1,10 +1,14 @@
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { ProfileForm } from '@/components/showcase-editor/profile-form'
+import { ReviewReplies } from '@/components/showcase-editor/review-replies'
 import { SharePanel } from '@/components/showcase-editor/share-panel'
 import { AccountSetupForm } from '@/components/onboarding/account-setup-form'
 import { getOwnShowcase } from '@/lib/showcase/get-own-profile'
 import { publicProfileUrl, qrDataUrl } from '@/lib/showcase/public-url'
+import { getReviewsForReply, type ReviewsForReplyResult } from '@/lib/showcase/review-replies'
+
+const NO_REVIEWS: ReviewsForReplyResult = { reviews: [], failed: false }
 
 export const dynamic = 'force-dynamic'
 
@@ -22,8 +26,11 @@ export default async function ShowcaseEditorPage() {
   if (!showcase) redirect('/login')
   const host = (await headers()).get('host')
   const url = publicProfileUrl(showcase.slug, host ? `http://${host}` : undefined)
-  const qrPng = await qrDataUrl(url, 360)
   const canEdit = showcase.role === 'owner' || showcase.role === 'admin'
+  const [qrPng, replies] = await Promise.all([
+    qrDataUrl(url, 360),
+    canEdit ? getReviewsForReply(showcase.db, showcase.organizationId) : Promise.resolve(NO_REVIEWS),
+  ])
 
   return (
     <div className="space-y-4">
@@ -34,9 +41,16 @@ export default async function ShowcaseEditorPage() {
         </p>
       </div>
       <div className="grid lg:grid-cols-[1fr_320px] gap-4 items-start">
-        <Card title="Datos de la página">
-          <ProfileForm profile={showcase.profile} fallbackName={showcase.orgName} canEdit={canEdit} />
-        </Card>
+        <div className="space-y-4">
+          <Card title="Datos de la página">
+            <ProfileForm profile={showcase.profile} fallbackName={showcase.orgName} canEdit={canEdit} />
+          </Card>
+          {canEdit && (
+            <Card title="Respuestas a reseñas">
+              <ReviewReplies reviews={replies.reviews} failed={replies.failed} />
+            </Card>
+          )}
+        </div>
         <div className="space-y-4">
           <Card title="Compartir">
             <SharePanel url={url} qrPng={qrPng} published={showcase.profile?.is_published ?? false} />

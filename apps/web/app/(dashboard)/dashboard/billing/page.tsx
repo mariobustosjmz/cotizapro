@@ -12,6 +12,10 @@ import { billingBadge } from '@/lib/billing/badge'
 import { checkoutEnvFrom, checkoutOptionsFor, hasMercadoPagoLinks } from '@/lib/billing/checkout-option'
 import { BillingSummaryCards } from '@/components/billing/billing-summary-cards'
 import { PlanLimitsTable } from '@/components/billing/plan-limits-table'
+import { AiUsageCard } from '@/components/ai/ai-usage-card'
+import { packLinks } from '@/lib/ai/packs'
+import { getUsageSummary } from '@/lib/ai/usage'
+import { logger } from '@/lib/logger'
 import { BillingClient } from './BillingClient'
 
 export const metadata = {
@@ -31,15 +35,21 @@ export default async function BillingPage() {
     .single()
   if (profileError || !profile) redirect('/login')
 
-  const [{ data: organization, error: orgError }, activeUsers] = await Promise.all([
+  const [{ data: organization, error: orgError }, activeUsers, aiSummary] = await Promise.all([
     supabase
       .from('organizations')
       .select('id, name, plan, subscription_status, stripe_customer_id, current_period_end, billing_provider')
       .eq('id', profile.organization_id)
       .single(),
     countOrganizationMembers(supabase),
+    getUsageSummary(supabase).catch((error: unknown) => {
+      logger.warn('billing ai summary failed', { reason: error instanceof Error ? error.message : 'unknown' })
+      return null
+    }),
   ])
   if (orgError || !organization) redirect('/dashboard')
+
+  const canManage = profile.role === 'owner' || profile.role === 'admin'
 
   const snapshot = snapshotFromRow(organization)
   const state = billingState(snapshot, new Date())
@@ -74,12 +84,14 @@ export default async function BillingPage() {
         cost={cost}
       />
 
+      <AiUsageCard summary={aiSummary} links={packLinks(organization.name?.trim() || 'mi negocio', process.env)} canBuy={canManage} />
+
       <BillingClient
         currentPlan={snapshot.planId}
         activeUsers={cost.activeUsers}
         options={options}
         mercadoPagoEnabled={hasMercadoPagoLinks(env)}
-        canManage={profile.role === 'owner' || profile.role === 'admin'}
+        canManage={canManage}
         hasBillingAccount={Boolean(organization.stripe_customer_id)}
       />
 

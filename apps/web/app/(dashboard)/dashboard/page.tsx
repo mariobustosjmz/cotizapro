@@ -1,7 +1,11 @@
 import { createServerClient } from '@/lib/supabase/server'
+import { AiUsageBanner } from '@/components/ai/ai-usage-banner'
+import { FollowUpPending } from '@/components/dashboard/follow-up-pending'
 import { GettingStarted } from '@/components/dashboard/getting-started'
+import { getPendingFollowUps } from '@/lib/ai/follow-up/pending'
 import { loadChecklist } from '@/lib/onboarding/load-checklist'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { RealtimeRefresh } from '@/components/dashboard/realtime-refresh'
 import {
   Users,
@@ -112,6 +116,7 @@ export default async function DashboardPage() {
     { count: clientsLastMonth },
     { data: quotes },
     { data: reminders },
+    pendingFollowUps,
   ] = await Promise.all([
     supabase
       .from('clients')
@@ -141,6 +146,7 @@ export default async function DashboardPage() {
       .eq('status', 'pending')
       .order('scheduled_date', { ascending: true })
       .limit(100),
+    profile.role === 'viewer' ? Promise.resolve([]) : getPendingFollowUps(supabase, orgId, now),
   ])
 
   const quoteCounts = {
@@ -191,6 +197,10 @@ export default async function DashboardPage() {
       )}
 
       {checklist && <GettingStarted steps={checklist} />}
+
+      {(profile.role === 'owner' || profile.role === 'admin') && <Suspense fallback={null}><AiUsageBanner role={profile.role} /></Suspense>}
+
+      <FollowUpPending items={pendingFollowUps} />
 
       {/* Urgent Reminders Banner */}
       {overdueReminders.length > 0 && (

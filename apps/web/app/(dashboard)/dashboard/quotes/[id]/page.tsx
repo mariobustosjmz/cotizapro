@@ -10,6 +10,9 @@ import { PaymentSection } from '@/components/dashboard/payment-section'
 import { JobPhotosSection } from '@/components/quotes/job-photos-section'
 import { ReviewRequestCard } from '@/components/quotes/review-request-card'
 import { ClientResponseCard } from '@/components/quotes/client-response-card'
+import { useMemberRole } from '@/hooks/use-member-role'
+import { FollowUpCard } from '@/components/ai/follow-up-card'
+import { daysSinceSent, isFollowUpEligible } from '@/lib/ai/follow-up/eligibility'
 import { QuoteShareDialog } from '@/components/dashboard/quote-share-dialog'
 import { parseWallClock } from '@/lib/calendar/wall-clock'
 import { formatAmount } from '@/lib/format/money'
@@ -27,6 +30,7 @@ interface Client {
   name: string
   email: string | null
   phone: string | null
+  whatsapp_phone: string | null
   company_name: string | null
 }
 
@@ -46,6 +50,7 @@ interface Quote {
   terms_and_conditions: string | null
   valid_until: string
   created_at: string
+  sent_at: string | null
   viewed_at: string | null
   accepted_at: string | null
   rejected_at: string | null
@@ -97,6 +102,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
   const [quote, setQuote] = useState<Quote | null>(null)
   const [workEvents, setWorkEvents] = useState<WorkEvent[]>([])
   const [shareOpen, setShareOpen] = useState(false)
+  const memberRole = useMemberRole()
 
   useEffect(() => {
     async function fetchQuote() {
@@ -355,6 +361,15 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       <ClientResponseCard quote={quote} onSaved={handleRefreshQuote} />
+
+      {memberRole !== null && memberRole !== 'viewer' && isFollowUpEligible(quote.status, quote.sent_at, new Date()) && (
+        <FollowUpCard
+          quoteId={quote.id}
+          clientName={quote.client?.name ?? null}
+          whatsappPhone={quote.client?.whatsapp_phone || quote.client?.phone || null}
+          days={daysSinceSent(quote.sent_at, new Date()) ?? 0}
+        />
+      )}
 
       {/* Payments */}
       <PaymentSection quoteId={quote.id} quoteTotal={quote.total} isCollected={quote.status === 'cobrado'} />

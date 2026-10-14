@@ -1,3 +1,5 @@
+import { z } from 'zod'
+import { aiUsageSummarySchema, type AiUsageSummary } from '@/lib/ai/usage'
 import type { PlanActivationRow } from './types'
 
 export interface AdminActionResponse {
@@ -28,6 +30,17 @@ export async function fetchActivations(organizationId: string): Promise<readonly
     if (!res.ok) return null
     const body: { data?: PlanActivationRow[] } = await res.json()
     return body.data ?? []
+  } catch {
+    return null
+  }
+}
+
+export async function fetchAiUsage(organizationId: string): Promise<AiUsageSummary | null> {
+  try {
+    const res = await fetch(`/api/admin/organizations/${organizationId}/ai-credits`, { cache: 'no-store' })
+    if (!res.ok) return null
+    const parsed = z.object({ data: aiUsageSummarySchema }).safeParse(await res.json())
+    return parsed.success ? parsed.data.data : null
   } catch {
     return null
   }

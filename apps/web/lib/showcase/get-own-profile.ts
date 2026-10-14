@@ -15,6 +15,8 @@ export interface OwnProfile {
 
 export interface OwnShowcase {
   readonly role: string
+  readonly organizationId: string
+  readonly db: Awaited<ReturnType<typeof createServerClient>>
   readonly orgName: string
   readonly slug: string
   readonly accountType: AccountType | null
@@ -43,6 +45,8 @@ export async function getOwnShowcase(): Promise<OwnShowcase | null> {
     .maybeSingle()
   return {
     role: member.role as string,
+    organizationId: member.organization_id as string,
+    db: supabase,
     orgName: org.name,
     slug: org.slug,
     accountType: org.account_type,

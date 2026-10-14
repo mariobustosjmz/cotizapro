@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ShieldCheck } from 'lucide-react'
 import { createServerClient } from '@/lib/supabase/server'
+import { ToastProvider } from '@/components/ui/toast'
 import { isPlatformAdmin } from '@/lib/admin/require-platform-admin'
 
 export default async function AdminLayout({ children }: { readonly children: React.ReactNode }) {
@@ -20,7 +21,7 @@ export default async function AdminLayout({ children }: { readonly children: Rea
           <Link href="/dashboard" className="text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Ir a mi panel</Link>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl p-4 sm:p-6">{children}</main>
+      <ToastProvider><main className="mx-auto max-w-6xl p-4 sm:p-6">{children}</main></ToastProvider>
     </div>
   )
 }

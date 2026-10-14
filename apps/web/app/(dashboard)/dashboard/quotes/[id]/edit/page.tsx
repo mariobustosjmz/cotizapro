@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback, use } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { QuoteNotesTerms } from '@/components/quotes/quote-notes-terms'
 import {
-  ArrowLeft, Plus, Trash2, ChevronDown, FileText, Zap,
+  ArrowLeft, Plus, Trash2, FileText,
   User, Percent, Calendar, Search, Check, GripVertical, Loader2
 } from 'lucide-react'
 import Link from 'next/link'
+import { AiDescribeButton } from '@/components/ai/ai-describe-button'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
 import { formatAmount } from '@/lib/format/money'
@@ -56,6 +57,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
   const [error, setError] = useState('')
   const [clients, setClients] = useState<Client[]>([])
   const [services, setServices] = useState<Service[]>([])
+  const serviceNames = useMemo(() => new Map(services.map(s => [s.id, s.name])), [services])
   const [selectedClientId, setSelectedClientId] = useState<string>('')
   const [items, setItems] = useState<QuoteItem[]>([
     { description: '', quantity: 1, unit_price: 0, unit_type: 'per_unit', service_id: null }
@@ -65,7 +67,6 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
   const [validUntil, setValidUntil] = useState('')
   const [notes, setNotes] = useState('')
   const [terms, setTerms] = useState('')
-  const [showExtras, setShowExtras] = useState(false)
   const [clientSearch, setClientSearch] = useState('')
   const [showClientDropdown, setShowClientDropdown] = useState(false)
   const [serviceSearchIndex, setServiceSearchIndex] = useState<number | null>(null)
@@ -112,10 +113,6 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
         setTerms(quote.terms_and_conditions || '')
         setValidUntil(quote.valid_until ? quote.valid_until.split('T')[0] : '')
         setCustomFields(quote.custom_fields || {})
-
-        if (quote.notes || quote.terms_and_conditions) {
-          setShowExtras(true)
-        }
 
         const client = clientsList.find((c: Client) => c.id === quote.client_id)
         if (client) {
@@ -169,15 +166,11 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
   }, [])
 
   function removeItem(index: number) {
-    if (items.length > 1) {
-      setItems(items.filter((_, i) => i !== index))
-    }
+    setItems(prev => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev))
   }
 
   function updateItem(index: number, field: keyof QuoteItem, value: string | number) {
-    const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
-    setItems(newItems)
+    setItems(prev => prev.map((it, i) => (i === index ? { ...it, [field]: value } : it)))
   }
 
   function selectService(index: number, serviceId: string) {
@@ -485,13 +478,17 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           )}
                         </div>
 
-                        <input
-                          value={item.description}
-                          onChange={(e) => updateItem(index, 'description', e.target.value)}
-                          required
-                          placeholder="Descripción del item..."
-                          className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
-                        />
+                        <div className="min-w-0 space-y-1">
+                          <input
+                            value={item.description}
+                            onChange={(e) => updateItem(index, 'description', e.target.value)}
+                            required
+                            placeholder="Descripción del item..."
+                            data-testid={`item-description-${index}`}
+                            className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
+                          />
+                          <AiDescribeButton description={item.description} serviceName={serviceNames.get(item.service_id ?? '') ?? null} onChange={(text) => updateItem(index, 'description', text)} testId={`ai-describe-${index}`} />
+                        </div>
                         <input
                           type="number"
                           min="0.01"
@@ -558,6 +555,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
                           placeholder="Descripción"
                           className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                         />
+                        <AiDescribeButton description={item.description} serviceName={serviceNames.get(item.service_id ?? '') ?? null} onChange={(text) => updateItem(index, 'description', text)} testId={`ai-describe-m-${index}`} />
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <label className="text-[10px] text-gray-400 dark:text-gray-500 mb-0.5 block">Cantidad</label>
@@ -606,50 +604,7 @@ export default function EditQuotePage({ params }: { params: Promise<{ id: string
               </div>
             </div>
 
-            {/* Notes & Terms - collapsible */}
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setShowExtras(!showExtras)}
-                className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Zap className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y Términos</span>
-                  {(notes || terms) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                  )}
-                </div>
-                <ChevronDown className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${showExtras ? 'rotate-180' : ''}`} />
-              </button>
-              {showExtras && (
-                <div className="px-4 pb-3 space-y-3 border-t border-gray-100 dark:border-gray-700 pt-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                      Notas
-                    </label>
-                    <Textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      rows={2}
-                      placeholder="Información adicional..."
-                      className="text-sm resize-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                      Terminos y Condiciones
-                    </label>
-                    <Textarea
-                      value={terms}
-                      onChange={(e) => setTerms(e.target.value)}
-                      rows={2}
-                      className="text-sm resize-none"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <QuoteNotesTerms notes={notes} terms={terms} onNotesChange={setNotes} onTermsChange={setTerms} autoOpen={Boolean(notes || terms)} />
 
             {/* Custom Fields */}
             <DynamicFieldsSection

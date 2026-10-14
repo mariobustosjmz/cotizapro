@@ -1,32 +1,33 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { QuoteNotesTerms } from '@/components/quotes/quote-notes-terms'
 import {
-  ArrowLeft, Plus, Trash2, ChevronDown, FileText, Zap,
+  ArrowLeft, Plus, Trash2, FileText,
   User, LayoutTemplate, Percent, Calendar, Search,
   Check, GripVertical
 } from 'lucide-react'
 import Link from 'next/link'
+import { AiDescribeButton } from '@/components/ai/ai-describe-button'
+import { DraftClientProposal } from '@/components/ai/draft-client-proposal'
+import { WhatsappDraftPanel } from '@/components/ai/whatsapp-draft-panel'
+import { ItemAttentionBadge } from '@/components/quotes/item-attention-badge'
+import { useApplyDraft } from '@/hooks/use-apply-draft'
 import type { PriceList } from '@cotizapro/quoting'
 import { ConfigurableItemPanel } from '@/components/quoting/configurable-item-panel'
 import { initialConfigurableItem, patchFromPreview } from '@/lib/pricing/configurable-item'
-import { formatAmount, type ItemInput } from '@/lib/pricing/client-preview'
+import { formatAmount } from '@/lib/pricing/client-preview'
+import { buildQuotePayload, clearItemReview, editQuoteItem, firstItemProblem, type EditableItemField } from '@/lib/quotes/form-items'
+import { focusQuoteItem, quoteItemElementId } from '@/lib/quotes/focus-item'
 import { DynamicFieldsSection } from '@/components/forms/DynamicFieldsSection'
 import type { CustomFieldValues } from '@/types/custom-fields'
+import type { QuoteFormItem } from '@/types/quote-form'
 
-interface QuoteItem {
-  description: string
-  quantity: number
-  unit_price: number
-  unit_type: 'fixed' | 'per_hour' | 'per_sqm' | 'per_unit' | 'per_lm'
-  service_id: string | null
-  input?: ItemInput | null
-}
+type QuoteItem = QuoteFormItem
 
 interface Client {
   id: string
@@ -80,6 +81,7 @@ export default function NewQuotePage() {
   const [error, setError] = useState('')
   const [clients, setClients] = useState<Client[]>([])
   const [services, setServices] = useState<Service[]>([])
+  const serviceNames = useMemo(() => new Map(services.map(s => [s.id, s.name])), [services])
   const [priceLists, setPriceLists] = useState<readonly PriceList[]>([])
   const [templates, setTemplates] = useState<QuoteTemplate[]>([])
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
@@ -92,7 +94,6 @@ export default function NewQuotePage() {
   const [validDays, setValidDays] = useState(30)
   const [notes, setNotes] = useState('')
   const [terms, setTerms] = useState('50% de anticipo al aceptar la cotización. 50% restante al completar el trabajo. Garantía de 1 año en mano de obra.')
-  const [showExtras, setShowExtras] = useState(false)
   const [clientSearch, setClientSearch] = useState('')
   const [showClientDropdown, setShowClientDropdown] = useState(false)
   const [serviceSearchIndex, setServiceSearchIndex] = useState<number | null>(null)
@@ -101,6 +102,9 @@ export default function NewQuotePage() {
   const formRef = useRef<HTMLFormElement>(null)
   const clientSearchRef = useRef<HTMLInputElement>(null)
   const clientDropdownRef = useRef<HTMLDivElement>(null)
+  const submittingRef = useRef(false)
+  const clearClient = (text: string) => { setSelectedClientId(''); setClientSearch(text) }
+  const draft = useApplyDraft({ services, priceLists, items, notes, selectedClientId, setItems, setNotes, selectClient, clearClient })
 
   useEffect(() => {
     async function fetchData() {
@@ -192,15 +196,11 @@ export default function NewQuotePage() {
   }, [])
 
   function removeItem(index: number) {
-    if (items.length > 1) {
-      setItems(items.filter((_, i) => i !== index))
-    }
+    setItems(prev => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev))
   }
 
-  function updateItem(index: number, field: keyof QuoteItem, value: string | number) {
-    const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
-    setItems(newItems)
+  function updateItem<F extends EditableItemField>(index: number, field: F, value: QuoteItem[F]) {
+    setItems(prev => prev.map((it, i) => (i === index ? editQuoteItem(it, field, value) : it)))
   }
 
   function selectService(index: number, serviceId: string) {
@@ -208,16 +208,16 @@ export default function NewQuotePage() {
     if (service) {
       const configurable = service.pricing_blocks ? initialConfigurableItem(service.name, service.pricing_blocks, priceLists) : null
       const newItems = [...items]
-      newItems[index] = configurable
-        ? { ...newItems[index], ...configurable, service_id: serviceId }
+      const base = { ...newItems[index], service_id: serviceId, needs_catalog: false }
+      newItems[index] = clearItemReview(configurable
+        ? { ...base, ...configurable }
         : {
-            ...newItems[index],
-            service_id: serviceId,
+            ...base,
             description: service.name,
             unit_price: Number(service.unit_price),
             unit_type: service.unit_type as QuoteItem['unit_type'],
             input: null,
-          }
+          })
       setItems(newItems)
     }
     setServiceSearchIndex(null)
@@ -252,12 +252,11 @@ export default function NewQuotePage() {
     toast({ message: `Plantilla "${template.name}" aplicada`, variant: 'success' })
   }
 
-  function selectClient(clientId: string) {
+  function selectClient(clientId: string, fallbackName = '') {
     setSelectedClientId(clientId)
     const client = clients.find(c => c.id === clientId)
-    if (client) {
-      setClientSearch(client.name + (client.company_name ? ` (${client.company_name})` : ''))
-    }
+    if (!client && fallbackName) setClients(prev => [...prev, { id: clientId, name: fallbackName, company_name: null, email: null, phone: null }])
+    setClientSearch(client ? client.name + (client.company_name ? ` (${client.company_name})` : '') : fallbackName)
     setShowClientDropdown(false)
   }
 
@@ -269,10 +268,9 @@ export default function NewQuotePage() {
   const itemCount = items.filter(i => i.description && i.quantity > 0).length
 
   // Progress calculation
-  const hasClient = !!selectedClientId
+  const hasClient = !!selectedClientId || draft.pendingClient !== null
   const hasItems = itemCount > 0
   const hasValidPrices = items.some(i => i.unit_price > 0)
-  const incompleteConfigurable = items.findIndex(i => i.input && i.unit_price <= 0)
   const completedSteps = [hasClient, hasItems, hasValidPrices].filter(Boolean).length
 
   const filteredClients = clientSearch
@@ -290,50 +288,37 @@ export default function NewQuotePage() {
       )
     : services
 
+  // Ctrl+Enter y doble clic: una sola ejecución cubre crear el cliente del mensaje y la cotización.
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
+    try { await submitQuote() } finally { submittingRef.current = false }
+  }
+
+  async function submitQuote() {
     setLoading(true)
     setError('')
 
-    if (!selectedClientId) {
-      setError('Selecciona un cliente')
+    // Las partidas se validan antes de crear el cliente del mensaje, para no dejar clientes sueltos.
+    const problem = firstItemProblem(items)
+    if (problem) {
+      setError(problem.message)
       setLoading(false)
+      focusQuoteItem(problem.index)
       return
     }
 
-    if (incompleteConfigurable >= 0) {
-      setError(`Completa las medidas y opciones de la partida ${incompleteConfigurable + 1}`)
-      setLoading(false)
-      return
-    }
-
-    const selectedClient = clients.find(c => c.id === selectedClientId)
-    if (!selectedClient) {
-      setError('Cliente no encontrado')
-      setLoading(false)
-      return
-    }
-
-    const validUntilDate = new Date()
-    validUntilDate.setDate(validUntilDate.getDate() + validDays)
-
-    const data = {
-      client_id: selectedClientId,
-      items: items.filter(item => item.description && item.quantity > 0),
-      notes: notes || null,
-      terms_and_conditions: terms || null,
-      valid_until: validUntilDate.toISOString(),
-      discount_rate: discountRate,
-      custom_fields: customFields,
-    }
-
-    if (data.items.length === 0) {
+    if (!hasItems) {
       setError('Agrega al menos un item a la cotizaci\u00F3n')
       setLoading(false)
       return
     }
 
     try {
+      const clientId = await draft.resolveClientId()
+      if (!clientId) throw new Error('Selecciona un cliente')
+      const data = buildQuotePayload({ clientId, items, notes, terms, validDays, discountRate, customFields })
       const response = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -414,6 +399,8 @@ export default function NewQuotePage() {
           {/* LEFT COLUMN */}
           <div className="lg:col-span-2 space-y-3">
 
+            <WhatsappDraftPanel onApply={draft.apply} />
+
             {/* Client + Template row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Client selector with search */}
@@ -437,6 +424,7 @@ export default function NewQuotePage() {
                       onChange={(e) => {
                         setClientSearch(e.target.value)
                         setShowClientDropdown(true)
+                        draft.reset()
                         if (!e.target.value) setSelectedClientId('')
                       }}
                       onFocus={() => setShowClientDropdown(true)}
@@ -478,6 +466,7 @@ export default function NewQuotePage() {
                     </div>
                   )}
                 </div>
+                <DraftClientProposal proposal={draft.proposal} pendingClient={draft.pendingClient} selectedClientId={selectedClientId} onPick={draft.pickClient} onCreateNew={draft.createNewClient} onDismiss={draft.dismiss} />
               </div>
 
               {/* Template selector */}
@@ -541,7 +530,7 @@ export default function NewQuotePage() {
                 {items.map((item, index) => {
                   const lineTotal = item.quantity * item.unit_price
                   return (
-                    <div key={index} className="group">
+                    <div key={index} id={quoteItemElementId(index)} className="group">
                       {/* Desktop row */}
                       <div className="hidden md:grid grid-cols-[1fr_2fr_70px_100px_90px_32px] gap-1.5 px-3 py-1.5 items-center hover:bg-orange-50/30 dark:hover:bg-orange-900/10 transition-colors">
                         {/* Service - with inline search */}
@@ -592,15 +581,17 @@ export default function NewQuotePage() {
                             </button>
                           )}
                         </div>
-
-                        <input
-                          value={item.description}
-                          onChange={(e) => updateItem(index, 'description', e.target.value)}
-                          required
-                          placeholder="Descripción del item..."
-                          data-testid={`item-description-${index}`}
-                          className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
-                        />
+                        <div className="min-w-0 space-y-1">
+                          <input
+                            value={item.description}
+                            onChange={(e) => updateItem(index, 'description', e.target.value)}
+                            required
+                            placeholder="Descripción del item..."
+                            data-testid={`item-description-${index}`}
+                            className="w-full px-2 py-1.5 bg-transparent dark:text-white border border-transparent hover:border-gray-200 dark:hover:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 transition-all"
+                          />
+                          <AiDescribeButton description={item.description} serviceName={serviceNames.get(item.service_id ?? '') ?? null} onChange={(text) => updateItem(index, 'description', text)} testId={`ai-describe-${index}`} />
+                        </div>
                         <input
                           type="number"
                           min="0.01"
@@ -672,6 +663,7 @@ export default function NewQuotePage() {
                           data-testid={`item-description-${index}`}
                           className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
                         />
+                        <AiDescribeButton description={item.description} serviceName={serviceNames.get(item.service_id ?? '') ?? null} onChange={(text) => updateItem(index, 'description', text)} testId={`ai-describe-m-${index}`} />
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <label className="text-[10px] text-gray-400 dark:text-gray-500 mb-0.5 block">Cantidad</label>
@@ -713,10 +705,11 @@ export default function NewQuotePage() {
                           value={item.input}
                           onChange={(input, preview) => {
                             const name = services.find(s => s.id === item.service_id)?.name ?? item.description
-                            setItems(prev => prev.map((it, i) => (i === index ? { ...it, ...patchFromPreview(name, input, preview) } : it)))
+                            setItems(prev => prev.map((it, i) => (i === index ? clearItemReview({ ...it, ...patchFromPreview(name, input, preview) }) : it)))
                           }}
                         />
                       )}
+                      <ItemAttentionBadge item={item} index={index} />
                     </div>
                   )
                 })}
@@ -735,50 +728,7 @@ export default function NewQuotePage() {
               </div>
             </div>
 
-            {/* Notes & Terms - collapsible */}
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setShowExtras(!showExtras)}
-                className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Zap className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
-                  <span className="font-semibold text-gray-900 dark:text-white text-sm">Notas y T&eacute;rminos</span>
-                  {(notes || terms) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-                  )}
-                </div>
-                <ChevronDown className={`w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${showExtras ? 'rotate-180' : ''}`} />
-              </button>
-              {showExtras && (
-                <div className="px-4 pb-3 space-y-3 border-t border-gray-100 dark:border-gray-700 pt-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                      Notas
-                    </label>
-                    <Textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      rows={2}
-                      placeholder="Informaci\u00F3n adicional..."
-                      className="text-sm resize-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                      T&eacute;rminos y Condiciones
-                    </label>
-                    <Textarea
-                      value={terms}
-                      onChange={(e) => setTerms(e.target.value)}
-                      rows={2}
-                      className="text-sm resize-none"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <QuoteNotesTerms notes={notes} terms={terms} onNotesChange={setNotes} onTermsChange={setTerms} />
 
             {/* Custom Fields */}
             <DynamicFieldsSection

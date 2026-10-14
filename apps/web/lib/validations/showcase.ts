@@ -41,3 +41,9 @@ export const publicProfileUpdateSchema = z.object({
 
 export type QuoteRequestInput = z.infer<typeof quoteRequestSchema>
 export type PublicProfileUpdateInput = z.infer<typeof publicProfileUpdateSchema>
+
+export const REVIEW_REPLY_MAX = 1000
+
+export const reviewReplySchema = z.object({
+  owner_reply: z.string({ error: 'Escribe tu respuesta' }).trim().max(REVIEW_REPLY_MAX, 'Máximo 1,000 caracteres'),
+})

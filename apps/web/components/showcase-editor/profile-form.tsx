@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import type { OwnProfile } from '@/lib/showcase/get-own-profile'
+import { AiShowcaseButton, type ShowcaseTextField } from './ai-showcase-button'
 import { TextField, Toggle } from './profile-fields'
 
 interface ProfileFormProps {
@@ -30,11 +31,25 @@ function payloadFrom(form: FormData) {
   }
 }
 
+/** Los campos son no controlados (defaultValue): la propuesta aceptada se escribe en el DOM y se guarda solo con "Guardar página". */
+function setFieldValue(form: HTMLFormElement, name: ShowcaseTextField, value: string): void {
+  const field = form.elements.namedItem(name)
+  if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) field.value = value
+}
+
 export function ProfileForm({ profile, fallbackName, canEdit }: ProfileFormProps) {
   const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const [error, setError] = useState('')
   const [errors, setErrors] = useState<FieldErrors>({})
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function applyAiText(field: ShowcaseTextField, value: string): void {
+    if (status === 'saving' || !formRef.current) return
+    setFieldValue(formRef.current, field, value)
+    setErrors((prev) => Object.fromEntries(Object.entries(prev).filter(([key]) => key !== field)))
+    setStatus('idle')
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -63,7 +78,8 @@ export function ProfileForm({ profile, fallbackName, canEdit }: ProfileFormProps
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {canEdit && <AiShowcaseButton onApply={applyAiText} disabled={status === 'saving'} />}
       <fieldset disabled={!canEdit || status === 'saving'} className="space-y-4">
         <TextField name="display_name" label="Nombre público" defaultValue={profile?.display_name ?? fallbackName} errors={errors} required maxLength={80} />
         <TextField name="headline" label="Frase corta" defaultValue={profile?.headline ?? null} errors={errors} maxLength={120} placeholder="Ej. Cancelería y vidrio templado en Monterrey" />
