@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { logger } from '@/lib/logger'
-import { billingState, snapshotFromRow } from './expiry'
+import { autoRenewsFromRow, billingState, snapshotFromRow } from './expiry'
 import { expiryBanner } from './expiry-copy'
 import type { ExpiryBanner } from './types'
 
@@ -13,12 +13,12 @@ export async function loadExpiryBanner(
   if (!organizationId) return null
   const { data, error } = await supabase
     .from('organizations')
-    .select('plan, current_period_end')
+    .select('plan, current_period_end, billing_provider')
     .eq('id', organizationId)
     .maybeSingle()
   if (error) {
     logger.error('dashboard billing read failed', error)
     return null
   }
-  return expiryBanner(billingState(snapshotFromRow(data), now))
+  return expiryBanner(billingState(snapshotFromRow(data), now), { autoRenews: autoRenewsFromRow(data) })
 }

@@ -15,6 +15,8 @@ export interface CheckoutContext {
   readonly state: BillingState
   readonly activeUsers: number
   readonly stripeEnabled: boolean
+  /** Ya paga con suscripción de Mercado Pago: otra liga crearía una segunda suscripción. */
+  readonly autoRenews?: boolean
   readonly businessName: string
   readonly env: CheckoutEnv
 }
@@ -53,12 +55,23 @@ function supportMessage(planId: PaidPlanId, ctx: CheckoutContext, total: number)
   return `Hola, quiero contratar el plan ${PLANS[planId].name} para ${businessLabel(ctx)} con ${ctx.activeUsers} usuarios (${formatMxn(total)} al mes). ¿Me mandan la liga de pago?`
 }
 
+function subscriberMessage(planId: PaidPlanId, ctx: CheckoutContext, total: number): string {
+  return `Hola, ${businessLabel(ctx)} paga CotizaPro con suscripción de Mercado Pago. Quiero el plan ${PLANS[planId].name} con ${ctx.activeUsers} usuarios (${formatMxn(total)} al mes).`
+}
+
+/** Con suscripción activa no se ofrece otra liga: o el cobro es automático o se resuelve con soporte. */
+function subscriberOption(planId: PaidPlanId, ctx: CheckoutContext, total: number): PlanCheckoutOption {
+  if (planId === ctx.currentPlan && ctx.state.kind === 'expiring') return { kind: 'auto_renewal' }
+  return { kind: 'whatsapp', total, url: whatsappLink(ctx.env.SUPPORT_WHATSAPP_PHONE, subscriberMessage(planId, ctx, total)) }
+}
+
 export function checkoutOptionFor(planId: PlanId, ctx: CheckoutContext): PlanCheckoutOption {
   const renewing = ctx.state.kind === 'expired' || ctx.state.kind === 'expiring'
   if (planId === ctx.currentPlan && (planId === 'free' || !renewing)) return { kind: 'current' }
   if (planId === 'free') return { kind: 'included' }
   const cost = monthlyCost(planId, ctx.activeUsers)
   if (cost.overLimit > 0) return { kind: 'too_small' }
+  if (ctx.autoRenews) return subscriberOption(planId, ctx, cost.total)
   const link = mercadoPagoLink(planId, ctx.env)
   if (!link) {
     if (ctx.stripeEnabled) return { kind: 'stripe' }

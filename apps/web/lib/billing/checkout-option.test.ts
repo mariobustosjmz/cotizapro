@@ -138,3 +138,28 @@ describe('hasMercadoPagoLinks y plansIntro', () => {
     expect(plansIntro(false, checkoutOptionsFor({ ...base, env: {} }))).toContain('próximamente')
   })
 })
+
+describe('checkoutOptionFor con suscripción de Mercado Pago activa', () => {
+  const subscribed = (end: string): CheckoutContext => ({
+    ...base,
+    currentPlan: 'pro',
+    autoRenews: true,
+    state: billingState({ planId: 'pro', currentPeriodEnd: end }, now),
+  })
+
+  it('por vencer: el plan actual muestra cobro automático y ninguna liga', () => {
+    expect(checkoutOptionFor('pro', subscribed('2026-10-16T14:00:00Z'))).toEqual({ kind: 'auto_renewal' })
+  })
+
+  it('vencida: el plan actual ofrece soporte por WhatsApp en lugar de una segunda suscripción', () => {
+    const option = checkoutOptionFor('pro', subscribed('2026-10-12T14:00:00Z'))
+    expect(option.kind).toBe('whatsapp')
+  })
+
+  it('cambiar de plan con suscripción activa pasa por soporte para no cobrar doble', () => {
+    const option = checkoutOptionFor('starter', subscribed('2026-12-01T00:00:00Z'))
+    expect(option.kind).toBe('whatsapp')
+    if (option.kind !== 'whatsapp' || !option.url) throw new Error('se esperaba WhatsApp con liga')
+    expect(decodeURIComponent(option.url)).toContain('suscripción de Mercado Pago')
+  })
+})

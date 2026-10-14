@@ -4,6 +4,13 @@ import type { BillingNoticeKind, BillingSnapshot, BillingState, OrganizationBill
 const DAY_MS = 86_400_000
 export const EXPIRY_WARNING_DAYS = 7
 export const BILLING_TIME_ZONE = 'America/Monterrey'
+/** Valor que guarda admin_activate_plan (migración 042) para planes pagados con Mercado Pago. */
+export const MERCADO_PAGO_PROVIDER = 'mercadopago_manual'
+
+/** La cuenta paga con suscripción de Mercado Pago: el cobro se repite solo y no debe ofrecerse otra liga. */
+export function autoRenewsFromRow(row: OrganizationBillingRow | null | undefined): boolean {
+  return row?.billing_provider === MERCADO_PAGO_PROVIDER
+}
 
 export function snapshotFromRow(row: OrganizationBillingRow | null | undefined): BillingSnapshot {
   const plan = row?.plan

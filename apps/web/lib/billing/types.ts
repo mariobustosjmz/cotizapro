@@ -3,6 +3,7 @@ import type { PlanId } from '@/lib/plans/types'
 export interface OrganizationBillingRow {
   readonly plan: string | null
   readonly current_period_end: string | null
+  readonly billing_provider?: string | null
 }
 
 export interface BillingSnapshot {
@@ -39,6 +40,7 @@ export type PlanCheckoutOption =
   | { readonly kind: 'too_small' }
   | { readonly kind: 'unavailable' }
   | { readonly kind: 'stripe' }
+  | { readonly kind: 'auto_renewal' }
   | { readonly kind: 'mercadopago'; readonly url: string; readonly renewing: boolean }
   | { readonly kind: 'whatsapp'; readonly url: string | null; readonly total: number }
 

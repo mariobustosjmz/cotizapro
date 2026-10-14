@@ -22,6 +22,7 @@ const STATIC_LABELS: Readonly<Partial<Record<PlanCheckoutOption['kind'], string>
   included: 'Incluido',
   too_small: 'No alcanza para tu equipo',
   unavailable: 'Próximamente',
+  auto_renewal: 'Se cobra solo con Mercado Pago',
 }
 
 function WhatsappCta({ url, total }: { readonly url: string | null; readonly total: number }) {

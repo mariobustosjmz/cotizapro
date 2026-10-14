@@ -6,7 +6,7 @@ import { monthlyCost } from '@/lib/plans/pricing'
 import { planLimitsEnforced } from '@/lib/plans/limits'
 import { isCheckoutConfigured } from '@/lib/stripe/index'
 import { countOrganizationMembers } from '@/lib/billing/member-count'
-import { billingState, snapshotFromRow } from '@/lib/billing/expiry'
+import { autoRenewsFromRow, billingState, snapshotFromRow } from '@/lib/billing/expiry'
 import { planStatusLine } from '@/lib/billing/expiry-copy'
 import { billingBadge } from '@/lib/billing/badge'
 import { checkoutEnvFrom, checkoutOptionsFor, hasMercadoPagoLinks } from '@/lib/billing/checkout-option'
@@ -34,7 +34,7 @@ export default async function BillingPage() {
   const [{ data: organization, error: orgError }, activeUsers] = await Promise.all([
     supabase
       .from('organizations')
-      .select('id, name, plan, subscription_status, stripe_customer_id, current_period_end')
+      .select('id, name, plan, subscription_status, stripe_customer_id, current_period_end, billing_provider')
       .eq('id', profile.organization_id)
       .single(),
     countOrganizationMembers(supabase),
@@ -50,6 +50,7 @@ export default async function BillingPage() {
     state,
     activeUsers: cost.activeUsers,
     stripeEnabled: isCheckoutConfigured(),
+    autoRenews: autoRenewsFromRow(organization),
     businessName: String(organization.name ?? ''),
     env,
   })

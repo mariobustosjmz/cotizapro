@@ -8,7 +8,19 @@ export function daysLabel(days: number): string {
   return days === 1 ? '1 día' : `${days} días`
 }
 
-export function expiryBanner(state: BillingState): ExpiryBanner | null {
+export interface ExpiryBannerOptions {
+  readonly autoRenews?: boolean
+}
+
+export function expiryBanner(state: BillingState, options: ExpiryBannerOptions = {}): ExpiryBanner | null {
+  if (state.kind === 'expiring' && options.autoRenews) {
+    return {
+      tone: 'warning',
+      message: `Tu plan ${PLANS[state.planId].name} vence en ${daysLabel(state.daysLeft)}. Si tu suscripción de Mercado Pago sigue activa, el cobro es automático y activamos el nuevo periodo al confirmarlo; no necesitas hacer nada.`,
+      ctaLabel: 'Ver Facturación',
+      ctaHref: RENEW_HREF,
+    }
+  }
   if (state.kind === 'expiring') {
     return {
       tone: 'warning',
@@ -20,7 +32,7 @@ export function expiryBanner(state: BillingState): ExpiryBanner | null {
   if (state.kind === 'expired') {
     return {
       tone: 'danger',
-      message: `Tu plan ${PLANS[state.planId].name} venció el ${formatExpiryDate(state.periodEnd)}. La cuenta está en solo lectura: puedes ver y descargar todo, pero no crear, editar ni enviar.`,
+      message: `Tu plan ${PLANS[state.planId].name} venció el ${formatExpiryDate(state.periodEnd)}. La cuenta está en solo lectura: puedes ver y descargar todo, pero no crear, editar ni enviar.${options.autoRenews ? ' Si ya se hizo el pago, la reactivamos en cuanto confirmemos el cargo de Mercado Pago.' : ''}`,
       ctaLabel: 'Renovar',
       ctaHref: RENEW_HREF,
     }

@@ -54,3 +54,18 @@ describe('adminExpiryLabel', () => {
     expect(adminExpiryLabel(stateOf('pro', null))).toBe('Sin vencimiento')
   })
 })
+
+describe('expiryBanner con suscripción de Mercado Pago', () => {
+  it('por vencer: avisa que el cobro es automático y no pide renovar', () => {
+    const banner = expiryBanner(stateOf('pro', '2026-10-16T14:00:00Z'), { autoRenews: true })
+    expect(banner?.tone).toBe('warning')
+    expect(banner?.message).toContain('el cobro es automático')
+    expect(banner?.ctaLabel).toBe('Ver Facturación')
+  })
+
+  it('vencida: sigue en rojo y explica que se activa al confirmar el cargo', () => {
+    const banner = expiryBanner(stateOf('pro', '2026-10-12T14:00:00Z'), { autoRenews: true })
+    expect(banner?.tone).toBe('danger')
+    expect(banner?.message).toContain('en cuanto confirmemos el cargo de Mercado Pago')
+  })
+})
