@@ -9,6 +9,8 @@ export interface Plan {
   readonly includedUsers: number
   /** false: el plan no admite usuarios adicionales; hay que cambiar de plan. */
   readonly allowsExtraUsers: boolean
+  /** Créditos de IA incluidos al mes; espejo de ai_monthly_allowance() en la migración 043. */
+  readonly aiCreditsMonthly: number
   readonly highlighted: boolean
   readonly features: readonly string[]
   readonly upcoming: readonly string[]

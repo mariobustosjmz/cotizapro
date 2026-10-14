@@ -87,3 +87,32 @@
 - Se arranca sin webhook ni credenciales de Mercado Pago en la app; las mismas RPC sirven después para un webhook.
 - El navegador nunca decide el monto ni el plan: lo calcula el servidor y lo escribe una RPC; el trigger `guard_org_billing_columns` bloquea los cambios directos.
 - El cron se autentica con el hash de `CRON_SECRET` porque el contenedor de producción no tiene service role.
+
+---
+
+## ADR-009: IA local con créditos mensuales
+
+**Decisión:** Las funciones de IA usan `gemma3:4b` en el Ollama compartido (API `/v1` compatible con OpenAI) y se cobran en créditos por empresa. Cupos mensuales: Gratis 25, Solo 150, Taller 400, Empresa 1,200; tope diario de 40 créditos por usuario. Créditos por función: borrador de WhatsApp 3, descripción de partida 2, seguimiento 1, reescribir 1, textos de la vitrina 2. El periodo es el mes calendario en `America/Monterrey` con reinicio el día 1. Paquetes: +200 créditos por $49 y +1,000 por $199 MXN, vigentes hasta fin de mes (ligas `MP_LINK_AI_PACK_200` y `MP_LINK_AI_PACK_1000`).
+
+**Rationale:**
+- Costo cero por llamada y sin enviar datos de clientes a terceros.
+- `ai_reserve` reserva con candado por empresa y `ai_finish` (con nonce) cobra solo lo que sale bien; errores, tiempos agotados, desconexión y salidas inválidas se reembolsan. Las reservas abiertas expiran.
+- No se guarda contenido: la bitácora solo tiene función, créditos, tokens, latencia y estado.
+- La IA nunca pone precios: salen del catálogo, las listas de precios o `@cotizapro/quoting`. Todo resultado es borrador hasta que una persona lo guarda.
+- Una cola en proceso (1 llamada a la vez, 1 por empresa, 6 en espera) protege el Ollama que comparten otros proyectos.
+- La base decide los límites con el ajuste `ai.limits_enforced`; `AI_LIMITS_ENFORCED=false` equivale exactamente a `'off'` en la base (se fija con `ALTER DATABASE ... SET`, solo con aprobación del operador). Cualquier otro valor deja los límites activos.
+
+**Decisiones tomadas durante la implementación:**
+- Las empresas en solo lectura (plan vencido) no pueden usar IA, porque consumir créditos es una escritura (402, igual que el resto de rutas que escriben). El estado de la IA sí se consulta.
+- Las sugerencias aparecen en una caja con botón explícito "Usar" en lugar de llenar el campo en vivo; una falla no deja texto a medias.
+- Reescribir tiene límites de largo por contexto (notas, términos, respuesta a reseña), validados en servidor y en cliente.
+- Las partidas dudosas del borrador de WhatsApp llevan la marca `needs_review` (por ejemplo, m2 sin medidas o producto configurable sin medidas); se muestran con aviso y bloquean el envío hasta que la persona las revisa.
+- Coincidencia ambigua de clientes: si teléfono y nombre apuntan a clientes distintos, o el nombre es de una sola palabra con varias coincidencias, el resultado es `ambiguous` y no se elige cliente.
+- Los paquetes exigen referencia y esta es única por empresa (índice parcial en 043; duplicada responde 409), para que reintentar el alta no duplique créditos.
+- El helper E2E que reinicia créditos solo funciona contra hosts locales y usa service role únicamente ahí.
+- La IA falsa (`/api/dev/fake-ai/v1`) solo responde en desarrollo o pruebas y con `AI_BASE_URL` apuntando explícitamente a ella; en producción da 404.
+
+**Límites conocidos:**
+- Los clientes se comparan entre los 500 más recientes de la empresa.
+- Los mensajes de `ai:eval` son sintéticos; deben reemplazarse por mensajes reales anonimizados antes de evaluar el modelo en el servidor.
+- `quotes/new/page.tsx` ya superaba las 400 líneas antes de este trabajo; se extrajeron componentes para que no crezca, pero dividir la página queda fuera de alcance.

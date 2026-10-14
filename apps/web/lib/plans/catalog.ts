@@ -12,6 +12,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
     monthlyPrice: 0,
     includedUsers: 1,
     allowsExtraUsers: false,
+    aiCreditsMonthly: 25,
     highlighted: false,
     features: [
       '5 cotizaciones al mes',
@@ -19,6 +20,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
       'Catálogo y listas de precios',
       'Envío por WhatsApp con un toque',
       'Página pública con QR',
+      '25 créditos de IA al mes',
     ],
     upcoming: [],
   },
@@ -29,6 +31,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
     monthlyPrice: 399,
     includedUsers: 1,
     allowsExtraUsers: false,
+    aiCreditsMonthly: 150,
     highlighted: false,
     features: [
       'Cotizaciones ilimitadas',
@@ -38,6 +41,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
       'Liga para que tu cliente acepte y pague el anticipo',
       'Plantillas y analítica de ventas',
       'Reseñas verificadas y solicitudes desde tu página',
+      '150 créditos de IA al mes',
     ],
     upcoming: ['Recordatorios automáticos por WhatsApp'],
   },
@@ -48,6 +52,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
     monthlyPrice: 999,
     includedUsers: 3,
     allowsExtraUsers: true,
+    aiCreditsMonthly: 400,
     highlighted: true,
     features: [
       'Todo lo del plan Solo',
@@ -55,6 +60,7 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
       'Agenda con responsable por evento',
       'Fotos de obra antes y después',
       'Tablero de cotizaciones por etapa',
+      '400 créditos de IA al mes',
     ],
     upcoming: [],
   },
@@ -65,11 +71,13 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
     monthlyPrice: 1590,
     includedUsers: 10,
     allowsExtraUsers: true,
+    aiCreditsMonthly: 1200,
     highlighted: false,
     features: [
       'Todo lo del plan Taller',
       'Usuarios suficientes para varias cuadrillas',
       'Acompañamiento para cargar catálogo y precios',
+      '1,200 créditos de IA al mes',
     ],
     upcoming: ['Facturación CFDI 4.0', 'API de integración'],
   },
@@ -77,7 +85,6 @@ export const PLANS: Readonly<Record<PlanId, Plan>> = {
 
 /** Funciones que aún no existen para ningún plan; se muestran como "Próximamente". */
 export const UPCOMING_FEATURES: readonly string[] = [
-  'Asistente con IA y créditos mensuales incluidos',
   'Envío automático por WhatsApp (API oficial de Meta)',
   'Contratación y pago del plan con tarjeta',
   'Pago anual con descuento',
