@@ -89,7 +89,7 @@ export type QuoteWithDetails = Quote & {
   notifications: QuoteNotification[]
 }
 
-export type NotificationType = 'email' | 'whatsapp'
+export type NotificationType = 'email' | 'whatsapp' | 'client_accepted' | 'client_rejected'
 export type NotificationStatus = 'sent' | 'delivered' | 'failed' | 'read'
 
 export type QuoteNotification = {
