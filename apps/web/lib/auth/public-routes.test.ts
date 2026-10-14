@@ -7,7 +7,7 @@ describe('isPublicPath', () => {
     (path) => expect(isPublicPath(path)).toBe(true),
   )
 
-  it.each(['/dashboard', '/dashboard/quotes/new', '/invitex', '/pagos', '/forgot-passwordx', '/clientes'])('exige sesión en %s', (path) => {
+  it.each(['/dashboard', '/dashboard/quotes/new', '/invitex', '/pagos', '/forgot-passwordx', '/clientes', '/admin'])('exige sesión en %s', (path) => {
     expect(isPublicPath(path)).toBe(false)
   })
 })
