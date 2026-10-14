@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 import * as path from 'path'
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env.local') })
+dotenv.config({ path: path.resolve(__dirname, '../../.env.local'), quiet: true })
 
 /** Credencial demo local documentada en scripts/seed/README.md; en otros entornos se pasa por env. */
 export const DEMO_PASSWORD = process.env.SEED_DEMO_PASSWORD ?? 'CotizaDemo-Local-2026'
