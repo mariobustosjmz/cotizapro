@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, Mail, MessageCircle, Send, Loader2, CheckCircle2, AlertCircle, Clock, FileDown, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { QuoteShareLinkPanel } from '@/components/dashboard/quote-share-link-panel'
 
 interface QuoteShareDialogProps {
   open: boolean
@@ -44,6 +45,7 @@ export function QuoteShareDialog({
   const [loadingPdf, setLoadingPdf] = useState(false)
   const [emailReady, setEmailReady] = useState<boolean | null>(null)
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -52,6 +54,7 @@ export function QuoteShareDialog({
     setWhatsappOverride('')
     setPdfUrl(null)
     setWhatsappUrl(null)
+    setShareUrl(null)
     setLoadingPdf(true)
 
     fetch('/api/messaging/channels')
@@ -108,6 +111,8 @@ export function QuoteShareDialog({
 
       const json = await res.json()
 
+      if (typeof json.share_url === 'string') setShareUrl(json.share_url)
+
       if (!res.ok) {
         toast({ message: json.error || 'Error al enviar', variant: 'error' })
         return
@@ -125,7 +130,7 @@ export function QuoteShareDialog({
       }
       onClose()
     } catch {
-      toast({ message: 'Error de conexion al enviar', variant: 'error' })
+      toast({ message: 'Error de conexión al enviar', variant: 'error' })
     } finally {
       setSending(false)
     }
@@ -220,13 +225,15 @@ export function QuoteShareDialog({
               </button>
             </div>
             {sendVia.has('whatsapp') && (
-              <p className="text-xs text-gray-500 dark:text-gray-400">Se abre tu WhatsApp con el mensaje listo; adjunta el PDF en la conversación.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Se abre tu WhatsApp con el mensaje y la liga para que tu cliente revise y acepte la cotización.</p>
             )}
           </div>
 
+          <QuoteShareLinkPanel key={shareUrl ?? 'sin-liga'} quoteId={quoteId} freshUrl={shareUrl} onLinkChanged={() => setWhatsappUrl(null)} />
+
           {whatsappUrl && (
             <div className="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-4 space-y-3">
-              <p className="text-sm font-medium text-green-800 dark:text-green-300">Mensaje listo. Ábrelo en WhatsApp y adjunta el PDF.</p>
+              <p className="text-sm font-medium text-green-800 dark:text-green-300">Mensaje listo con la liga de la cotización. Ábrelo en WhatsApp para enviarlo.</p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <a
                   href={whatsappUrl}
@@ -291,7 +298,7 @@ export function QuoteShareDialog({
           {/* Notification history */}
           {notifications.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Historial de envios</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Historial de envíos</p>
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {notifications.map(n => (
                   <div key={n.id} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 py-1">

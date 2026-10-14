@@ -38,7 +38,7 @@ export DB="postgresql://postgres:postgres@127.0.0.1:54332/postgres"
 export APP=http://localhost:3100   # el dev server ya corre en 3100
 # JWT del propietario demo de MEGAGLASS, para probar rutas con sesión:
 # (requiere SEED_DEMO_PASSWORD en apps/web/.env.local; el valor local no se versiona)
-export JWT=$(cd $REPO/apps/web && node -e "require('dotenv').config({path:'.env.local'});const {createClient}=require('@supabase/supabase-js');createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,{auth:{persistSession:false}}).auth.signInWithPassword({email:'direccion@megaglass.demo.cotizapro.mx',password:process.env.SEED_DEMO_PASSWORD}).then(r=>console.log(r.data.session.access_token))")
+export JWT=$(cd $REPO/apps/web && node -e "require('dotenv').config({path:'.env.local',quiet:true});const {createClient}=require('@supabase/supabase-js');createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,{auth:{persistSession:false}}).auth.signInWithPassword({email:'direccion@megaglass.demo.cotizapro.mx',password:process.env.SEED_DEMO_PASSWORD}).then(r=>console.log(r.data.session.access_token))")
 # Una cotización en borrador de MEGAGLASS:
 export QUOTE=$(psql "$DB" -Atc "select id from quotes where organization_id='00000000-0000-0000-00c0-000000000001' and status='draft' order by created_at desc limit 1")
 ```

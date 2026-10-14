@@ -1,24 +1,14 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Bell, Clock, AlertTriangle, Mail, MessageCircle } from 'lucide-react'
+import { Bell, Clock, AlertTriangle, Mail, MessageCircle, CheckCircle } from 'lucide-react'
+import type { BellItem } from '@/lib/notifications/types'
 import Link from 'next/link'
 import { useRealtimeRefresh } from '@/hooks/use-realtime'
 
-interface NotificationItem {
-  id: string
-  type: 'reminder' | 'send'
-  title: string
-  subtitle: string
-  date: string
-  priority: string
-  read: boolean
-  href: string
-}
-
 export function NotificationBell() {
   const [open, setOpen] = useState(false)
-  const [items, setItems] = useState<NotificationItem[]>([])
+  const [items, setItems] = useState<BellItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -136,8 +126,10 @@ export function NotificationBell() {
                       ) : (
                         <Clock className="w-3.5 h-3.5 text-yellow-600" />
                       )
-                    ) : item.title.includes('Email') ? (
+                    ) : item.kind === 'email' ? (
                       <Mail className="w-3.5 h-3.5 text-blue-500" />
+                    ) : item.kind === 'client_response' ? (
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                     ) : (
                       <MessageCircle className="w-3.5 h-3.5 text-green-500" />
                     )}

@@ -19,6 +19,7 @@ export async function GET(
       .from('quote_notifications')
       .select('id, notification_type, recipient, status, sent_at, delivered_at')
       .eq('quote_id', id)
+      .in('notification_type', ['email', 'whatsapp'])
       .order('sent_at', { ascending: false })
       .limit(20)
 

@@ -2,8 +2,14 @@ import { createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { updateOrganizationSchema } from '@/lib/validations/settings'
 import { defaultApiLimiter, applyRateLimit } from '@/lib/rate-limit'
-import { handleApiError, ApiErrors } from '@/lib/error-handler'
+import { handleApiError, ApiErrors, validationErrorResponse } from '@/lib/error-handler'
 import { logger } from '@/lib/logger'
+
+const DEPOSIT_ERRORS: Readonly<Record<string, string>> = {
+  invalid_deposit_percent: 'El anticipo debe ser un número entero de 0 a 100.',
+  invalid_deposit_instructions: 'Las instrucciones de pago pueden tener hasta 500 caracteres.',
+  invalid_deposit_payment_url: 'La liga de pago debe empezar con https://',
+}
 
 /**
  * PATCH /api/settings/organization
@@ -56,11 +62,8 @@ export async function PATCH(request: NextRequest) {
     // Validate input
     const validation = updateOrganizationSchema.safeParse(body)
     if (!validation.success) {
-      logger.warn('Organization update validation failed', { errors: validation.error.issues })
-      return handleApiError(
-        ApiErrors.VALIDATION_FAILED(`Invalid organization data: ${validation.error.issues.map(e => e.path.join('.')).join(', ')}`),
-        'PATCH /api/settings/organization - validation'
-      )
+      logger.warn('Organization update validation failed', { errors: validation.error.issues.length })
+      return validationErrorResponse(validation.error)
     }
 
     const {
@@ -73,6 +76,9 @@ export async function PATCH(request: NextRequest) {
       tax_rate,
       logo_url,
       brand_color,
+      deposit_percent,
+      deposit_instructions,
+      deposit_payment_url,
     } = validation.data
 
     const settings = {
@@ -84,6 +90,9 @@ export async function PATCH(request: NextRequest) {
       ...(tax_rate !== undefined && { tax_rate }),
       ...(logo_url !== undefined && { logo_url }),
       ...(brand_color !== undefined && { brand_color }),
+      ...(deposit_percent !== undefined && { deposit_percent }),
+      ...(deposit_instructions !== undefined && { deposit_instructions }),
+      ...(deposit_payment_url !== undefined && { deposit_payment_url }),
     }
 
     // update_org_settings fusiona solo claves permitidas y valida owner/admin (migración 039).
@@ -93,6 +102,8 @@ export async function PATCH(request: NextRequest) {
     })
 
     if (error) {
+      const depositError = DEPOSIT_ERRORS[error.message]
+      if (depositError) return NextResponse.json({ error: depositError }, { status: 400 })
       logger.error('Error updating organization in database', error, {
         orgId: profile.organization_id,
         userId: user.id,

@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { FormField } from '@/components/ui/form-field'
 import { PasswordChangeForm } from '@/components/dashboard/PasswordChangeForm'
 import { BrandSettings } from '@/components/settings/brand-settings'
+import { DepositSettings } from '@/components/settings/deposit-settings'
+import { depositSettingsFromForm } from '@/lib/deposit/settings-form'
 import { roleLabel } from '@/lib/team/roles'
 import { Save, Building, User, Bell, Shield, Settings2 } from 'lucide-react'
 
@@ -33,6 +35,9 @@ interface Organization {
     tax_rate?: number
     logo_url?: string
     brand_color?: string
+    deposit_percent?: number
+    deposit_instructions?: string
+    deposit_payment_url?: string
   } | null
 }
 
@@ -42,6 +47,7 @@ export default function SettingsPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [orgError, setOrgError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [profile, setProfile] = useState<Profile | null>(null)
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [activeTab, setActiveTab] = useState<'profile' | 'organization' | 'notifications' | 'security'>('profile')
@@ -116,6 +122,7 @@ export default function SettingsPage() {
     setLoading(true)
     setError('')
     setSuccess('')
+    setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
 
@@ -134,6 +141,7 @@ export default function SettingsPage() {
       tax_rate: parseFloat(formData.get('tax_rate') as string) || 16,
       logo_url: rawLogoUrl || null,
       brand_color: rawBrandColor || null,
+      ...depositSettingsFromForm(formData),
     }
 
     try {
@@ -145,7 +153,9 @@ export default function SettingsPage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Error al actualizar organización')
+        const fields: Record<string, string> = errorData.fieldErrors ?? {}
+        setFieldErrors(fields)
+        throw new Error(Object.values(fields)[0] || errorData.error || 'Error al actualizar organización')
       }
 
       const updated = await response.json()
@@ -354,6 +364,17 @@ export default function SettingsPage() {
                 placeholder="50% de anticipo al aceptar la cotización. 50% restante al completar el trabajo."
               />
             </FormField>
+
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Anticipo</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Tu cliente lo ve al abrir la liga de la cotización. El pago lo recibes tú directamente.</p>
+              <DepositSettings
+                initialPercent={organization.settings?.deposit_percent ?? null}
+                initialInstructions={organization.settings?.deposit_instructions ?? null}
+                initialPaymentUrl={organization.settings?.deposit_payment_url ?? null}
+                fieldErrors={fieldErrors}
+              />
+            </div>
 
             <div className="flex justify-end pt-2 border-t border-gray-100 dark:border-gray-800">
               <Button type="submit" size="sm" disabled={loading} className="bg-orange-500 hover:bg-orange-600 text-white">

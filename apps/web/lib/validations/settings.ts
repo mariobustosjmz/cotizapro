@@ -23,6 +23,18 @@ export const updateOrganizationSchema = z.object({
   tax_rate: z.number().min(0, 'La tasa no puede ser negativa').max(100, 'La tasa no puede exceder 100').nullable().optional(),
   logo_url: z.string().url('URL de logo inválida').max(500).nullable().optional(),
   brand_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color debe ser formato hex (#RRGGBB)').nullable().optional(),
+  deposit_percent: z.number({ error: 'El anticipo debe ser un número entero de 0 a 100' })
+    .int('El anticipo debe ser un número entero')
+    .min(0, 'El anticipo no puede ser negativo')
+    .max(100, 'El anticipo no puede pasar de 100 %')
+    .optional(),
+  deposit_instructions: z.string().trim().max(500, 'Las instrucciones de pago pueden tener hasta 500 caracteres').nullable().optional(),
+  deposit_payment_url: z.string()
+    .trim()
+    .max(500, 'La liga de pago es muy larga')
+    .regex(/^https?:\/\/[^\s"<>]+$/, 'La liga de pago debe empezar con https://')
+    .nullable()
+    .optional(),
 })
 
 /**

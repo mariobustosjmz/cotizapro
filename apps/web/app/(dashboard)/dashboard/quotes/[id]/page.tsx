@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { PaymentSection } from '@/components/dashboard/payment-section'
 import { JobPhotosSection } from '@/components/quotes/job-photos-section'
 import { ReviewRequestCard } from '@/components/quotes/review-request-card'
+import { ClientResponseCard } from '@/components/quotes/client-response-card'
 import { QuoteShareDialog } from '@/components/dashboard/quote-share-dialog'
 import { parseWallClock } from '@/lib/calendar/wall-clock'
 import { formatAmount } from '@/lib/format/money'
@@ -45,6 +46,12 @@ interface Quote {
   terms_and_conditions: string | null
   valid_until: string
   created_at: string
+  viewed_at: string | null
+  accepted_at: string | null
+  rejected_at: string | null
+  rejection_reason: string | null
+  accepted_by_name: string | null
+  deposit_percent: number | null
   items: QuoteItem[]
 }
 
@@ -347,6 +354,8 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
+      <ClientResponseCard quote={quote} onSaved={handleRefreshQuote} />
+
       {/* Payments */}
       <PaymentSection quoteId={quote.id} quoteTotal={quote.total} isCollected={quote.status === 'cobrado'} />
 
@@ -459,7 +468,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Acciones</p>
               <div className="flex flex-wrap gap-1.5">
-                {quote.status === 'sent' && (
+                {(quote.status === 'sent' || quote.status === 'viewed') && (
                   <>
                     <Button size="sm" onClick={() => handleStatusChange('accepted')} disabled={loading} className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white">
                       Aceptar

@@ -176,6 +176,12 @@ export const updateQuoteSchema = z.object({
     .max(100, 'El descuento no puede ser mayor a 100%')
     .optional(),
   status: quoteStatusSchema.optional(),
+  deposit_percent: z.number()
+    .int('El anticipo debe ser un número entero')
+    .min(0, 'El anticipo no puede ser negativo')
+    .max(100, 'El anticipo no puede pasar de 100 %')
+    .nullable()
+    .optional(),
 })
 
 export type CreateQuoteInput = z.infer<typeof createQuoteSchema>
