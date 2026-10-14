@@ -7,6 +7,8 @@ export interface QuoteEmailInput extends BrandedEmailBrand {
   readonly quoteNumber: string
   readonly total: number | string
   readonly validUntil: string | null
+  /** Liga pública /c/... para ver y aceptar; null si no se generó. */
+  readonly acceptUrl: string | null
   readonly contact: BusinessContact
 }
 
@@ -24,6 +26,17 @@ function formatDate(value: string | null): string | null {
     : date.toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Monterrey' })
 }
 
+function acceptButton(input: QuoteEmailInput): string {
+  if (!input.acceptUrl) return ''
+  return `<p style="margin:20px 0 0;text-align:center"><a href="${escapeHtml(input.acceptUrl)}" style="display:inline-block;background:${input.palette.color};color:${input.palette.ink};text-decoration:none;font-weight:bold;font-size:15px;padding:12px 24px;border-radius:8px">Ver y aceptar cotización</a></p>`
+}
+
+function closingLine(input: QuoteEmailInput): string {
+  return input.acceptUrl
+    ? 'Puedes revisarla y aceptarla en línea con el botón. Si tienes dudas, responde a este correo y con gusto te atendemos.'
+    : 'Si tienes dudas o quieres aprobarla, responde a este correo y con gusto te atendemos.'
+}
+
 export function buildQuoteEmail(input: QuoteEmailInput): EmailContent {
   const total = `$${formatAmount(input.total)} MXN`
   const validUntil = formatDate(input.validUntil)
@@ -35,7 +48,8 @@ export function buildQuoteEmail(input: QuoteEmailInput): EmailContent {
 <tr><td style="padding:12px 16px;font-size:14px;color:#6b7280">Total</td><td style="padding:12px 16px;font-size:18px;font-weight:bold;text-align:right;color:${input.palette.onLight}">${escapeHtml(total)}</td></tr>
 ${validUntil ? `<tr><td style="padding:0 16px 12px;font-size:14px;color:#6b7280">Válida hasta</td><td style="padding:0 16px 12px;font-size:14px;text-align:right">${escapeHtml(validUntil)}</td></tr>` : ''}
 </table>
-<p style="margin:16px 0 0;font-size:15px;line-height:1.5">Si tienes dudas o quieres aprobarla, responde a este correo y con gusto te atendemos.</p>
+${acceptButton(input)}
+<p style="margin:16px 0 0;font-size:15px;line-height:1.5">${closingLine(input)}</p>
 ${contactHtml(input.contact)}`
 
   const lines = contactLines(input.contact)
@@ -45,8 +59,9 @@ ${contactHtml(input.contact)}`
     `Te compartimos la cotización ${input.quoteNumber} de ${input.businessName}. Va adjunta en PDF.`,
     `Total: ${total}`,
     ...(validUntil ? [`Válida hasta: ${validUntil}`] : []),
+    ...(input.acceptUrl ? ['', `Ver y aceptar cotización: ${input.acceptUrl}`] : []),
     '',
-    'Si tienes dudas o quieres aprobarla, responde a este correo.',
+    input.acceptUrl ? 'Si tienes dudas, responde a este correo.' : 'Si tienes dudas o quieres aprobarla, responde a este correo.',
     ...(lines.length ? ['', ...lines] : []),
   ].join('\n')
 

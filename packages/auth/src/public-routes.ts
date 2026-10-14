@@ -1,6 +1,6 @@
 /** Rutas accesibles sin sesión; cada una cubre también sus subrutas. */
 export const PUBLIC_ROUTES: readonly string[] = [
-  '/', '/login', '/signup', '/forgot-password', '/auth', '/onboarding', '/invite', '/terminos', '/privacidad', '/p', '/r',
+  '/', '/login', '/signup', '/forgot-password', '/auth', '/onboarding', '/invite', '/terminos', '/privacidad', '/p', '/r', '/c',
 ]
 
 export function isPublicPath(pathname: string): boolean {

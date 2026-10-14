@@ -9,7 +9,8 @@ import {
 import { createStyles } from './pdf-styles'
 import { brandPalette } from '@/lib/branding/color'
 import { ITEM_UNIT_LABEL, materialsFromItems } from './quote-materials'
-import type { QuoteWithItems } from '@/types/database.types'
+import type { QuotePdfData } from './quote-pdf-types'
+import { formatPdfDate } from './format-date'
 
 export interface OrgSettings {
   company_address?: string
@@ -20,7 +21,7 @@ export interface OrgSettings {
 }
 
 interface QuotePDFProps {
-  quote: QuoteWithItems
+  quote: QuotePdfData
   orgName: string
   orgSettings: OrgSettings
 }
@@ -37,18 +38,10 @@ function formatCurrency(value: number): string {
   return `$${value.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
-
 export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
   const palette = brandPalette(orgSettings.brand_color)
   const styles = createStyles(palette)
-  const materials = materialsFromItems(quote.items as readonly { readonly breakdown?: unknown }[])
+  const materials = materialsFromItems(quote.items)
 
   const companyLines = [
     orgSettings.company_address,
@@ -85,8 +78,8 @@ export function QuotePDF({ quote, orgName, orgSettings }: QuotePDFProps) {
             <View>
               <Text style={styles.metaLabel}>Cotización</Text>
               <Text style={styles.metaValue}>#{quote.quote_number}</Text>
-              <Text style={styles.metaValueSub}>Fecha: {formatDate(quote.created_at)}</Text>
-              <Text style={styles.metaValueSub}>Válida hasta: {formatDate(quote.valid_until)}</Text>
+              <Text style={styles.metaValueSub}>Fecha: {formatPdfDate(quote.created_at)}</Text>
+              <Text style={styles.metaValueSub}>Válida hasta: {formatPdfDate(quote.valid_until)}</Text>
             </View>
             <View style={styles.clientBlock}>
               <Text style={styles.metaLabel}>Cliente</Text>

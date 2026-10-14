@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeWhatsappPhone, quoteWhatsappMessage, whatsappLink } from './link'
+import { normalizeWhatsappPhone, quoteQuestionMessage, quoteWhatsappMessage, whatsappLink } from './link'
 
 describe('normalizeWhatsappPhone', () => {
   it('antepone 52 a un número local de 10 dígitos', () => {
@@ -29,7 +29,7 @@ describe('quoteWhatsappMessage', () => {
     quoteNumber: 'COT-2026-002',
     total: 12238.48,
     validUntil: '2026-10-27T00:00:00.000Z',
-    pdfUrl: null,
+    shareUrl: null,
   }
 
   it('saluda por nombre e incluye folio, negocio, total y vigencia', () => {
@@ -41,7 +41,19 @@ describe('quoteWhatsappMessage', () => {
     expect(text).toContain('te mando el PDF')
   })
 
-  it('usa la liga del PDF cuando existe', () => {
-    expect(quoteWhatsappMessage({ ...base, pdfUrl: 'https://x/y.pdf' })).toContain('PDF: https://x/y.pdf')
+  it('lleva la liga para revisar y aceptar cuando existe', () => {
+    const text = quoteWhatsappMessage({ ...base, shareUrl: 'https://app.cotizapro.mx/c/abc' })
+    expect(text).toContain('Revísala y acéptala aquí: https://app.cotizapro.mx/c/abc')
+    expect(text).not.toContain('PDF')
+  })
+})
+
+describe('quoteQuestionMessage', () => {
+  it('se presenta con el nombre del cliente', () => {
+    expect(quoteQuestionMessage('COT-2026-002', 'Andrea')).toBe('Hola, soy Andrea. Tengo dudas sobre la cotización COT-2026-002.')
+  })
+
+  it('sin nombre solo menciona el folio', () => {
+    expect(quoteQuestionMessage('COT-2026-002', null)).toBe('Hola. Tengo dudas sobre la cotización COT-2026-002.')
   })
 })

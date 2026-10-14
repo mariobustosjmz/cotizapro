@@ -20,7 +20,8 @@ export interface QuoteMessageInput {
   readonly quoteNumber: string
   readonly total: number
   readonly validUntil: string | null
-  readonly pdfUrl: string | null
+  /** Liga pública /c/... para ver y aceptar; null si no se generó. */
+  readonly shareUrl: string | null
 }
 
 const money = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 })
@@ -33,7 +34,13 @@ export function quoteWhatsappMessage(input: QuoteMessageInput): string {
     `Hola ${firstName}, te comparto la cotización ${input.quoteNumber}${from}.`,
     `Total: ${money.format(Number(input.total))}`,
     input.validUntil ? `Vigente hasta el ${day.format(new Date(input.validUntil))}.` : null,
-    input.pdfUrl ? `PDF: ${input.pdfUrl}` : 'En seguida te mando el PDF por aquí.',
+    input.shareUrl ? `Revísala y acéptala aquí: ${input.shareUrl}` : 'En seguida te mando el PDF por aquí.',
   ]
   return lines.filter((line): line is string => line !== null).join('\n')
+}
+
+/** Mensaje del botón "Tengo dudas" de la página pública (lo escribe el cliente al negocio). */
+export function quoteQuestionMessage(quoteNumber: string, clientFirstName: string | null): string {
+  const who = clientFirstName ? `, soy ${clientFirstName}` : ''
+  return `Hola${who}. Tengo dudas sobre la cotización ${quoteNumber}.`
 }

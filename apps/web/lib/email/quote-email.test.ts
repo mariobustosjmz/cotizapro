@@ -10,6 +10,7 @@ const base: QuoteEmailInput = {
   quoteNumber: 'COT-2026-0007',
   total: '12500.5',
   validUntil: '2026-11-12T00:00:00.000Z',
+  acceptUrl: null,
   contact: { phone: '81 1234 5678', email: 'ventas@megaglass.mx', address: null },
 }
 
@@ -30,6 +31,20 @@ describe('buildQuoteEmail', () => {
     expect(text).toContain('Total: $12,500.50 MXN')
     expect(html).toContain('#0E7490')
     expect(html).toContain('brand-assets/x/logo.png')
+  })
+
+  it('agrega el botón "Ver y aceptar cotización" con la liga', () => {
+    const url = 'https://app.cotizapro.mx/c/0123abcd'
+    const { html, text } = buildQuoteEmail({ ...base, acceptUrl: url })
+    expect(html).toContain('Ver y aceptar cotización')
+    expect(html).toContain(`href="${url}"`)
+    expect(text).toContain(`Ver y aceptar cotización: ${url}`)
+  })
+
+  it('sin liga no muestra el botón', () => {
+    const { html, text } = buildQuoteEmail(base)
+    expect(html).not.toContain('Ver y aceptar cotización')
+    expect(text).not.toContain('Ver y aceptar cotización')
   })
 
   it('omite logo, vigencia y contacto cuando faltan', () => {
